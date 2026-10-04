@@ -1,0 +1,39 @@
+# LaTeX compilation intermediates
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.nav
+*.snm
+*.vrb
+*.bbl
+*.blg
+*.toc
+*.lof
+*.lot
+*.dvi
+*.bcf
+*.run.xml
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.env
+*.env.*
+venv/
+.venv/
+env/
+.env/
+
+# OS metadata, backups & IDEs
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+*.tmp

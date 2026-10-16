@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" width="100%" height="100%">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 620" width="100%" height="100%">
   <defs>
     <marker id="arrow" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
       <path d="M0,1 L7,4 L0,7 Z" fill="#334155" />
@@ -12,115 +12,105 @@
     .node-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #475569; text-anchor: middle; }
     .branch-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 600; fill: #475569; text-anchor: middle; }
     .container-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #334155; letter-spacing: 0.5px; }
+    .firewall-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #b91c1c; letter-spacing: 0.5px; text-anchor: middle; }
+    .firewall-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; fill: #b91c1c; text-anchor: middle; }
   </style>
 
-  <rect width="900" height="680" fill="#ffffff" />
+  <rect width="900" height="620" fill="#ffffff" />
 
   <!-- Header -->
   <g transform="translate(60, 40)">
-    <text x="0" y="0" class="diagram-title">Decision Engine: Task &amp; Tool Routing</text>
-    <text x="0" y="18" class="diagram-sub">How an NPC selects between Classical AI algorithms and LLM dialogue during a turn</text>
+    <text x="0" y="0" class="diagram-title">Runtime Dispatch: Body &amp; Voice</text>
+    <text x="0" y="18" class="diagram-sub">How the engine handles an NPC turn — movement via schedule + A*, speech via prompt assembler + live API</text>
   </g>
 
-  <!-- Input Node: Turn Context -->
+  <!-- Input Node: NPC Turn -->
   <g transform="translate(290, 85)">
     <rect x="0" y="0" width="320" height="52" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="160" y="24" class="node-title">NPC Turn Context</text>
-    <text x="160" y="40" class="node-sub">Active Goal + Local Perception + Recent Memory</text>
+    <text x="160" y="24" class="node-title">NPC Turn</text>
+    <text x="160" y="40" class="node-sub">schedule waypoint due · player message received</text>
   </g>
 
   <!-- Central Routing Bar -->
-  <line x1="450" y1="137" x2="450" y2="185" stroke="#334155" stroke-width="1.5" />
-  <line x1="140" y1="185" x2="760" y2="185" stroke="#334155" stroke-width="1.5" />
+  <line x1="450" y1="137" x2="450" y2="175" stroke="#334155" stroke-width="1.5" />
+  <line x1="225" y1="175" x2="675" y2="175" stroke="#334155" stroke-width="1.5" />
 
-  <!-- 4 Drop Lines with markers -->
-  <line x1="140" y1="185" x2="140" y2="235" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
-  <line x1="350" y1="185" x2="350" y2="235" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
-  <line x1="550" y1="185" x2="550" y2="235" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
-  <line x1="760" y1="185" x2="760" y2="235" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+  <!-- Drop Lines -->
+  <line x1="225" y1="175" x2="225" y2="215" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+  <line x1="675" y1="175" x2="675" y2="215" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
   <!-- Branch Condition Labels -->
-  <rect x="75" y="198" width="130" height="18" fill="#ffffff" />
-  <text x="140" y="211" class="branch-label">Point-to-point transit</text>
+  <rect x="160" y="190" width="130" height="16" fill="#ffffff" />
+  <text x="225" y="202" class="branch-label">MOVEMENT (BODY)</text>
 
-  <rect x="280" y="198" width="140" height="18" fill="#ffffff" />
-  <text x="350" y="211" class="branch-label">Multi-stop trade-offs</text>
+  <rect x="610" y="190" width="130" height="16" fill="#ffffff" />
+  <text x="675" y="202" class="branch-label">SPEECH (VOICE)</text>
 
-  <rect x="485" y="198" width="130" height="18" fill="#ffffff" />
-  <text x="550" y="211" class="branch-label">Reflexive reaction</text>
-
-  <rect x="695" y="198" width="130" height="18" fill="#ffffff" />
-  <text x="760" y="211" class="branch-label">Social communication</text>
-
-  <!-- 4 Specialized Tool Blocks -->
-  <!-- 1. A* Search -->
-  <g transform="translate(50, 238)">
-    <rect x="0" y="0" width="180" height="110" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="90" y="26" class="node-title">A* / BFS Search</text>
-    <text x="90" y="44" class="node-sub">Deterministic path</text>
-    <line x1="20" y1="56" x2="160" y2="56" stroke="#e2e8f0" stroke-width="1" />
-    <text x="90" y="74" class="node-sub">Navigates town graph</text>
-    <text x="90" y="92" class="node-sub">Shortest physical path</text>
+  <!-- LEFT BRANCH: BODY -->
+  <g transform="translate(105, 220)">
+    <rect x="0" y="0" width="240" height="80" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+    <text x="120" y="26" class="node-title">NPC Schedule (Body)</text>
+    <text x="120" y="46" class="node-sub">next waypoint from world.json</text>
+    <line x1="20" y1="56" x2="220" y2="56" stroke="#e2e8f0" stroke-width="1" />
+    <text x="120" y="72" class="node-sub">a few stops per session</text>
   </g>
 
-  <!-- 2. Genetic Algorithm -->
-  <g transform="translate(260, 238)">
-    <rect x="0" y="0" width="180" height="110" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="90" y="26" class="node-title">Genetic Algorithm</text>
-    <text x="90" y="44" class="node-sub">Multi-objective plan</text>
-    <line x1="20" y1="56" x2="160" y2="56" stroke="#e2e8f0" stroke-width="1" />
-    <text x="90" y="74" class="node-sub">Evolves daily routes</text>
-    <text x="90" y="92" class="node-sub">Distance vs Danger vs Clues</text>
+  <line x1="225" y1="300" x2="225" y2="335" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+
+  <g transform="translate(105, 340)">
+    <rect x="0" y="0" width="240" height="80" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+    <text x="120" y="26" class="node-title">A* Pathfinding</text>
+    <text x="120" y="46" class="node-sub">shortest path on town graph</text>
+    <line x1="20" y1="56" x2="220" y2="56" stroke="#e2e8f0" stroke-width="1" />
+    <text x="120" y="72" class="node-sub">Euclidean heuristic · tile coords</text>
   </g>
 
-  <!-- 3. Neural Net Policy -->
-  <g transform="translate(460, 238)">
-    <rect x="0" y="0" width="180" height="110" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="90" y="26" class="node-title">Neural Net (MLP)</text>
-    <text x="90" y="44" class="node-sub">Reflex policy classifier</text>
-    <line x1="20" y1="56" x2="160" y2="56" stroke="#e2e8f0" stroke-width="1" />
-    <text x="90" y="74" class="node-sub">State vector $ightarrow$ Action</text>
-    <text x="90" y="92" class="node-sub">Flee, Wait, Examine</text>
+  <!-- CENTER: SPOILER FIREWALL CALLOUT -->
+  <g transform="translate(380, 235)">
+    <rect x="0" y="0" width="140" height="144" rx="6" fill="#ffffff" stroke="#b91c1c" stroke-width="1.2" stroke-dasharray="4,4" />
+    <text x="70" y="24" class="firewall-title">SPOILER FIREWALL</text>
+    <text x="70" y="48" class="firewall-text">truth.json never sent</text>
+    <text x="70" y="62" class="firewall-text">to any API</text>
+    <text x="70" y="80" class="firewall-text">no other NPC's files</text>
+    <text x="70" y="94" class="firewall-text">own files only</text>
+    <line x1="20" y1="106" x2="120" y2="106" stroke="#fecaca" stroke-width="1" />
+    <text x="70" y="122" class="firewall-text">enforced by tests,</text>
+    <text x="70" y="136" class="firewall-text">not prompt wording</text>
   </g>
 
-  <!-- 4. LLM Dialogue -->
-  <g transform="translate(670, 238)">
-    <rect x="0" y="0" width="180" height="110" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="90" y="26" class="node-title">LLM Dialogue Brain</text>
-    <text x="90" y="44" class="node-sub">Grounded language</text>
-    <line x1="20" y1="56" x2="160" y2="56" stroke="#e2e8f0" stroke-width="1" />
-    <text x="90" y="74" class="node-sub">In-character chat</text>
-    <text x="90" y="92" class="node-sub">Binds strictly to memory</text>
+  <!-- RIGHT BRANCH: VOICE -->
+  <g transform="translate(555, 220)">
+    <rect x="0" y="0" width="240" height="80" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+    <text x="120" y="26" class="node-title">Prompt Assembler</text>
+    <text x="120" y="46" class="node-sub">identity + memory + chat history</text>
+    <line x1="20" y1="56" x2="220" y2="56" stroke="#e2e8f0" stroke-width="1" />
+    <text x="120" y="72" class="node-sub">own files only · + player input</text>
   </g>
 
-  <!-- Re-convergence Lines -->
-  <line x1="140" y1="348" x2="140" y2="395" stroke="#334155" stroke-width="1.5" />
-  <line x1="350" y1="348" x2="350" y2="395" stroke="#334155" stroke-width="1.5" />
-  <line x1="550" y1="348" x2="550" y2="395" stroke="#334155" stroke-width="1.5" />
-  <line x1="760" y1="348" x2="760" y2="395" stroke="#334155" stroke-width="1.5" />
+  <line x1="675" y1="300" x2="675" y2="335" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
-  <line x1="140" y1="395" x2="760" y2="395" stroke="#334155" stroke-width="1.5" />
-  <line x1="450" y1="395" x2="450" y2="435" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
-
-  <rect x="375" y="405" width="150" height="18" fill="#ffffff" />
-  <text x="450" y="418" class="branch-label">candidate action output</text>
-
-  <!-- Convergence Node: Grounding Gate -->
-  <g transform="translate(260, 440)">
-    <rect x="0" y="0" width="380" height="56" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="190" y="24" class="node-title">Ground Truth Verification Gate</text>
-    <text x="190" y="42" class="node-sub">Simulator verifies physical laws, inventory, and location</text>
+  <g transform="translate(555, 340)">
+    <rect x="0" y="0" width="240" height="80" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+    <text x="120" y="26" class="node-title">Live API (Voice)</text>
+    <text x="120" y="46" class="node-sub">≥2 providers · ≈2–3 s · streaming</text>
+    <line x1="20" y1="56" x2="220" y2="56" stroke="#e2e8f0" stroke-width="1" />
+    <text x="120" y="72" class="node-sub">token cap · canned fallback</text>
   </g>
 
-  <!-- Edge: Gate -> Executed Action -->
-  <line x1="450" y1="496" x2="450" y2="538" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
-  <rect x="400" y="508" width="100" height="16" fill="#ffffff" />
-  <text x="450" y="520" class="branch-label">validated action</text>
+  <!-- Re-convergence -->
+  <line x1="225" y1="420" x2="225" y2="465" stroke="#334155" stroke-width="1.5" />
+  <line x1="675" y1="420" x2="675" y2="465" stroke="#334155" stroke-width="1.5" />
+  <line x1="225" y1="465" x2="675" y2="465" stroke="#334155" stroke-width="1.5" />
+  <line x1="450" y1="465" x2="450" y2="505" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
-  <!-- Final Node: Action Execution -->
-  <g transform="translate(290, 542)">
-    <rect x="0" y="0" width="320" height="52" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
-    <text x="160" y="24" class="node-title">World State Update</text>
-    <text x="160" y="40" class="node-sub">Coordinates shift, item changes hand, clock advances</text>
+  <rect x="375" y="473" width="150" height="16" fill="#ffffff" />
+  <text x="450" y="485" class="branch-label">validated outcome</text>
+
+  <!-- Result Node -->
+  <g transform="translate(265, 510)">
+    <rect x="0" y="0" width="370" height="56" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
+    <text x="185" y="24" class="node-title">Engine Applies Result</text>
+    <text x="185" y="40" class="node-sub">position · chat history · journal · clock</text>
+    <text x="185" y="52" class="node-sub">bundle stays read-only (session state)</text>
   </g>
 </svg>

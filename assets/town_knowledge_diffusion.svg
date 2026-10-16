@@ -9,134 +9,127 @@
     .diagram-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 18px; font-weight: 700; fill: #0f172a; text-anchor: start; }
     .diagram-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; fill: #64748b; text-anchor: start; }
     .node-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 600; fill: #0f172a; text-anchor: middle; }
+    .node-title-red { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 13px; font-weight: 700; fill: #b91c1c; text-anchor: middle; }
     .node-sub { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #475569; text-anchor: middle; }
     .section-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 700; fill: #334155; letter-spacing: 0.5px; text-anchor: start; }
-    .edge-text { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 500; fill: #64748b; text-anchor: middle; }
     .card-title { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 12px; font-weight: 700; fill: #0f172a; text-anchor: start; }
-    .status-known-start { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #0f766e; text-anchor: start; }
-    .status-unknown-start { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #b91c1c; text-anchor: start; }
-    .status-known-center { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #0f766e; text-anchor: middle; }
+    .card-line { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #475569; text-anchor: start; }
+    .status-true { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #b91c1c; text-anchor: start; }
+    .status-partial { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #0f766e; text-anchor: start; }
+    .status-neutral { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; font-weight: 600; fill: #64748b; text-anchor: start; }
+    .blocked-label { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 10px; font-weight: 600; fill: #b91c1c; text-anchor: middle; }
+    .footnote { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 11px; fill: #64748b; text-anchor: start; }
   </style>
 
   <rect width="900" height="640" fill="#ffffff" />
 
   <!-- Header -->
   <g transform="translate(60, 35)">
-    <text x="0" y="0" class="diagram-title">Town Knowledge Separation &amp; Information Diffusion</text>
-    <text x="0" y="18" class="diagram-sub">Why limited perception bubbles prevent omniscient NPCs and how information spreads through encounters</text>
+    <text x="0" y="0" class="diagram-title">Knowledge Isolation &amp; Spoiler Firewall</text>
+    <text x="0" y="18" class="diagram-sub">Each NPC is authored to know only its own facts; truth.json stays engine-only and never enters a prompt</text>
   </g>
 
-  <!-- Part 1: Spatial Map & State at 10:00 AM -->
+  <!-- ============ PART 1: PER-NPC KNOWLEDGE ============ -->
   <g transform="translate(60, 80)">
-    <rect x="0" y="0" width="780" height="230" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" />
-    <text x="18" y="24" class="section-label">PART 1: SPATIAL NETWORK &amp; OBSERVATION AT 10:00 AM</text>
+    <rect x="0" y="0" width="780" height="175" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" />
+    <text x="18" y="24" class="section-label">PART 1: PER-NPC KNOWLEDGE (authored at generation time)</text>
 
-    <!-- Node A: Market -->
-    <g transform="translate(40, 48)">
-      <circle cx="80" cy="55" r="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
-      <rect x="10" y="25" width="140" height="60" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
-      <text x="80" y="47" class="node-title">Market</text>
-      <text x="80" y="65" class="node-sub">Sara is here</text>
-      <text x="80" y="78" class="status-known-center">★ Clue Dropped</text>
+    <!-- Card A: Culprit -->
+    <g transform="translate(15, 45)">
+      <rect x="0" y="0" width="240" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+      <text x="14" y="22" class="card-title">Ravi — Culprit</text>
+      <line x1="12" y1="32" x2="228" y2="32" stroke="#e2e8f0" stroke-width="1" />
+      <text x="14" y="50" class="status-true">knows the TRUE account</text>
+      <text x="14" y="68" class="card-line">did: took the locket (hide)</text>
+      <text x="14" y="84" class="card-line">cover story: “at the docks” (lie)</text>
+      <text x="14" y="100" class="card-line">only holder of the full truth</text>
     </g>
 
-    <!-- Edge: Market <-> Square -->
-    <line x1="200" y1="108" x2="310" y2="108" stroke="#475569" stroke-width="1.5" />
-    <rect x="235" y="98" width="40" height="18" fill="#ffffff" />
-    <text x="255" y="111" class="edge-text">dist = 4</text>
-
-    <!-- Node B: Town Square -->
-    <g transform="translate(320, 58)">
-      <rect x="0" y="15" width="140" height="60" rx="6" fill="#ffffff" stroke="#64748b" stroke-width="1.5" />
-      <text x="70" y="42" class="node-title">Town Square</text>
-      <text x="70" y="60" class="node-sub">Transit hub</text>
+    <!-- Card B: Witness -->
+    <g transform="translate(270, 45)">
+      <rect x="0" y="0" width="240" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+      <text x="14" y="22" class="card-title">Mira — Witness</text>
+      <line x1="12" y1="32" x2="228" y2="32" stroke="#e2e8f0" stroke-width="1" />
+      <text x="14" y="50" class="status-partial">partial observation only</text>
+      <text x="14" y="68" class="card-line">witnessed: locket snatched</text>
+      <text x="14" y="84" class="card-line">disclosure: if_asked</text>
+      <text x="14" y="100" class="card-line">never names a culprit unseen</text>
     </g>
 
-    <!-- Edge: Square <-> Cafe -->
-    <line x1="470" y1="108" x2="580" y2="108" stroke="#475569" stroke-width="1.5" />
-    <rect x="505" y="98" width="40" height="18" fill="#ffffff" />
-    <text x="525" y="111" class="edge-text">dist = 3</text>
-
-    <!-- Node C: Cafe -->
-    <g transform="translate(590, 48)">
-      <circle cx="80" cy="55" r="50" fill="#f8fafc" stroke="#94a3b8" stroke-width="1" stroke-dasharray="3,3" />
-      <rect x="10" y="25" width="140" height="60" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
-      <text x="80" y="47" class="node-title">Café</text>
-      <text x="80" y="65" class="node-sub">Ahmed is here</text>
-      <text x="80" y="78" class="node-sub">Sipping coffee</text>
-    </g>
-
-    <!-- Knowledge comparison cards at bottom of Part 1 -->
-    <g transform="translate(40, 155)">
-      <rect x="0" y="0" width="340" height="56" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-      <text x="16" y="24" class="card-title">Sara's Memory (10:00 AM)</text>
-      <text x="16" y="43" class="status-known-start">[Logged] Saw gold watch at Market stall</text>
-    </g>
-
-    <g transform="translate(400, 155)">
-      <rect x="0" y="0" width="340" height="56" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
-      <text x="16" y="24" class="card-title">Ahmed's Memory (10:00 AM)</text>
-      <text x="16" y="43" class="status-unknown-start">[Unaware] Zero knowledge of watch or theft</text>
+    <!-- Card C: Red herring -->
+    <g transform="translate(525, 45)">
+      <rect x="0" y="0" width="240" height="110" rx="6" fill="#f8fafc" stroke="#cbd5e1" stroke-width="1" />
+      <text x="14" y="22" class="card-title">Tomas — Red herring</text>
+      <line x1="12" y1="32" x2="228" y2="32" stroke="#e2e8f0" stroke-width="1" />
+      <text x="14" y="50" class="status-neutral">unrelated secret</text>
+      <text x="14" y="68" class="card-line">own secret (hide)</text>
+      <text x="14" y="84" class="card-line">suspicion without answers</text>
+      <text x="14" y="100" class="card-line">keeps the case ambiguous</text>
     </g>
   </g>
 
-  <!-- Part 2: Step-by-Step Diffusion Timeline -->
-  <g transform="translate(60, 335)">
-    <rect x="0" y="0" width="780" height="260" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" />
-    <text x="18" y="24" class="section-label">PART 2: INFORMATION SPREAD TIMELINE (PHYSICAL ENCOUNTER)</text>
+  <!-- ============ PART 2: RUNTIME FIREWALL ============ -->
+  <g transform="translate(60, 285)">
+    <rect x="0" y="0" width="780" height="310" rx="8" fill="#ffffff" stroke="#94a3b8" stroke-width="1" stroke-dasharray="4,4" />
+    <text x="18" y="24" class="section-label">PART 2: RUNTIME PROMPT ASSEMBLY (spoiler firewall)</text>
 
-    <!-- Step 1 -->
-    <g transform="translate(30, 48)">
-      <rect x="0" y="0" width="160" height="180" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.2" />
-      <text x="80" y="26" class="node-title">1. Detection</text>
-      <text x="80" y="42" class="node-sub">Time: 10:00 AM</text>
-      <line x1="15" y1="52" x2="145" y2="52" stroke="#e2e8f0" stroke-width="1" />
-      <text x="80" y="74" class="node-sub">Sara senses clue</text>
-      <text x="80" y="92" class="node-sub">in local bubble</text>
-      <text x="80" y="125" class="node-sub">Appends event to</text>
-      <text x="80" y="143" class="node-sub">her private log</text>
+    <!-- Flow step 1: Own files -->
+    <g transform="translate(20, 48)">
+      <rect x="0" y="0" width="175" height="70" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+      <text x="87" y="26" class="node-title">Own Files Only</text>
+      <text x="87" y="46" class="node-sub">identity.json + memory.json</text>
+      <text x="87" y="60" class="node-sub">own chat history</text>
     </g>
 
-    <line x1="200" y1="138" x2="225" y2="138" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+    <line x1="195" y1="83" x2="225" y2="83" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
-    <!-- Step 2 -->
-    <g transform="translate(235, 48)">
-      <rect x="0" y="0" width="160" height="180" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.2" />
-      <text x="80" y="26" class="node-title">2. Pathfinding</text>
-      <text x="80" y="42" class="node-sub">Time: 10:05 AM</text>
-      <line x1="15" y1="52" x2="145" y2="52" stroke="#e2e8f0" stroke-width="1" />
-      <text x="80" y="74" class="node-sub">Sara sets goal:</text>
-      <text x="80" y="92" class="node-sub">"Warn Ahmed"</text>
-      <text x="80" y="125" class="node-sub">Runs A* Search:</text>
-      <text x="80" y="143" class="node-sub">Market -> Café</text>
+    <!-- Flow step 2: Prompt assembler -->
+    <g transform="translate(230, 48)">
+      <rect x="0" y="0" width="175" height="70" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+      <text x="87" y="26" class="node-title">Prompt Assembler</text>
+      <text x="87" y="46" class="node-sub">disclosure policies applied</text>
+      <text x="87" y="60" class="node-sub">player input appended</text>
     </g>
 
-    <line x1="405" y1="138" x2="430" y2="138" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+    <line x1="405" y1="83" x2="430" y2="83" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
-    <!-- Step 3 -->
-    <g transform="translate(440, 48)">
-      <rect x="0" y="0" width="160" height="180" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.2" />
-      <text x="80" y="26" class="node-title">3. Travel</text>
-      <text x="80" y="42" class="node-sub">Time: 10:05-10:25 AM</text>
-      <line x1="15" y1="52" x2="145" y2="52" stroke="#e2e8f0" stroke-width="1" />
-      <text x="80" y="74" class="node-sub">Sara moves across</text>
-      <text x="80" y="92" class="node-sub">town over 4 ticks</text>
-      <text x="80" y="125" class="node-sub">Ahmed remains</text>
-      <text x="80" y="143" class="node-sub">unaware at Café</text>
+    <!-- Flow step 3: Live API -->
+    <g transform="translate(435, 48)">
+      <rect x="0" y="0" width="165" height="70" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
+      <text x="82" y="26" class="node-title">Live API</text>
+      <text x="82" y="46" class="node-sub">≥2 providers · ≈2–3 s</text>
+      <text x="82" y="60" class="node-sub">no local chat model</text>
     </g>
 
-    <line x1="610" y1="138" x2="635" y2="138" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
+    <line x1="600" y1="83" x2="625" y2="83" stroke="#334155" stroke-width="1.5" marker-end="url(#arrow)" />
 
-    <!-- Step 4 -->
-    <g transform="translate(645, 48)">
-      <rect x="0" y="0" width="160" height="180" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
-      <text x="80" y="26" class="node-title">4. Encounter</text>
-      <text x="80" y="42" class="node-sub">Time: 10:30 AM</text>
-      <line x1="15" y1="52" x2="145" y2="52" stroke="#e2e8f0" stroke-width="1" />
-      <text x="80" y="74" class="node-sub">Sara enters Café</text>
-      <text x="80" y="92" class="node-sub">Calls Talk(Ahmed)</text>
-      <text x="80" y="125" class="status-known-center">Ahmed's memory</text>
-      <text x="80" y="143" class="status-known-center">receives clue</text>
+    <!-- Flow step 4: Reply -->
+    <g transform="translate(630, 48)">
+      <rect x="0" y="0" width="130" height="70" rx="6" fill="#f1f5f9" stroke="#334155" stroke-width="1.5" />
+      <text x="65" y="26" class="node-title">In-Character</text>
+      <text x="65" y="46" class="node-sub">{reply, mood}</text>
+      <text x="65" y="60" class="node-sub">bounded by own facts</text>
     </g>
+
+    <!-- truth.json: ENGINE ONLY (blocked) -->
+    <g transform="translate(230, 175)">
+      <rect x="0" y="0" width="175" height="70" rx="6" fill="#ffffff" stroke="#b91c1c" stroke-width="1.5" />
+      <text x="87" y="24" class="node-title-red">truth.json</text>
+      <text x="87" y="40" class="node-sub">ENGINE ONLY</text>
+      <text x="87" y="52" class="node-sub">never in a prompt or API call</text>
+      <text x="87" y="64" class="node-sub">culprit · timeline · solution</text>
+    </g>
+
+    <!-- Blocked arrow -->
+    <line x1="317" y1="175" x2="317" y2="122" stroke="#b91c1c" stroke-width="1.5" stroke-dasharray="4,3" />
+    <line x1="308" y1="141" x2="326" y2="159" stroke="#b91c1c" stroke-width="2.2" />
+    <line x1="326" y1="141" x2="308" y2="159" stroke="#b91c1c" stroke-width="2.2" />
+
+    <!-- Blocked label -->
+    <text x="122" y="150" class="blocked-label">BLOCKED: never enters</text>
+    <text x="122" y="164" class="blocked-label">a prompt or API call</text>
+
+    <!-- Footnote -->
+    <text x="20" y="285" class="footnote">Session facts (what the player tells an NPC) are added per NPC; the shipped bundle stays read-only.</text>
   </g>
 </svg>

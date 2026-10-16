@@ -1,28 +1,34 @@
-# Multi-Agent NPC Simulation: Hybrid Classical AI + LLM Brain
+# Fabula: AI-Generated Mystery Game (Fine-tuned LLM + Live-API NPCs)
 
-[![Python 3.10+](https://img.shields.io/badge/python-3.10+-blue.svg)](https://www.python.org/)
-[![AI-Core](https://img.shields.io/badge/AI-Search%20%7C%20GA%20%7C%20ANN%20%7C%20Clustering-orange.svg)]()
-[![LLM-Grounded](https://img.shields.io/badge/LLM-Grounded%20Dialogue-pink.svg)]()
-[![Hardware-Friendly](https://img.shields.io/badge/Compute-100%25%20CPU%20Executable-green.svg)]()
+[![Python 3.11+](https://img.shields.io/badge/python-3.11+-blue.svg)](https://www.python.org/)
+[![Fine-tuned Generator](https://img.shields.io/badge/LLM-QLoRA%20Fine--tuned%20Generator-orange.svg)]()
+[![Live API Voice](https://img.shields.io/badge/Runtime-Live%20APIs%20Only-pink.svg)]()
+[![Session Scale](https://img.shields.io/badge/Scale-5%E2%80%936%20NPCs%20%C2%B7%20~10%20min-green.svg)]()
 
-> A small-scale multi-agent simulation where game characters (NPCs) perceive a dynamic town, maintain private memories and goals, make decisions using **Classical AI algorithms (Search, Genetic Algorithms, Neural Networks, Clustering)**, and engage in natural conversation through a **grounded Large Language Model (LLM)**.
+> A small, single-player **Python mystery game** where every NPC is AI-controlled: a **fine-tuned small LLM generates the entire game before play** (mystery, town, cast, and each NPC's private knowledge and identity), a headless Python engine brings it to life, and **live APIs** give each NPC its voice — grounded strictly in that NPC's own JSON files.
 
 ---
 
 ## 📖 Full Technical Documentation
-For the complete technical breakdown including mathematical formulations, research citations, prompt design, evaluation metrics, and ablation matrices:
+For the complete technical breakdown including architecture, schemas, prompts, evaluation metrics, and the implementation plan:
 
 - 📄 **Markdown Technical Docs (for AI / Reading)**: **[docs/md/DOCUMENTATION.md](docs/md/DOCUMENTATION.md)**
-- 📕 **Academic PDF Report**: **[docs/latex/main.pdf](docs/latex/main.pdf)** (12-page compiled LaTeX report)
+- 📕 **Academic PDF Report**: **[docs/latex/main.pdf](docs/latex/main.pdf)**
 - 📐 **LaTeX Source (for User / TeX Compilation)**: **[docs/latex/main.tex](docs/latex/main.tex)**
+- 🧭 **Product Specification (single source of truth)**: **[docs/features.md](docs/features.md)** · **[docs/FABULA_DEVPLAN_SOURCE.md](docs/FABULA_DEVPLAN_SOURCE.md)**
+- 🗂️ **Development Plan (generated)**: **[docs/dev_plan/](docs/dev_plan/)**
+
+> **Documentation status:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` are the sole sources of truth; everything else is synced to them. The LaTeX report still reflects the previous (pre-sync) edition and is regenerated only on explicit request.
 
 ---
 
 ## 🏛️ System Architecture
+The game runs in two phases — **generation** (local, before play) and **play** (~10 minutes):
 
-The simulation operates as a discrete tick-based loop, enforcing that physical reality is strictly managed by the game simulator:
+- **Phase 1**: player settings (`mystery_type`, `tone`, `difficulty`) → the fine-tuned ~3–4B LLM generates the bundle in stages (`world → cast → truth → per-NPC files`) with constrained JSON decoding → validators + retries → a JSON game bundle on disk.
+- **Phase 2**: the engine builds the world from `world.json`; NPCs move via **schedules + A\***; NPC conversation goes through **live APIs only**, with prompts assembled from that NPC's own `identity.json` + `memory.json`; `truth.json` stays engine-only.
 
-![System Architecture: NPC Simulation Loop](assets/system_architecture.png)
+![System Architecture: Generation & Play](assets/system_architecture.png)
 
 - **Vector SVG**: [assets/system_architecture.svg](assets/system_architecture.svg)
 - **High-Res PNG (2x)**: [assets/system_architecture.png](assets/system_architecture.png)
@@ -35,37 +41,41 @@ All diagrams are designed with a minimalist light theme (simple boxes, clear arr
 
 | # | Diagram Title | Where Used | Formats |
 |---|---|---|---|
-| **01** | **[System Architecture: Simulation Loop](assets/system_architecture.png)** | Section 3: Overview of the 5-step perception-decision-action loop | [PNG](assets/system_architecture.png) • [SVG](assets/system_architecture.svg) |
-| **02** | **[Decision Engine: Task & Tool Routing](assets/decision_engine_dispatch.png)** | Section 4: How tasks route to $A^*$, GA, MLP, and LLM | [PNG](assets/decision_engine_dispatch.png) • [SVG](assets/decision_engine_dispatch.svg) |
-| **03** | **[Genetic Algorithm: Multi-Objective Flow](assets/genetic_algorithm_flow.png)** | Section 4.2: Chromosomes, fitness, and the 50-gen cycle | [PNG](assets/genetic_algorithm_flow.png) • [SVG](assets/genetic_algorithm_flow.svg) |
-| **04** | **[Town Knowledge Separation & Diffusion](assets/town_knowledge_diffusion.png)** | Section 5: Sensory boundaries and social encounter timeline | [PNG](assets/town_knowledge_diffusion.png) • [SVG](assets/town_knowledge_diffusion.svg) |
+| **01** | **[System Architecture: Generation & Play](assets/system_architecture.png)** | Section 3: Phase 1 staged generation + Phase 2 play loop | [PNG](assets/system_architecture.png) • [SVG](assets/system_architecture.svg) |
+| **02** | **[Runtime Dispatch: Body & Voice](assets/decision_engine_dispatch.png)** | Section 4: How an NPC turn routes to schedule + $A^*$ or prompt assembler + live API | [PNG](assets/decision_engine_dispatch.png) • [SVG](assets/decision_engine_dispatch.svg) |
+| **03** | **[Knowledge Isolation & Spoiler Firewall](assets/town_knowledge_diffusion.png)** | Section 5: Per-NPC knowledge and the engine-only `truth.json` boundary | [PNG](assets/town_knowledge_diffusion.png) • [SVG](assets/town_knowledge_diffusion.svg) |
 
 ---
 
-## ⚙️ How It Works (The 5-Step Loop)
+## ⚙️ How It Works
 
-1. **World State**: The simulator maintains ground truth (town graph, item coordinates, NPC locations, clock).
-2. **Perception Filter**: NPCs only see and hear events within their local sensory range (preventing unrealistic omniscience).
-3. **Internal State**: Characters append observations to a **Memory Log** and track prioritized **Goals & Personality Traits**.
-4. **Decision Engine**:
-   - **$A^*$ Pathfinding**: Solves shortest-path physical navigation.
-   - **Genetic Algorithm**: Solves multi-objective daily routes (balancing distance, danger, and clues).
-   - **Neural Network (MLP)**: Predicts reflexive actions from state feature vectors.
-   - **K-Means Clustering**: Analyzes emergent agent behaviors across runs.
-   - **LLM Dialogue Brain**: Formulates natural in-character speech grounded strictly in the NPC's private memory.
-5. **Action Execution**: Physical actions (`Move`, `Talk`, `Examine`, `PickUp`, `Wait`) are verified by the simulator, advancing time to the next tick.
+### Phase 1 — Generation (local, before play)
+1. **Player settings**: `mystery_type` (theft / disappearance / murder / random), `tone` (cozy ↔ dark), `difficulty`.
+2. **Staged generation**: the fine-tuned ~3–4B LLM emits `world → cast → truth (+clues) → per-NPC files` with grammar / JSON-schema-constrained decoding.
+3. **Validation**: every stage is checked (schema, cross-references, graph connectivity, timeline, solvability, unique culprit) and retried up to 3 times; persistent failure shows a clear error screen.
+4. **Bundle on disk**: `world.json`, `truth.json` (engine-only), `clues.json`, and `npcs/<id>/identity.json` + `memory.json`.
+5. Everything runs on the player's machine — **the fine-tuned model never runs during play**.
+
+### Phase 2 — Play (~10 minutes)
+1. **World**: the engine loads the bundle read-only and builds the town (3–4 locations from a fixed type enum → placeholder tiles).
+2. **Body**: NPCs follow simplified schedules using $A^*$ pathfinding and perceive events only in their own location.
+3. **Player loop**: walk, examine ~4–6 clues, type free-text questions to 5–6 NPCs, watch the visible timer.
+4. **Voice**: each reply comes from a live API whose prompt contains only that NPC's `identity.json`, `memory.json`, and chat history — `truth.json` never leaves the engine (enforced by tests).
+5. **Verdict**: the journal records clues; the player accuses **who / how / why**; the engine checks the accusation against `truth.json` → win or lose.
 
 ---
 
 ## 🚀 8-Week Implementation Roadmap
 
-```
-Weeks 1–2: Environment & Simulator Core (Gymnasium Town Graph, Perception Filter, Memory Buffer)
-Weeks 3–4: Classical AI Development (A* Pathfinding & Multi-Objective Genetic Algorithm)
-Week 5:    LLM Dialogue & Interactive Web UI (FastAPI Backend + React / Vite Town Map)
-Week 6:    Data Generation, MLP Training & K-Means Trajectory Clustering
-Week 7:    Quantitative Evaluation, Ablation Studies & Fairness Testing
-Week 8:    Final Technical Report, Charts, Demo Video & Code Packaging
+```text
+Week 1: Decisions, frozen schemas, project setup (schema-freeze sign-off)
+Week 2: Symbolic skeletons (theft/disappearance/murder); simulation & conversation foundations
+Week 3: Training-data pipeline; mocked staged generator
+Week 4: Baseline comparison + first QLoRA fine-tune on Kaggle T4
+Week 5: Local model runtime + UI on mock generation
+Week 6: End-to-end integration + first probe runs
+Week 7: Evaluation, playtests
+Week 8: Fixes, report, licence review, release decision
 ```
 
-> **Compute Requirements**: 100% CPU executable. Runs on standard student laptops without GPU clusters or cloud dependencies.
+> **Compute requirements**: generation runs on the player's CPU (with a loading screen); fine-tuning runs on free Kaggle T4 GPUs (QLoRA + Unsloth); play needs only live-API keys — no local model at runtime.

@@ -18,7 +18,7 @@ For the complete technical breakdown including architecture, schemas, prompts, e
 - 🧭 **Product Specification (single source of truth)**: **[docs/features.md](docs/features.md)** · **[docs/FABULA_DEVPLAN_SOURCE.md](docs/FABULA_DEVPLAN_SOURCE.md)**
 - 🗂️ **Development Plan (generated)**: **[docs/dev_plan/](docs/dev_plan/)**
 
-> **Documentation status:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` are the sole sources of truth; everything else is synced to them. The LaTeX report still reflects the previous (pre-sync) edition and is regenerated only on explicit request.
+> **Documentation status:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` are the sole sources of truth; everything else is synced to them. The LaTeX report (`docs/latex/main.pdf`) was regenerated from the synced documentation on 2026-10-16 and is updated only on explicit request.
 
 ---
 

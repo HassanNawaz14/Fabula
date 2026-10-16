@@ -1,7 +1,7 @@
 # Fabula — Product & Feature Specification (Single Source of Truth)
 
 > **Status:** Authoritative. Written 2026-10-16 at the end of the pre-development planning session.
-> **Supersedes:** `README.md`, `docs/md/DOCUMENTATION.md`, `docs/latex/*`, and `AGENTS.md` project-context sections. Those describe an older, different (course-style, classical-AI-only) design and are **outdated**. If anything there conflicts with this file, **this file wins**. Do not open `docs/latex/` (it only duplicates the old markdown doc).
+> **Supersedes:** `README.md`, `docs/md/DOCUMENTATION.md`, `docs/latex/*`, and `AGENTS.md` project-context sections. Those documents were rewritten from this file and `docs/FABULA_DEVPLAN_SOURCE.md` (synced 2026-10-16; the LaTeX report regenerated the same day) and are derived — never authoritative. If anything there conflicts with this file, **this file wins**. Do not open `docs/latex/` (formal deliverable only; see `AGENTS.md` §2).
 
 ---
 

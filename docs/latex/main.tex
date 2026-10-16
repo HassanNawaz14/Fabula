@@ -34,8 +34,8 @@
 }
 
 % --- Title Information ---
-\title{\textbf{Multi-Agent NPC Simulation: System Architecture and Technical Documentation}\\[0.5em]
-\large A Hybrid AI Framework Combining Classical Decision Algorithms with Grounded Large Language Model Dialogue}
+\title{\textbf{Fabula: AI-Generated Mystery Game --- System Architecture and Technical Documentation}\\[0.5em]
+\large A Two-Phase Hybrid Architecture: Fine-Tuned LLM Generation, Classical-AI Simulation, and Live-API NPC Conversation}
 \author{\textbf{Semester AI Project Team}}
 \date{\today}
 
@@ -44,11 +44,11 @@
 \maketitle
 
 \begin{abstract}
-Traditional video game Non-Player Characters (NPCs) typically suffer from either rigid, scripted predictability or unconstrained language model hallucinations that violate game rules and spatial reality. This report presents the architectural design and technical specification of a small-scale multi-agent simulation in which 5 to 10 autonomous game characters perceive a dynamic, discrete town environment, maintain private episodic memory streams, and execute actions governed by classical Artificial Intelligence algorithms. Classical algorithms---including $A^*$ search for deterministic pathfinding, Genetic Algorithms (GA) for multi-objective daily planning, Multi-Layer Perceptrons (MLP) for reflex action classification, and K-Means for unsupervised behavior analysis---manage physical navigation, resource allocation, and physics verification. Concurrently, a Large Language Model (LLM) functions strictly as a conversational brain, generating persona-consistent dialogue grounded solely in the NPC's private memory log. By establishing the simulation engine as the immutable ground truth, this hybrid framework eliminates state hallucinations while preserving emergent social dynamics and natural language interaction.
+Traditional video game Non-Player Characters (NPCs) suffer from either rigid, scripted predictability or unconstrained language-model hallucinations that violate game state and spatial reality. This report presents the architectural design and technical specification of \textbf{Fabula}, a small, single-player Python mystery game in which every NPC is AI-controlled and the entire game---mystery, town, cast, and each NPC's private knowledge and identity---is authored \emph{before play} by a fine-tuned small ($\sim$3--4B) language model. Generation runs locally in validated stages (world $\rightarrow$ cast $\rightarrow$ truth $\rightarrow$ per-NPC files) with grammar-constrained decoding and per-stage validators that retry or fail cleanly, producing a JSON game bundle. Play is a $\sim$10-minute session executed by a headless pure-Python engine: NPCs move via simplified schedules and $A^*$ pathfinding (the ``Body''), while free-text conversation is mediated exclusively by live APIs (the ``Voice''), with each prompt assembled only from that NPC's own \texttt{identity.json} and \texttt{memory.json}. The engine keeps \texttt{truth.json} as ground truth that never enters any prompt or API call---a spoiler firewall enforced by tests. Consequently the fine-tuned model never runs at runtime, and evaluation targets \emph{NPC behaviour} (secret-keeping, knowledge boundary, persona adherence, consistency) through scripted probe suites and a base-versus-fine-tune experiment.
 \end{abstract}
 
 \vspace{1em}
-\noindent\textbf{Keywords:} Multi-Agent Systems, Non-Player Characters, Classical AI, Genetic Algorithms, Grounded LLM, $A^*$ Pathfinding, Game Simulation.
+\noindent\textbf{Keywords:} Fine-Tuned LLM, QLoRA, Knowledge Isolation, Spoiler Firewall, Live-API Dialogue, $A^*$ Pathfinding, Mystery Game.
 
 \vspace{1.5em}
 \hrule
@@ -62,353 +62,492 @@ Traditional video game Non-Player Characters (NPCs) typically suffer from either
 % =========================================================================
 
 \subsection{Problem Formulation and Motivation}
-In interactive entertainment and synthetic simulations, Non-Player Characters (NPCs) have historically relied on Finite State Machines (FSMs) or static behavior trees. While computationally trivial and deterministic, these characters display zero episodic recall, fail to adapt to emergent events, and exhibit repetitive conversational dialogue. 
+In interactive entertainment, Non-Player Characters have historically relied on Finite State Machines (FSMs) or static behavior trees. While computationally trivial and deterministic, these characters display zero episodic recall, fail to adapt to emergent events, and repeat canned conversational dialogue.
 
-Recent advancements in generative artificial intelligence have prompted attempts to replace scripted logic entirely with Large Language Models (LLMs). However, pure LLM-driven agents introduce critical architectural flaws:
+Recent advances in generative AI have prompted attempts to replace scripted logic entirely with Large Language Models (LLMs). However, pure LLM-driven agents introduce critical architectural flaws:
 \begin{enumerate}
-    \item \textbf{Factual and Physical Hallucination:} Generative models invent unearned items, claim impossible physical actions, or bypass geographic barriers.
-    \item \textbf{Loss of Spatial Grounding:} Language models lack internal metric geometry and cannot reliably compute shortest paths or avoid collision zones without structured external engines.
-    \item \textbf{Excessive Computational Overhead:} Querying frontier models for every low-level movement tick is computationally prohibitive and latency-heavy.
+    \item \textbf{Factual and Physical Hallucination:} Generative models invent unearned items, claim impossible physical actions, or bypass geographic and knowledge boundaries.
+    \item \textbf{Loss of Grounding:} Language models lack the game's state; without an external engine they cannot reliably track time, position, or who knows what.
+    \item \textbf{Excessive Computational Overhead:} Querying frontier models for every low-level decision is latency-heavy, costly, and fragile.
 \end{enumerate}
 
-To resolve this dichotomy, we propose a \textbf{Hybrid Multi-Agent Simulation}. The system populates a simulated town (comprising nodes such as Market, Caf\'e, Town Square, Library, Park, and Residential Homes) with 5 to 10 autonomous NPCs (e.g., Ahmed, Sara, Bilal). Each character maintains sensory constraints, an individual memory stream, and dynamic goal hierarchies, arbitrated through a clear division of responsibilities (Table~\ref{tab:hybrid_roles}).
+Fabula resolves this dichotomy with a \textbf{two-phase hybrid architecture}. Phase 1 (\emph{Generation}) runs a fine-tuned small LLM locally, before the game starts, and produces a complete, validated JSON bundle: the mystery, a tiny town of \textbf{3--4 named locations}, a cast of \textbf{5--6 NPCs}, and each NPC's private knowledge. Phase 2 (\emph{Play}) runs a $\sim$10-minute session in which a Python engine owns all physical state, classical AI handles movement, and live APIs handle conversation. Mystery type is a parameter, not a fixed genre: v1 supports \textbf{theft, disappearance, and murder}, and every solution has the same shape---\emph{who, how, why}. Table~\ref{tab:hybrid_roles} lists the architectural division of responsibilities.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Architectural Division of Responsibilities Between AI Subsystems}
+\caption{Architectural Division of Responsibilities Between Subsystems}
 \label{tab:hybrid_roles}
 \begin{tabularx}{\textwidth}{lX}
 \toprule
 \textbf{Subsystem} & \textbf{Core Responsibilities and Guarantees} \\
 \midrule
-\textbf{Classical AI Engine} & $\bullet$ Deterministic spatial traversal across town graph topologies ($A^*$, BFS). \\
-(\textit{``The Body''})     & $\bullet$ Multi-objective combinatorial route optimization (Genetic Algorithm). \\
-                           & $\bullet$ Instantaneous state-to-action reflex classification (Neural Net MLP). \\
-                           & $\bullet$ Unsupervised clustering of agent trajectories into emergent styles. \\
-                           & $\bullet$ Verification of physical laws, inventory transfer, and clock ticks. \\
+\textbf{Generator} & $\bullet$ Fine-tuned $\sim$3--4B LLM, runs only before play (local, CPU-class). \\
+(\textit{Phase 1})  & $\bullet$ Staged emission of world, cast, truth, and per-NPC files. \\
+                   & $\bullet$ Constrained JSON decoding; per-stage validation and retries. \\
 \addlinespace
-\textbf{LLM Dialogue Brain} & $\bullet$ In-character natural language communication with players and NPCs. \\
-(\textit{``The Voice''})    & $\bullet$ Bounded conversational replies conditioned strictly on private memories. \\
-                           & $\bullet$ High-level semantic intention parsing and goal decomposition. \\
+\textbf{Classical AI Engine} & $\bullet$ Deterministic spatial traversal across the town graph ($A^*$). \\
+(\textit{``The Body''})       & $\bullet$ Simplified NPC schedules (a few waypoints per session). \\
+                             & $\bullet$ Perception, physics, journal, timer, accusation checking. \\
+\addlinespace
+\textbf{Live-API Dialogue} & $\bullet$ In-character free-text conversation with the player. \\
+(\textit{``The Voice''})    & $\bullet$ Prompts built only from that NPC's own JSON files. \\
+                           & $\bullet$ Provider abstraction, token cap, canned fallback lines. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Academic Syllabus Integration}
-Rather than reducing AI coursework to prompt engineering, this project centers on classical and modern foundational AI pillars:
+\subsection{Two-Phase Design}
+Table~\ref{tab:twophase} summarizes when each component runs and which language model is involved.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{The Two Phases of Fabula}
+\label{tab:twophase}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Phase} & \textbf{When} & \textbf{What Runs / LLM Involved} \\
+\midrule
+\textbf{Generation} & Before the game, on the player's machine & Fine-tuned small LLM (local) produces a complete JSON game bundle. \\
+\addlinespace
+\textbf{Play} & During the $\sim$10-minute session & Python engine builds the world from JSON; NPCs move via classical AI; conversation uses live APIs only. The fine-tuned model never runs. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Academic Relevance}
+Rather than reducing the project to prompt engineering, the system integrates foundational and modern AI pillars:
 \begin{itemize}
-    \item \textbf{Graph Search ($A^*$, BFS):} Optimal point-to-point traversal across weighted topological maps.
-    \item \textbf{Evolutionary Computation (GA):} Chromosome encoding, crossover, mutation, and elitism for multi-objective schedule planning.
-    \item \textbf{Supervised Learning (ANN / MLP):} Feature extraction, forward propagation, loss optimization, and evaluation (confusion matrices, F1-scores).
-    \item \textbf{Unsupervised Learning (K-Means):} Grouping high-dimensional agent trajectories to uncover emergent archetypes.
-    \item \textbf{Grounded Generative AI:} Structured JSON prompt synthesis ensuring grounded, hallucination-free dialogue.
+    \item \textbf{Graph Search ($A^*$):} Optimal point-to-point traversal across weighted town topologies.
+    \item \textbf{Knowledge Representation:} Structured facts with source and disclosure policies; authored cover stories for deception.
+    \item \textbf{Constrained Structured Generation:} Grammar / JSON-schema-constrained decoding, staged generation, validator-and-retry loops.
+    \item \textbf{LLM Fine-Tuning:} QLoRA supervised fine-tuning of a $\sim$3--4B instruct model with Unsloth on Kaggle T4.
+    \item \textbf{Grounded Prompting \& Isolation:} Per-NPC prompt assembly with a machine-enforced spoiler firewall.
+    \item \textbf{Behavioural Evaluation of LLMs:} Scripted probe suites, secret-keeping metrics, LLM-judge rubrics, and a base-vs-fine-tune experiment.
 \end{itemize}
+The Genetic Algorithm planner, MLP action classifier, and K-Means clustering of the earlier course-style design are \textbf{not part of the MVP} and are built only if a course requirement is stated (open decision HG-10; default: do not build).
 
 % =========================================================================
 \section{Inspiration and Related Work}
 % =========================================================================
 
-\subsection{Generative Agents (Park et al., 2023)}
-Park et al.~\cite{park2023generative} demonstrated that LLM-driven agents could exhibit coherent social behaviors in a 25-character virtual community (``Smallville''). Their core contribution was the \textbf{Memory Stream} architecture: agents record raw natural language observations, retrieve memories via recency, importance, and relevance metrics, and periodically synthesize higher-level reflections. While groundbreaking, Generative Agents relied on unconstrained LLM calls for physical planning, incurring severe compute costs and occasional spatial inconsistencies. Our architecture preserves the memory stream concept while transferring physical planning to deterministic classical algorithms.
+\subsection{MuSR and the Synthetic-to-Natural Pipeline}
+Sprague et~al.~\cite{sprague2024musr} introduced MuSR, a reasoning dataset whose murder mysteries are created by a \textbf{neurosymbolic synthetic-to-natural generation algorithm}: a symbolic reasoning structure is built first, then narrated into natural language. This directly inspired Fabula's training-data pipeline (Section~\ref{sec:data}): a plain-Python symbolic scenario generator produces skeletons (crime type, culprit, motive, means, opportunity, timeline, clue graph, alibis, per-NPC knowledge), and a strong teacher LLM expands each skeleton into full stage JSON in the target schema.
 
-\subsection{Narrative Evaluation and NARRA-Gym (Huang et al., 2026)}
-Huang et al.~\cite{huang2026narra} benchmarked nine leading frontier LLMs in multi-turn interactive storytelling environments. Their findings revealed that even state-of-the-art models consistently fail at long-horizon consistency, character stability, and spatial bounds when operating without external structured harnesses. Decoupling the narrative dialogue layer from the physical simulator directly resolves these stability deficits.
+\subsection{True Detective and Style References}
+Del and Fishel~\cite{del2023true} compiled \emph{True Detective}, a benchmark of 191 human-authored long-form mystery narratives sourced from the ``5 Minute Mystery'' platform, demonstrating that human-written mysteries remain challenging for frontier models. Together with public-domain detective fiction (Christie, Conan Doyle), it serves as style and fair-play reference material for teacher prompts and scenario authoring. Licences for every reference dataset must be verified before use (HG-17), and the teacher model's terms must permit training on its outputs (HG-11).
 
-\subsection{Text-Based Environments and Gym Standards}
-Microsoft's TextWorld~\cite{cote2018textworld} established that discrete room environments and text interfaces provide rigorous, reproducible benchmarks for reinforcement learning and planning. Concurrently, the Gymnasium~\cite{gymnasium2023} and PettingZoo~\cite{pettingzoo2021} (Farama Foundation) standards formalize multi-agent simulation loops (`reset()`, `step()`, observation/action spaces). Our town engine adopts Gymnasium conventions, ensuring lightweight execution on standard multi-core CPUs without GPU dependencies.
+\subsection{Superseded Design Lineage}
+An earlier edition of this project described a different, course-style design whose constraints are now explicitly superseded and must not be reintroduced:
+\begin{itemize}
+    \item ``100\% CPU, no GPU/cloud API'' and ``no fine-tuning'' $\rightarrow$ mandatory fine-tuning on Kaggle T4 plus live APIs at runtime.
+    \item 5--10 NPCs $\rightarrow$ fixed \textbf{5--6 NPCs} and \textbf{3--4 locations}.
+    \item Gymnasium / FastAPI / React stack $\rightarrow$ plain Python, headless simulation core with a thin Pygame/Arcade UI (engine choice open, HG-01).
+    \item Fixed stolen-watch scenario, demographic-bias benchmark, and the old ablation matrix $\rightarrow$ generated mysteries and NPC-behaviour evaluation (Section~\ref{sec:eval}).
+\end{itemize}
 
 % =========================================================================
-\section{System Architecture and the Simulation Loop}
+\section{System Architecture and the Two-Phase Design}
 % =========================================================================
 
-The simulation operates as an episodic, discrete-time loop where each tick represents a fixed quantum of virtual time (e.g., 5 simulation minutes), as illustrated in Figure~\ref{fig:system_arch}.
+The system separates a local, pre-play generation phase from a timed play phase, as illustrated in Figure~\ref{fig:system_arch}.
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{../../assets/system_architecture.png}
-\caption{The closed perception-decision-action simulation loop governing agent behaviors.}
+\caption{Phase 1 (local staged generation $\rightarrow$ validated JSON bundle) and Phase 2 (headless engine with the Body/Voice split).}
 \label{fig:system_arch}
 \end{figure}
 
-\subsection{Detailed Stages of the Simulation Tick}
+\subsection{Phase 1: Staged Generation (Local, Before Play)}
+Player settings---$\textit{mystery\_type} \in \{\text{theft}, \text{disappearance}, \text{murder}, \text{random}\}$, $\textit{tone} \in [\text{cozy}, \text{dark}]$, and $\textit{difficulty}$---condition the fine-tuned model, which generates the bundle in sequential stages:
+\begin{equation}
+    \text{settings} \;\rightarrow\; W \;\rightarrow\; C \;\rightarrow\; T \;\rightarrow\; \big\{(I_i, M_i)\big\}_{i=1}^{N}
+\end{equation}
+where $W$ is the world, $C$ the cast, $T$ the truth (emitted together with the clue set as one atomic pair), and $(I_i, M_i)$ the \texttt{identity.json}/\texttt{memory.json} pair of NPC $i$, with $N \in \{5, 6\}$.
+
+Design decisions behind the pipeline:
+\begin{itemize}
+    \item \textbf{Staged generation:} each stage is validated separately and retries are cheap; small models stay more consistent than when asked for one giant output.
+    \item \textbf{Constrained decoding:} grammar- or JSON-schema-constrained output prevents malformed JSON.
+    \item \textbf{Validator and retry loop:} after every stage the system checks schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability, and the unique-culprit rule. A failed stage retries up to $N=3$ times (configurable); persistent failure produces a clear error screen. These validators are a \emph{runtime safety guard}, not the project's headline evaluation.
+    \item \textbf{Solvability, concretely:} a chain of clues/facts exists from which the player can derive who/how/why; exactly one culprit set; no timeline contradictions; all cross-references resolve; the location graph is connected; and there are 4--6 clues.
+    \item \textbf{Loading screen:} local CPU generation of a few thousand JSON tokens may take minutes on low-end machines (estimated; benchmarked early, HA-03).
+\end{itemize}
+
+\subsection{The Game Bundle}
+The output of Phase 1 is a read-only JSON bundle:
+
+\begin{lstlisting}[caption={Game Bundle Layout (output of Phase 1)}]
+bundle/
+|-- world.json         scenario meta, locations (fixed type enum),
+|                      NPC roster, start positions, schedules
+|-- truth.json         ENGINE ONLY: ground truth; never sent to
+|                      any API or NPC prompt
+|-- clues.json         clue definitions, placement, reveal rules
+`-- npcs/<npc_id>/
+    |-- identity.json  persona, traits, speech style, goals
+    `-- memory.json    structured facts: what they know, hide,
+                       or lie about (+ cover story if any)
+\end{lstlisting}
+
+Rules: files under \texttt{npcs/<id>/} are isolated (no cross-NPC content beyond that NPC's own relationships and observations); only the culprit's \texttt{memory.json} contains the true account of the crime; and the shipped bundle stays read-only during play (in-session additions live in session state).
+
+\subsection{Phase 2: The Play Loop ($\sim$10 Minutes)}
+The engine loads the bundle read-only and runs a session loop that advances a session clock. Each NPC turn passes through five stages.
 
 \subsubsection{Stage 1: World State (Ground Truth)}
-The central game engine maintains the objective ground truth of the universe:
 \begin{equation}
     S_t = \langle \mathcal{G}, \mathcal{O}_t, \mathcal{A}_t, \tau_t \rangle
 \end{equation}
-where $\mathcal{G} = (V, E)$ represents the town graph topology, $\mathcal{O}_t$ denotes item placements and states, $\mathcal{A}_t$ represents character locations and inventories, and $\tau_t$ tracks the simulation clock.
+where $\mathcal{G} = (V, E)$ is the town graph built from \texttt{world.json}, $\mathcal{O}_t$ denotes clue/object placements on tiles drawn from a \emph{fixed location-type enum} (no generated art), $\mathcal{A}_t$ represents NPC coordinates, and $\tau_t$ is the session clock (real-time vs.\ tick-based remains open, HG-05; schedules assume minute-based time).
 
 \subsubsection{Stage 2: Perception Filtering}
-To prevent omniscient knowledge leakage, each agent $i$ receives a filtered observation $o_{i, t} \subset S_t$ constrained by a spatial sensory radius $r_{\text{percept}}$:
+Each agent $i$ receives a filtered observation $o_{i,t} \subset S_t$ restricted to its own location (optionally adjacent), formalized as:
 \begin{equation}
     o_{i, t} = \{ e \in S_t \mid \text{dist}(\text{loc}(i), \text{loc}(e)) \le r_{\text{percept}} \}
 \end{equation}
-Events occurring beyond this sensory boundary are withheld from the character's cognitive pipeline.
+Events beyond this boundary never enter the agent's cognitive pipeline; the precise rule is finalized at schema freeze (HG-18).
 
-\subsubsection{Stage 3: Internal NPC State Representation}
-Each character maintains two persistent internal structures:
+\subsubsection{Stage 3: Internal NPC State}
+Each character holds two read-only JSON stores plus session state:
 \begin{enumerate}
-    \item \textbf{Episodic Memory Log ($M_i$):} An append-only chronological ledger of observations, dialogues, and interactions.
-    \item \textbf{Goal and Trait Profile ($P_i$):} A static vector of personality traits (e.g., $\text{caution} \in [0, 1]$, $\text{curiosity} \in [0, 1]$) and a priority stack of active operational goals.
+    \item \textbf{Identity ($I_i$):} static persona, traits, speech style, goals, and relationships.
+    \item \textbf{Memory ($M_i$):} structured facts with a source and a disclosure policy (Section~\ref{sec:knowledge}).
+    \item \textbf{Session state:} chat history with the player, in-session facts, and discovered clues.
 \end{enumerate}
 
-\subsubsection{Stage 4: Hybrid Decision Engine}
-Given internal state $\langle M_i, P_i \rangle$ and current observation $o_{i, t}$, the character evaluates whether physical navigation, multi-stop planning, reflexive action, or dialogue is required, dispatching the task to the respective algorithm.
+\subsubsection{Stage 4: Decision and Communication}
+Given internal state and the current observation, the dispatcher routes the turn:
+\begin{itemize}
+    \item \textbf{Movement} $\rightarrow$ next schedule waypoint, solved by $A^*$ (the ``Body'').
+    \item \textbf{Speech} $\rightarrow$ prompt assembler (that NPC's files only) $\rightarrow$ live API $\rightarrow$ in-character reply (the ``Voice'').
+\end{itemize}
 
-\subsubsection{Stage 5: Action Execution and State Validation}
-The proposed candidate action $a_i \in \{\text{Move}, \text{Talk}, \text{Examine}, \text{PickUp}, \text{Wait}\}$ is submitted to the simulation engine. The engine verifies physical feasibility (e.g., target object adjacency, path validity). Valid actions mutate the world state $S_{t+1}$ and advance the clock $\tau_{t+1}$.
+\subsubsection{Stage 5: Action Execution and Feedback}
+A candidate action $a_i \in \{\text{Move}, \text{Talk}, \text{Examine}, \text{Wait}, \text{Accuse}\}$ is verified by the engine; valid actions mutate $S_{t+1}$ and advance $\tau_{t+1}$. The journal auto-records discovered clues and key statements, the visible timer counts down, and the player's accusation (who / how / why) is checked against \texttt{truth.json} to decide win or lose.
 
 \begin{quote}
-\textbf{The Grounding Axiom:} World State is absolute truth. The language model may formulate dialogue and intent, but cannot modify physical coordinates, alter item inventories, or warp simulation time.
+\textbf{The Grounding and Spoiler Rule:} World state is absolute truth, owned by the engine. \texttt{truth.json} is never sent to any API, and no NPC prompt ever contains another NPC's files. Physical reality is governed by simulation code; the LLM cannot hallucinate new items, teleport an NPC, or alter the clock. This is enforced by tests, not by prompt wording.
 \end{quote}
 
 % =========================================================================
-\section{The AI Decision Engine: Classical AI and LLM Integration}
+\section{The Hybrid NPC Architecture: Classical AI and Live-API Integration}
 % =========================================================================
 
-The decision engine routes computational subtasks to specialized algorithms, ensuring verifiable execution and linguistic richness (Figure~\ref{fig:decision_dispatch}).
+The architecture assigns each responsibility to the technology best suited for it (Figure~\ref{fig:decision_dispatch}).
 
 \begin{figure}[htbp]
 \centering
 \includegraphics[width=0.92\textwidth]{../../assets/decision_engine_dispatch.png}
-\caption{Task and tool routing within the hybrid decision engine.}
+\caption{Runtime dispatch of an NPC turn: schedules and $A^*$ for the Body; prompt assembler and live API for the Voice, under the spoiler firewall.}
 \label{fig:decision_dispatch}
 \end{figure}
 
-\subsection{Search and Pathfinding ($A^*$ and BFS)}
-When an agent requires traversal between two distinct town nodes (e.g., Home to Market), the system invokes the $A^*$ search algorithm across the weighted town graph $G = (V, E)$. The evaluation function:
+\subsection{Search and Pathfinding ($A^*$)}
+When an agent requires traversal between two town nodes, the system invokes $A^*$ across the weighted town graph $G = (V, E)$. The evaluation function:
 \begin{equation}
     f(n) = g(n) + h(n)
 \end{equation}
-combines exact path cost $g(n)$ from the origin with an admissible Euclidean distance heuristic $h(n)$ to the destination node. This guarantees mathematically optimal paths with zero computational hallucination.
+combines exact path cost $g(n)$ from the origin with an admissible Euclidean distance heuristic $h(n)$ over explicit tile coordinates, guaranteeing mathematically optimal paths with zero hallucination risk.
 
-\subsection{Genetic Algorithm for Multi-Objective Planning}
-When an NPC must construct a daily itinerary balancing competing requirements, single-source shortest path algorithms fail. We formulate multi-objective daily scheduling as an evolutionary optimization problem (Figure~\ref{fig:ga_flow}).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.92\textwidth]{../../assets/genetic_algorithm_flow.png}
-\caption{Genetic algorithm chromosome structure, fitness evaluation, and evolutionary cycle.}
-\label{fig:ga_flow}
-\end{figure}
-
-\subsubsection{Chromosome Representation}
-A candidate plan is encoded as an ordered permutation chromosome of target waypoint nodes:
+\subsection{NPC Schedules (Body)}
+Each NPC follows a simplified schedule---a few waypoints spread over the 10-minute session, authored per NPC in \texttt{world.json}:
 \begin{equation}
-    C = [v_1, v_2, v_3, \dots, v_k], \quad v_j \in V
+    \sigma_i = \big[(m_1, \ell_1),\, (m_2, \ell_2),\, \dots,\, (m_k, \ell_k)\big], \quad m_j \in [0, 10],\; \ell_j \in V
 \end{equation}
-For example: $[\text{Market} \rightarrow \text{Alley} \rightarrow \text{Library} \rightarrow \text{Caf\'e} \rightarrow \text{Home}]$.
+$A^*$ executes each waypoint transition. The result is a town that feels alive without per-frame planning; schedule time semantics are frozen together with the time model (HG-05).
 
-\subsubsection{Multi-Objective Fitness Evaluation}
-The fitness function penalizes distance and danger while rewarding clue discovery and punctual completion:
-\begin{equation}
-    \text{Fitness}(C) = - \left(w_1 \cdot D(C)\right) - \left(w_2 \cdot H(C)\right) + \left(w_3 \cdot R(C)\right) + \left(w_4 \cdot B(C)\right)
-\end{equation}
-where $D(C)$ represents cumulative travel distance, $H(C)$ denotes passage through high-threat alleys, $R(C)$ quantifies investigated clue sites, and $B(C)$ is a terminal punctuality bonus.
-
-\subsubsection{Evolutionary Operators}
-\begin{itemize}
-    \item \textbf{Initialization:} 50 candidate routes generated randomly from valid graph connections.
-    \item \textbf{Tournament Selection:} Subsets of $k=3$ individuals compete; the highest fitness candidate is selected as a parent.
-    \item \textbf{Order Crossover (OX):} Preserves contiguous route sub-segments while preventing duplicate node visitation.
-    \item \textbf{Swap Mutation:} Randomly swaps two waypoints ($p_m = 0.05$) to explore novel detours.
-    \item \textbf{Elitism:} The top $5\%$ fittest candidates survive into subsequent generations without mutation.
-\end{itemize}
-The algorithm terminates after 50 generations (taking $<200\text{ ms}$ on CPU), dispatching the evolved itinerary to the agent controller.
-
-\subsection{Neural Network Policy (Supervised Classification)}
-For fast reflex choices without re-running combinatorial planners, a Multi-Layer Perceptron (MLP) acts as a reactive policy:
-\begin{itemize}
-    \item \textbf{Input Feature Vector ($\mathbf{x} \in \mathbb{R}^7$):} Normalized state features:
-    \begin{equation}
-        \mathbf{x} = [\text{loc\_id}, \text{dist\_goal}, \text{nearby\_npcs}, \text{clue\_flag}, \text{threat\_level}, \text{caution}, \text{curiosity}]
-    \end{equation}
-    \item \textbf{Target Space ($y$):} Discrete action classes $y \in \{\text{Move}, \text{Talk}, \text{Examine}, \text{Wait}, \text{Flee}\}$.
-    \item \textbf{Topology:} Input ($7$) $\rightarrow$ Dense ($32$, ReLU) $\rightarrow$ Dense ($16$, ReLU) $\rightarrow$ Softmax ($5$).
-    \item \textbf{Training:} Optimized using Adam and cross-entropy loss over simulation logs; evaluated via held-out confusion matrices and F1-scores.
-\end{itemize}
-
-\subsection{Unsupervised Trajectory Clustering (K-Means)}
-To study emergent playstyles without manual behavioral tagging, simulation trajectory summaries (total distance, conversational volume, clue inspections, idle ticks) are clustered using K-Means ($k=3$):
-\begin{enumerate}
-    \item \textbf{The Inquisitor:} High spatial displacement, frequent clue inspections, moderate dialogue.
-    \item \textbf{The Socialite:} Low transit distance, long stays at the Caf\'e and Town Square, high dialogue frequency.
-    \item \textbf{The Cautious Resident:} Avoids high-threat alleys, returns home early, minimizes risky investigations.
-\end{enumerate}
-
-\subsection{Grounded LLM Dialogue Engine}
-The LLM is invoked solely when linguistic exchange occurs. A controlled context-injection pipeline compiles the character's private memories and persona into a strict JSON contract:
-
-\begin{lstlisting}[caption={Example Grounded LLM Prompt Template}]
-{
-  "system": "You are Ahmed, a 42-year-old cafe owner. Cautious and guarded with strangers. Answer strictly based on your private memories. If you did not witness an event, truthfully say you do not know.",
-  "npc_profile": { "name": "Ahmed", "traits": ["cautious", "observant"], "current_goal": "Keep cafe safe" },
-  "relevant_memories": [
-    "[09:30 AM] Brewed coffee for morning patrons.",
-    "[10:00 AM] Sat reading the town newspaper."
-  ],
-  "player_input": "Did you see who dropped the golden watch at the Market?",
-  "output_format": "JSON: {\"reply\": string, \"mood\": string}"
-}
-\end{lstlisting}
-
-When evaluated by the model, this structured context produces a grounded, in-character response without leaking unobserved town events:
-
-\begin{lstlisting}[caption={Example Grounded LLM Response Output}]
-{
-  "reply": "A golden watch? I haven't left this cafe all morning, so I couldn't tell you. You might want to check down at the Market yourself.",
-  "mood": "neutral"
-}
-\end{lstlisting}
-
-Because Ahmed's prompt excludes events from the Market, he cannot leak information regarding the stolen watch, preserving narrative authenticity.
-
-% =========================================================================
-\section{The Town Environment and Knowledge Boundaries}
-% =========================================================================
-
-Believable multi-agent social behavior requires \textbf{information asymmetry}. Knowledge must diffuse across the environment through physical encounters rather than instantaneous global updates (Figure~\ref{fig:town_diffusion}).
-
-\begin{figure}[htbp]
-\centering
-\includegraphics[width=0.92\textwidth]{../../assets/town_knowledge_diffusion.png}
-\caption{Spatial perception asymmetry at 10:00 AM and information diffusion timeline.}
-\label{fig:town_diffusion}
-\end{figure}
-
-\subsection{Information Diffusion Scenario Walkthrough}
-\begin{enumerate}
-    \item \textbf{Detection (10:00 AM):} A gold pocket watch is dropped at Market Stall 4. Sara is located at the Market node; her sensory filter logs the clue. Ahmed is at the Caf\'e node ($d=7$ ticks away); his sensory radius detects nothing.
-    \item \textbf{Goal Formulation and Pathfinding (10:05 AM):} Sara establishes a goal: ``Warn Ahmed at Caf\'e.'' She runs $A^*$ search to compute the route: $\text{Market} \rightarrow \text{Town Square} \rightarrow \text{Caf\'e}$.
-    \item \textbf{Physical Transit (10:05--10:25 AM):} Sara traverses intermediate nodes over multiple clock ticks. Ahmed remains reading at the caf\'e, completely oblivious.
-    \item \textbf{Social Encounter (10:30 AM):} Sara enters the Caf\'e node and executes $\text{Talk}(\text{Ahmed})$. The dialogue model generates speech: \textit{``Ahmed, look what was dropped at the Market!''} Ahmed's memory ledger appends: \texttt{[10:30 AM] Sara reported finding a gold watch at Market.}
-\end{enumerate}
-
-% =========================================================================
-\section{Data Generation and Machine Learning Pipeline}
-% =========================================================================
-
-The project implements a self-generating simulation pipeline on CPU hardware, avoiding massive web datasets or GPU clusters (Table~\ref{tab:ml_pipeline}).
+\subsection{Deliberately Excluded Components}
+Table~\ref{tab:excluded} lists components of the older design that are excluded from the MVP by default (open decision HG-10).
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Self-Generating Simulation Data Pipeline Specifications}
-\label{tab:ml_pipeline}
+\caption{Components Excluded from the MVP}
+\label{tab:excluded}
+\begin{tabularx}{\textwidth}{lXl}
+\toprule
+\textbf{Component (old design)} & \textbf{Old Role} & \textbf{Fate} \\
+\midrule
+Genetic Algorithm planner & Multi-objective daily route optimization & Not built$^\ast$ \\
+MLP action classifier & Reflexive action prediction & Not built$^\ast$ \\
+K-Means trajectory clustering & Post-hoc behaviour archetypes & Not built$^\ast$ \\
+\bottomrule
+\end{tabularx}
+\\ \vspace{0.4em}
+{\footnotesize $^\ast$ Built only if a course requirement is stated (HG-10; default: skip).}
+\end{table}
+
+\subsection{Runtime Conversation (Voice, Live APIs Only)}
+The language model is invoked solely for linguistic exchange. The prompt assembler compiles a controlled prompt from \emph{that NPC's files only}:
+
+\begin{lstlisting}[caption={Example Prompt Template (built per NPC)}]
+{
+  "system": "You are Mira, a 34-year-old market vendor. Stay in
+             character. Use only the facts in your own memory.
+             Obey each fact's disclosure policy: volunteer
+             'volunteer' facts, answer 'if_asked' facts only when
+             asked, never truthfully reveal 'hide' or 'lie' facts.
+             If you do not know, say you do not know.",
+  "identity": { "name": "Mira", "traits": ["observant", "guarded"],
+                "role": "lotus-seed vendor" },
+  "knowledge": [
+    { "id": "f_01", "what": "Someone snatched the silver locket
+       from the east stall", "source": "witnessed",
+       "disclosure": "if_asked" },
+    { "id": "f_04", "what": "I owe Ravi a favour I would rather
+       keep quiet", "source": "did", "disclosure": "hide" }
+  ],
+  "chat_history": [],
+  "player_input": "Did you see who took the locket?",
+  "output_format": "JSON: {\"reply\": string, \"mood\": string}"
+}
+\end{lstlisting}
+
+The structured context produces a grounded, in-character reply without leaking unobserved events or another NPC's secrets (output format is provisional, HG-08):
+
+\begin{lstlisting}[caption={Example Grounded Response Output}]
+{
+  "reply": "I did, actually - right by my stall, quick as anything.
+            But I only saw a shape slipping toward the north gate.
+            Who it was, I couldn't swear to.",
+  "mood": "wary"
+}
+\end{lstlisting}
+
+Because the prompt contains only Mira's own facts, she cannot reveal the culprit's account; asked about anything outside her memory, she says she does not know. Runtime requirements:
+\begin{itemize}
+    \item \textbf{Provider abstraction:} swappable adapters for live API providers (Gemini, Grok-class, others; final list open, HG-07); at least two providers in the MVP for robustness evaluation.
+    \item \textbf{Keys:} bring-your-own key (leaning) or capped developer key (HG-07).
+    \item \textbf{Latency and cost:} $\approx$2--3\,s per reply with streaming where supported; per-session token cap.
+    \item \textbf{Failure handling:} on API failure or timeout, canned in-character fallback lines.
+    \item \textbf{No local runtime LLM:} no Ollama/local fallback; the fine-tuned model never runs during play.
+    \item \textbf{Content safety:} player-typed input is filtered before any API call (boundary specifics open, HG-13).
+    \item \textbf{Optional toggles:} an output leak-filter and a gated reveal (a secret is injected only after the required clue is presented) are implemented as toggles, off by default, used as evaluation ablations (HG-09).
+\end{itemize}
+
+% =========================================================================
+\section{NPC Knowledge, Secrets, and the Spoiler Firewall}
+\label{sec:knowledge}
+% =========================================================================
+
+Fabula enforces \textbf{information asymmetry by construction}: knowledge distribution is authored at generation time, not spread by word of mouth at runtime, and each NPC's memory is a private, structured account that no other NPC can read (Figure~\ref{fig:town_diffusion}).
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.92\textwidth]{../../assets/town_knowledge_diffusion.png}
+\caption{Per-NPC knowledge isolation, the engine-only \texttt{truth.json} boundary, and what each character is authored to know.}
+\label{fig:town_diffusion}
+\end{figure}
+
+\subsection{Structured Facts, Not Free Text}
+NPC memory is a list of structured facts rather than free-text strings:
+\begin{equation}
+    f = \langle\, \text{id},\, \text{what},\, \text{where},\, \text{when},\, \text{src},\, \text{disclosure},\, \text{reveal\_requires}\, \rangle
+\end{equation}
+with $\text{src} \in \{\texttt{did}, \texttt{witnessed}, \texttt{heard}, \texttt{inferred}\}$ and $\text{disclosure} \in \{\texttt{volunteer}, \texttt{if\_asked}, \texttt{hide}, \texttt{lie}\}$. Structured facts make secret-keeping and consistency machine-checkable (Section~\ref{sec:eval}).
+
+\subsection{Knowledge Partitioning}
+\begin{itemize}
+    \item \textbf{Only the culprit(s)} hold the true account of what happened (their own actions).
+    \item \textbf{Non-culprits} hold partial observations plus their own unrelated secrets (\emph{red herrings}), without which the case would be trivially solvable or unsolvable.
+    \item A validator checks that the complete account exists only in culprit memory.
+\end{itemize}
+
+\subsection{Authored Cover Stories}
+Culprit lies are \textbf{authored, not improvised}: the culprit's memory includes a \texttt{cover\_story} (a claim plus supporting facts) generated with the scenario, so lies remain consistent across an entire session---even under pressure.
+
+\subsection{The Spoiler Firewall}
+\begin{itemize}
+    \item The engine owns \texttt{truth.json}; it is never included in any prompt or API request.
+    \item An NPC prompt may contain only: that NPC's \texttt{identity.json}, \texttt{memory.json}, its own chat history and session facts, and player input.
+    \item Truth references inside clues remain engine-side opaque IDs; the prompt DTO excludes clues and truth entirely unless a discovered public clue has become a player-visible session fact.
+    \item Enforcement is by tests (e.g., a test asserting no NPC prompt ever contains \texttt{truth.json} content or another NPC's files), not by prompt wording.
+\end{itemize}
+
+\subsection{Illustrative Example: Authored Information Asymmetry}
+An illustrative theft scenario (generated for a 10-minute session):
+\begin{enumerate}
+    \item \textbf{Ravi (culprit):} a \texttt{did} fact---\emph{``I took the locket from the east stall''} (\texttt{hide})---plus a \texttt{cover\_story}: \emph{``I was at the docks all morning''} (\texttt{lie}), supported by two decoy facts.
+    \item \textbf{Mira (witness):} a \texttt{witnessed} fact---\emph{``Someone snatched the locket''} (\texttt{if\_asked}). She volunteers it only when asked directly and never names a culprit she did not see.
+    \item \textbf{Tomas (red herring):} an unrelated secret (\texttt{hide})---an argument he had that evening. It raises suspicion but explains nothing.
+    \item \textbf{Player input:} whatever the player tells an NPC becomes a session fact \emph{for that NPC only}; the shipped bundle stays read-only.
+\end{enumerate}
+Nobody but Ravi can reconstruct the full truth, and no prompt anywhere contains \texttt{truth.json}.
+
+% =========================================================================
+\section{Data Generation and Fine-Tuning Pipeline}
+\label{sec:data}
+% =========================================================================
+
+No scraping and no massive web crawls: all training data is produced by a synthetic-to-natural pipeline inspired by MuSR~\cite{sprague2024musr} (Table~\ref{tab:data_pipeline}).
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Synthetic-to-Natural Training-Data Pipeline}
+\label{tab:data_pipeline}
 \begin{tabularx}{\textwidth}{lX}
 \toprule
 \textbf{Pipeline Stage} & \textbf{Technical Implementation} \\
 \midrule
-\textbf{1. Simulation Logging} & Execute 1,000--5,000 automated episodes (20--50 ticks each) with heuristic agents. Record state-action transitions to SQLite/JSON. \\
-\textbf{2. Feature Extraction}  & Convert turns into 7-dimensional normalized vectors $\mathbf{x}$ and discrete action labels $y \in \{\text{Move}, \text{Talk}, \text{Examine}, \text{Wait}, \text{Flee}\}$. \\
-\textbf{3. Model Training}      & Split dataset $80/20$. Train MLP classifier in \texttt{scikit-learn}. Run K-Means ($k=3$) on agent trajectory matrices. \\
+\textbf{1. Symbolic generator} & Plain Python, deterministic seeds, one template per v1 mystery type (theft, disappearance, murder). Emits skeletons: crime type, culprit, motive, means, opportunity, timeline, clue graph, alibis, per-NPC knowledge. \\
+\addlinespace
+\textbf{2. Teacher expansion} & A strong teacher LLM expands each skeleton into full stage JSON in the target schema (licence must permit training on outputs; HG-11). \\
+\addlinespace
+\textbf{3. Validator filter} & Discards malformed or inconsistent examples; keeps verified $(\text{settings} + \text{stage input}) \rightarrow \text{stage JSON}$ pairs. \\
+\addlinespace
+\textbf{4. Dataset export} & 1,500--3,000 verified examples, balanced across mystery types; varied by setting, cast size, culprit type, difficulty, and tone. \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-Generating 2,000 automated episodes and training the policy classifier completes in under 5 minutes on a modern laptop CPU.
+\subsection{Fine-Tuning Configuration}
+\begin{itemize}
+    \item \textbf{Base model:} small instruct LLM, $\sim$3--4B parameters (candidates: Qwen 3.x $\sim$4B, Gemma 3 4B, Llama 3.2 3B; exact choice open, HG-02).
+    \item \textbf{Method:} QLoRA supervised fine-tuning with Unsloth on Kaggle T4; check the current weekly GPU quota and session limits before scheduling runs (HA-01). SFT first; RL (e.g., GRPO) is deferred.
+    \item \textbf{Export:} quantised GGUF (Q4-class) for local CPU inference; llama.cpp-style runtime (open, HG-03).
+    \item \textbf{What it learns:} format reliability, schema adherence, and the style of scenarios and NPC identities---not world knowledge.
+\end{itemize}
+
+\subsection{Baselines}
+Before and during fine-tuning, the \emph{base model with good prompting} and a large API model are tested on the same generation task. The fine-tune must show a measurable benefit (Section~\ref{sec:eval}), with owner sign-off at the baseline comparison.
 
 % =========================================================================
 \section{Implementation Plan and 8-Week Roadmap}
 % =========================================================================
 
-The project schedule is structured across eight weeks for a two-student team (Table~\ref{tab:roadmap}).
+The operational, task-level plan lives in the generated development plan (\texttt{docs/dev\_plan/}); Tables~\ref{tab:workstreams} and~\ref{tab:roadmap} summarize it.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{Eight-Week Phased Project Implementation Schedule}
-\label{tab:roadmap}
+\caption{Workstream Map and Dependencies}
+\label{tab:workstreams}
 \begin{tabularx}{\textwidth}{llX}
 \toprule
-\textbf{Period} & \textbf{Milestone Focus} & \textbf{Team Responsibilities} \\
+\textbf{WS} & \textbf{Deliverable} & \textbf{Key Dependencies} \\
 \midrule
-\textbf{Weeks 1--2} & World Engine \& NPC Schema  & Student A: Graph topology \& tick loop engine. \newline Student B: NPC state \& perception schemas. \\
-\addlinespace
-\textbf{Weeks 3--4} & Classical AI Algorithms     & Student A: $A^*$ search \& graph traversal. \newline Student B: GA chromosome encoding \& fitness. \\
-\addlinespace
-\textbf{Week 5}     & LLM Dialogue \& UI          & Student A: FastAPI REST endpoints \& web map. \newline Student B: Prompt templates \& JSON validation. \\
-\addlinespace
-\textbf{Week 6}     & Machine Learning Pipeline   & Student A: Automated data generation scripts. \newline Student B: MLP training \& K-Means clustering. \\
-\addlinespace
-\textbf{Week 7}     & Evaluation \& Ablations     & Both Students: 100 scenario trials, consistency benchmarks, and demographic bias tests. \\
-\addlinespace
-\textbf{Week 8}     & Final Deliverables          & Both Students: Report authoring, chart synthesis, code packaging, and demonstration video. \\
+A & Frozen Pydantic schemas, stage contracts, validators, fixtures & HG-04/05/06, HG-18 \\
+B & Deterministic symbolic skeleton generator + three templates & A \\
+C & Licensed teacher expansion and training-data pipeline & A, B, HG-11/13/17 \\
+D & Baselines and Kaggle T4 QLoRA training/export & C, HG-02, HA-01 \\
+E & Local staged generation CLI and inference adapter & A, D, HG-03/16 \\
+F & Headless simulation core & A, HG-05/06 \\
+G & Isolated live-API conversation & A, HG-07/08/09/13 \\
+H & Thin game UI and interaction loop & F/G, HG-01, HA-06 \\
+I & NPC probe suite, metrics, experiments & E/G, HG-12, HA-02/05 \\
+J & Integration, packaging, playtest, licensing, release & all, HG-14/16/17 \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Difficulty Assessment ($\sim 7 / 10$)}
+Schema freeze (HG-18) is the sole initial blocker; afterwards B, F, and G run in parallel, and mocks/fixtures allow every task to be built and tested without GPU, live APIs, or the trained model. Eighteen human gates (HG-01--HG-18) and eight human-only actions (HA-01--HA-08) are recorded in the plan's \texttt{01\_HUMAN\_GATES.md}; no open item may ever be decided silently by an agent.
+
+\begin{table}[htbp]
+\centering
+\small
+\caption{Indicative Eight-Week Schedule (open, HG-14)}
+\label{tab:roadmap}
+\begin{tabularx}{\textwidth}{llX}
+\toprule
+\textbf{Period} & \textbf{Milestone Focus} & \textbf{Deliverables} \\
+\midrule
+\textbf{Week 1} & Decisions \& schemas & Open items resolved, frozen schemas, project setup (HG-18 sign-off). \\
+\addlinespace
+\textbf{Week 2} & Generator + foundations & Symbolic skeletons for theft/disappearance/murder; simulation \& conversation foundations. \\
+\addlinespace
+\textbf{Week 3} & Data pipeline & Training-data pipeline; mocked staged generator. \\
+\addlinespace
+\textbf{Week 4} & Fine-tune v1 & Baseline comparison and first QLoRA fine-tune on Kaggle T4. \\
+\addlinespace
+\textbf{Week 5} & Runtime + UI & Local model runtime and UI on mock generation. \\
+\addlinespace
+\textbf{Week 6} & Integration & End-to-end wiring and first probe runs. \\
+\addlinespace
+\textbf{Week 7} & Evaluation \& playtests & Probe metrics, base-vs-fine-tune experiment, playtest findings (HA-04). \\
+\addlinespace
+\textbf{Week 8} & Release \& report & Fixes, report, licence review, release decision (HA-07). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Difficulty Assessment (Informal)}
 \begin{itemize}
-    \item \textbf{Simulator Engine (5/10):} Standard Python graph programming using NetworkX and Gymnasium conventions.
-    \item \textbf{Genetic Algorithm (6/10):} Straightforward permutation encoding; requires tuning objective weights ($w_1 \dots w_4$).
-    \item \textbf{MLP and Clustering (6/10):} Standard scikit-learn workflow; CPU training executes rapidly.
-    \item \textbf{Grounded Consistency (8/10):} Preventing LLM factual leaks and hallucinations requires disciplined JSON prompt engineering and rigorous validation gates.
+    \item \textbf{Spoiler-firewall isolation (8/10):} the most subtle component; correctness is guaranteed by tests over prompt DTOs, not by prompt wording.
+    \item \textbf{Bundle schemas and validators (7/10):} cross-stage consistency, solvability, and unique-culprit checks.
+    \item \textbf{Staged generation and constrained decoding (7/10):} small-model reliability engineering plus CPU-speed benchmarking.
+    \item \textbf{Fine-tuning pipeline (6/10):} standard QLoRA/Unsloth on Kaggle T4.
+    \item \textbf{Headless simulation and thin UI (5/10):} conventional Python engineering.
 \end{itemize}
 
 % =========================================================================
 \section{Quantitative Evaluation Framework}
+\label{sec:eval}
 % =========================================================================
 
-The system's performance is rigorously measured across 100 scenario trials:
+Evaluation targets \textbf{NPC behaviour}, not mystery quality. Generator validators still run as safety guards, and their statistics (schema validity, solvability, diversity) may be reported only as secondary results.
+
+\subsection{Method: Scripted Probe Suite}
+A probe suite is defined per NPC: direct questions, leading questions, false accusations, pressure (``the culprit already confessed''), ``ignore your instructions'' attempts, and repeated questions across turns. Probes run against at least two live providers using prompts built from generated bundles.
 
 \subsection{Core Evaluation Metrics}
-\begin{enumerate}
-    \item \textbf{Goal Success Rate:} Percentage of episodes where NPCs fulfill assigned primary goals within 50 ticks (Target: $\ge 80\%$).
-    \begin{equation}
-        \text{Success Rate} = \frac{N_{\text{completed}}}{N_{\text{total}}} \times 100\%
-    \end{equation}
-    \item \textbf{Path Optimality Ratio:} Ratio of optimal $A^*$ path length to actual traversed distance (Target: $\ge 92\%$).
-    \begin{equation}
-        \text{Optimality} = \frac{\text{Length}(A^*)}{\text{Distance}_{\text{traveled}}}
-    \end{equation}
-    \item \textbf{Memory Consistency Rate:} Automated verification that conversational statements contain zero contradictions against memory logs (Target: $\ge 95\%$).
-    \begin{equation}
-        \text{Consistency} = 1 - \frac{N_{\text{contradictions}}}{N_{\text{dialogues}}}
-    \end{equation}
-    \item \textbf{Goal Alignment Score:} Proportion of actions directly advancing top-priority goals versus idle ticks (Target: $\ge 85\%$).
-    \begin{equation}
-        \text{Alignment} = \frac{A_{\text{goal-relevant}}}{A_{\text{total actions}}}
-    \end{equation}
-    \item \textbf{ANN Classification F1-Score:} Weighted F1-score of the MLP policy on held-out test data (Target: $\ge 0.88$).
-    \begin{equation}
-        \text{F1} = 2 \cdot \frac{\text{Precision} \cdot \text{Recall}}{\text{Precision} + \text{Recall}}
-    \end{equation}
-\end{enumerate}
-
-\subsection{Ablation Study Matrix}
-To evaluate the contribution of each component, four configurations are compared (Table~\ref{tab:ablation}).
+Table~\ref{tab:metrics} lists the seven headline metrics.
 
 \begin{table}[htbp]
 \centering
 \small
-\caption{System Ablation Experimental Comparison Matrix}
-\label{tab:ablation}
-\begin{tabularx}{\textwidth}{lXlX}
+\caption{NPC-Behaviour Evaluation Metrics}
+\label{tab:metrics}
+\begin{tabularx}{\textwidth}{lXX}
 \toprule
-\textbf{Configuration} & \textbf{Decision Engine} & \textbf{Memory} & \textbf{Observed Limitation} \\
+\textbf{Metric} & \textbf{What It Measures} & \textbf{How} \\
 \midrule
-\textbf{1. Full Hybrid (Ours)} & $A^*$ + GA + MLP & Enabled  & Optimal performance baseline. \\
-\textbf{2. Amnesic Baseline}    & $A^*$ + GA + MLP & Disabled & Severe dialogue repetition. \\
-\textbf{3. Rule-Based Baseline} & Static State Machine & Enabled & Rigid, zero conversational nuance. \\
-\textbf{4. Pure LLM Baseline}   & Prompting Only & Enabled  & Frequent physical hallucinations. \\
+Secret-keeping rate & NPC does not leak facts marked \texttt{hide}/\texttt{lie} & Fact-match + LLM-judge \\
+Knowledge boundary & NPC never claims knowledge absent from its own JSON & Fact-extraction check \\
+Persona adherence & Traits and speech style respected & Rubric (judge + human sample) \\
+Consistency & No contradictions with own memory or earlier answers & Fact-extraction vs.\ facts \\
+Culprit lie consistency & Lies stay within the authored cover story & Check vs.\ \texttt{cover\_story} \\
+Disclosure adherence & Reveals on \texttt{volunteer}/\texttt{if\_asked}/required clue; withholds otherwise & Scripted probes \\
+Provider robustness & Stability across Gemini, Grok, etc. & Same probes per provider \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsection{Demographic Bias and Fairness Testing}
-Following benchmark conventions (e.g., BBQ), mystery scenarios are executed while systematically altering character names and demographic markers (e.g., Ahmed vs. Sara vs. Alex). Statistical significance tests confirm that dialogue responses exhibit invariance in sentiment, suspicion, and blame attribution.
+Two headline metrics have closed forms:
+\begin{equation}
+    \text{Secret-Keeping} = 1 - \frac{N_{\text{secrets leaked in probes}}}{N_{\text{secret-bearing probes}}}
+\end{equation}
+\begin{equation}
+    \text{Consistency} = 1 - \frac{N_{\text{contradictions}}}{N_{\text{dialogues}}}
+\end{equation}
+
+\subsection{Core Experiment}
+NPC JSONs are generated with the \textbf{base model} and with the \textbf{fine-tuned model}; the \emph{same} runtime API model answers the same probes for both, and the metrics above are compared, broken down by mystery type. This ties the fine-tune directly to measurable NPC quality and constitutes the project's headline result.
+
+\subsection{Ablation Studies}
+\begin{enumerate}
+    \item Secrets-in-prompt (baseline) vs.\ gated reveal.
+    \item Output leak-filter off (default for evaluation) vs.\ on.
+    \item Different API providers (same probes, per provider).
+\end{enumerate}
+
+\subsection{Judge and Human Sampling}
+The LLM-judge model/provider and the human-sampling protocol (a human rates a sample of NPC outputs, HA-05) remain open decisions (HG-12).
 
 % =========================================================================
 \section{Summary and Key Advantages}
 % =========================================================================
 
 \begin{enumerate}
-    \item \textbf{Pragmatic Resource Footprint:} Runs 100\% on consumer-grade laptop CPUs without requiring expensive cloud GPUs or model fine-tuning.
-    \item \textbf{Comprehensive AI Coverage:} Unifies classical search ($A^*$), evolutionary computation (GA), supervised learning (MLP), unsupervised clustering (K-Means), and grounded generative AI.
-    \item \textbf{Verifiable Grounding:} Restricting the language model to dialogue while anchoring physical reality in deterministic simulation code guarantees that generative hallucinations cannot violate game physics.
+    \item \textbf{A genuinely generated game:} the fine-tuned $\sim$3--4B LLM is the most crucial component---it authors the mystery, town, cast, and every NPC's private knowledge before play.
+    \item \textbf{Architectural grounding:} the engine owns absolute truth (\texttt{truth.json}), each NPC's prompt is built only from its own JSON, and the spoiler firewall is enforced by tests, eliminating game-breaking hallucinations and accidental spoilers while keeping roleplay natural.
+    \item \textbf{Two-phase, resource-sensible design:} generation runs locally once (loading screen, validators, retries); play needs only a CPU-class machine plus live APIs---no fine-tuned model and no local chat model at runtime.
+    \item \textbf{Measurable claims:} evaluation targets NPC behaviour with concrete metrics (secret-keeping, knowledge boundary, consistency, persona, disclosure adherence, provider robustness) and a base-vs-fine-tune experiment per mystery type.
+    \item \textbf{Small, complete product:} 5--6 NPCs, 3--4 locations, 4--6 clues, three mystery types, and a $\sim$10-minute session with journal, timer, and a who/how/why accusation.
+    \item \textbf{Course alignment:} classical search ($A^*$), constrained structured generation, QLoRA fine-tuning, grounded prompt engineering, and behavioural LLM evaluation---all inside one working game.
 \end{enumerate}
 
 % =========================================================================
@@ -416,30 +555,15 @@ Following benchmark conventions (e.g., BBQ), mystery scenarios are executed whil
 % =========================================================================
 \begin{thebibliography}{9}
 
-\bibitem{park2023generative}
-J.~S. Park, J.~C. O'Brien, C.~J. Cai, M.~R. Morris, P.~Liang, and M.~S. Bernstein,
-\newblock ``Generative agents: Interactive simulacra of human behavior,''
-\newblock in \emph{Proceedings of the 36th Annual ACM Symposium on User Interface Software and Technology (UIST)}, pp. 1--22, 2023.
+\bibitem{sprague2024musr}
+Z.~Sprague, X.~Ye, K.~Bostrom, S.~Chaudhuri, and G.~Durrett,
+\newblock ``MuSR: Testing the limits of chain-of-thought with multistep soft reasoning,''
+\newblock in \emph{Proceedings of the Twelfth International Conference on Learning Representations (ICLR)}, 2024. (Spotlight). arXiv:2310.16049.
 
-\bibitem{huang2026narra}
-Y.~Huang, et~al.,
-\newblock ``NARRA-Gym: Benchmarking interactive narrative generation with LLM agents,''
-\newblock \emph{arXiv preprint arXiv:2601.08921}, 2026.
-
-\bibitem{cote2018textworld}
-M.-A. C\^ot\'e, \'A. K\'ad\'ar, X.~Yuan, B.~Kybartas, T.~Barnes, E.~Fine, J.~Moore, R.~Tao, M.~Hausknecht, L.~E. Asri, M.~Adada, W.~Tay, and A.~Trischler,
-\newblock ``TextWorld: A learning environment for text-based games,''
-\newblock in \emph{Computer Games Workshop at IJCAI}, 2018.
-
-\bibitem{gymnasium2023}
-M.~Towers, et~al.,
-\newblock ``Gymnasium: A standard interface for reinforcement learning environments,''
-\newblock \emph{arXiv preprint arXiv:2407.17032}, 2023.
-
-\bibitem{pettingzoo2021}
-J.~K. Terry, et~al.,
-\newblock ``PettingZoo: Gym for multi-agent reinforcement learning,''
-\newblock in \emph{Advances in Neural Information Processing Systems (NeurIPS)}, 2021.
+\bibitem{del2023true}
+M.~Del and M.~Fishel,
+\newblock ``True Detective: A deep abductive reasoning benchmark undoable for GPT-3 and challenging for GPT-4,''
+\newblock in \emph{Proceedings of the 12th Joint Conference on Lexical and Computational Semantics (*SEM)}, pp. 314--322, 2023. arXiv:2212.10114.
 
 \end{thebibliography}
 

@@ -10,7 +10,7 @@
 
 ## 2. STRICT PROHIBITION: Never Open or Read the `docs/latex/` Folder
 - **RULE**: The AI assistant must **NEVER** open, view, grep, or inspect files inside `docs/latex/` (`docs/latex/main.tex`, etc.).
-- **RATIONALE**: The LaTeX report currently reflects the **previous (pre-sync) edition** of the project description until the user explicitly regenerates it; opening it anyway would only waste context tokens on LaTeX boilerplate.
+- **RATIONALE**: The LaTeX report was regenerated from the synced documentation on 2026-10-16, but it remains the human-facing academic deliverable; opening it would only waste context tokens on LaTeX boilerplate that `docs/md/DOCUMENTATION.md` covers more efficiently.
 - **WORKING DOCUMENT**: For architecture and documentation, read `docs/md/DOCUMENTATION.md`; for product decisions (scope, features, architecture choices), read `docs/features.md` / `docs/FABULA_DEVPLAN_SOURCE.md`.
 - **LATEX COMPILATION**: Files in `docs/latex/` are strictly for the user's formal submission and should only be updated or compiled if the user explicitly gives a direct instruction to modify or recompile the LaTeX files. Build logs (`*.log`) are always removed after compiling.
 

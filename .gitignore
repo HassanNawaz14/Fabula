@@ -27,6 +27,9 @@ venv/
 .venv/
 env/
 .env/
+*.egg-info/
+.ruff_cache/
+.pytest_cache/
 
 # Deliverable 1: raw/large datasets must never be uploaded to GitHub
 data/raw/

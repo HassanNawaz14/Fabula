@@ -28,6 +28,19 @@ venv/
 env/
 .env/
 
+# Deliverable 1: raw/large datasets must never be uploaded to GitHub
+data/raw/
+data/processed/
+data/external/
+data/**/*.csv
+data/**/*.jsonl
+data/**/*.parquet
+*.parquet
+*.arrow
+*.pkl
+*.joblib
+*.h5
+
 # OS metadata, backups & IDEs
 .DS_Store
 Thumbs.db

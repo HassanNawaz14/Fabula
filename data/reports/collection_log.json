@@ -1,0 +1,28 @@
+{
+  "step": "collection",
+  "method": "synthetic symbolic generation (no scraping, no downloaded datasets - HG-17)",
+  "command": "python data/scripts/collect.py",
+  "started_at": "2026-10-16T20:27:53+00:00",
+  "duration_seconds": 0.514,
+  "python": "3.11.9",
+  "generator_version": "0.1.0",
+  "output": "C:\\Users\\HP\\OneDrive\\Desktop\\Fabula\\data\\raw\\skeletons.jsonl",
+  "total_rows": 300,
+  "rejected_rows": 0,
+  "counts_by_type": {
+    "theft": 100,
+    "disappearance": 100,
+    "murder": 100
+  },
+  "counts_by_tone": {
+    "cozy": 102,
+    "neutral": 99,
+    "dark": 99
+  },
+  "counts_by_difficulty": {
+    "easy": 102,
+    "normal": 99,
+    "hard": 99
+  },
+  "jsonl_sha256": "f52b2e1ab45e34bbd17f294fff76d19244662f117aeb332e55fdd4be9175827a"
+}

@@ -273,7 +273,7 @@ Culprit lies are **authored, not improvised**: the culprit's `memory.json` inclu
 
 ### 5.5 Example: Authored Information Asymmetry (illustrative)
 Scenario: a theft mystery generated for a 10-minute session.
-1. **Ravi (culprit)** — `did` fact: *"I took the locket from the east stall"* (`hide`), plus `cover_story`: *"I was at the docks all morning"* (`lie`, supported by two decoy facts).
+1. **Ravi (culprit)** — `did` fact: *"I took the locket from the east stall"* (`hide`), plus `cover_story`: *"I was at the parking lot all morning"* (`lie`, supported by two decoy facts).
 2. **Mira (witness)** — `witnessed` fact: *"Someone snatched the locket"* (`if_asked`). She volunteers it only when asked directly; she never names a culprit she did not see.
 3. **Tomas (red herring)** — an unrelated secret (`hide`): an argument he had that evening. It raises suspicion but explains nothing.
 4. **Player input** — whatever the player tells an NPC becomes a **session fact** for that NPC only; the shipped bundle stays read-only.

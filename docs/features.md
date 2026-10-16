@@ -100,7 +100,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 
 - **Engine [OPEN]:** Pygame or Arcade (default if undecided: Pygame). Whichever is chosen, the simulation core is a **pure-Python, headless library with no UI imports** (testable and batch-runnable); the UI is a thin layer on top **[ADOPTED]**.
 - **World construction [DECIDED]:** Python builds the world from `world.json`.
-- **Locations [DECIDED/ADOPTED]:** 3–4 named locations per game, named and described by the LLM, but their **type must come from a fixed enum** (e.g. market, library, café, park, docks; **exact enum [OPEN]**) that maps to **pre-made tiles/placeholder assets**. This keeps generated worlds renderable without generated art.
+- **Locations [DECIDED/ADOPTED]:** 3–4 named locations per game, named and described by the LLM, but their **type must come from a fixed enum** (`location_types_v1`: market, library, café, park, parking, residence — decided via HG-04; docks replaced by parking on 2026-10-17) that maps to **pre-made tiles/placeholder assets**. This keeps generated worlds renderable without generated art.
 - **Coordinates [ADOPTED]:** locations and NPC positions use explicit coordinates / tile positions (needed for A* heuristics); movement is on a small tile map or graph with named location nodes.
 - **Perception [ADOPTED]:** an NPC perceives events in its own location (optionally adjacent). Specific rule finalised at schema freeze.
 - **Time model [OPEN]:** real-time vs tick-based simulation. The session target is 10 real minutes.
@@ -438,7 +438,7 @@ Which model/provider acts as LLM-judge, and the human-sampling protocol.
 | 1 | Engine: Pygame vs Arcade | Default Pygame |
 | 2 | Exact base model | ~3–4B instruct (Qwen / Gemma / Llama candidates) |
 | 3 | Local inference runtime | llama.cpp-style |
-| 4 | Location-type enum contents | Start: market, library, café, park, docks |
+| 4 | Location-type enum contents | **Resolved (HG-04):** market, library, café, park, parking, residence |
 | 5 | Mystery types beyond v1 | Sabotage, blackmail/fraud |
 | 6 | Real-time vs tick-based simulation | Undecided |
 | 7 | Number of accusations; partial credit; hint system | Undecided |

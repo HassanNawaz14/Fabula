@@ -41,7 +41,7 @@
       <line x1="12" y1="32" x2="228" y2="32" stroke="#e2e8f0" stroke-width="1" />
       <text x="14" y="50" class="status-true">knows the TRUE account</text>
       <text x="14" y="68" class="card-line">did: took the locket (hide)</text>
-      <text x="14" y="84" class="card-line">cover story: “at the docks” (lie)</text>
+      <text x="14" y="84" class="card-line">cover story: “at the parking lot” (lie)</text>
       <text x="14" y="100" class="card-line">only holder of the full truth</text>
     </g>
 

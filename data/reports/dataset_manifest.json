@@ -1,0 +1,26 @@
+{
+  "generator": "fabula-skeletons-v1",
+  "generator_version": "0.1.0",
+  "seeds_per_type": 100,
+  "total_rows": 300,
+  "rejected_rows": 0,
+  "rejected": [],
+  "counts_by_type": {
+    "theft": 100,
+    "disappearance": 100,
+    "murder": 100
+  },
+  "counts_by_tone": {
+    "cozy": 102,
+    "neutral": 99,
+    "dark": 99
+  },
+  "counts_by_difficulty": {
+    "easy": 102,
+    "normal": 99,
+    "hard": 99
+  },
+  "jsonl": "skeletons.jsonl",
+  "jsonl_sha256": "f52b2e1ab45e34bbd17f294fff76d19244662f117aeb332e55fdd4be9175827a",
+  "created_at": "2026-10-16T20:27:54+00:00"
+}

@@ -1,79 +1,71 @@
 # Deliverable 1 — Problem Definition & Data Foundations (Status Hub)
 
 > **Source brief:** [`Deliverable 1.pdf`](./Deliverable%201.pdf)
-> **Scope of this folder:** every document needed for Deliverable 1 lives here (`deliv1_docs/`). Existing project documentation (`README.md`, `docs/*`) is intentionally **not updated** for this deliverable (owner instruction).
-> **Status legend:** `DONE` = completed now, no decisions required · `BLOCKED` = cannot start until a listed prerequisite/gate is resolved.
+> **Folder rule:** every Deliverable-1 document lives here (`deliv1_docs/`). Existing project docs are not modified for this deliverable.
+> **Status legend:** `DONE` = finished, no decision needed · `WAITING` = blocked; the reason is stated.
 
-**Deadline note (must be clarified):** the PDF header says *18 March 2024*, while the policies section says *submit to Google Classroom before 11:59 PM on 23 October*. The two dates contradict each other — treat the deadline as **unconfirmed** until the owner/instructor clarifies.
+**Deadline note:** the PDF says *18 March 2024* in the header but *23 October 11:59 PM* in the policies — still contradictory, still unconfirmed.
+
+**Key change (2026-10-16):** all project decisions HG-01…HG-17 are now recorded in `docs/decisions.md`. From here on, nothing waits on a *decision* — only on work order, one approval, and human-only actions.
+**Update (2026-10-17):** location `docks` replaced by `parking` (owner) — and the **schema freeze is APPROVED (HG-18)**. The data pipeline is unblocked.
+**Update (2026-10-17, later):** **Steps 1–3 of the data pipeline are COMPLETE** — validators, deterministic skeleton generator, balanced 300-scenario dataset, cleaning/features scripts, and three EDA charts.
 
 ---
 
-## 1. Requirements (from the brief)
+## 1. Requirements (short form)
 
-### Phase 1 — Problem Definition
-1. **Problem Statement** — the real-world pain point being addressed.
-2. **Target Audience** — who will use the tool / which research gap is filled.
-3. **AI Justification** — why ML/DL is necessary for this problem instead of traditional rule-based programming.
-
-### Phase 2 — Data Acquisition & Preprocessing (data-centric approach mandatory)
-1. **Collection** — evidence of data gathering (the brief lists examples: scraping scripts, API logs, or documentation of dataset downloads — these are *examples*, not all required).
-2. **Cleaning Implementation** — Python scripts handling missing values, duplicates, outliers.
-3. **Feature Strategy** — normalization, scaling, encoding + initial EDA charts in the report.
-
-### Submission Checklist
-- **GitHub repository:** professional `README.md` · `.gitignore` (no large raw datasets) · folder for all Phase 2 code (owner instruction: **`data/scripts/`**) · commit history showing all group members.
-- **Technical report (LaTeX):** PDF covering all Phase 1 and Phase 2 requirements, including raw-data visualizations (class distributions, feature correlations).
+- **Phase 1:** problem statement · target audience · why AI is needed (not rule-based).
+- **Phase 2:** data-collection evidence · cleaning scripts · feature strategy + EDA charts.
+- **Repo:** README · `.gitignore` without big datasets · Phase-2 code folder (`data/scripts/`) · commits from all members.
+- **Report:** LaTeX PDF covering Phase 1 + 2, with data charts.
 
 ---
 
 ## 2. Status at a Glance
 
-| # | Requirement | Status | Where / Blocker |
+| # | Requirement | Status | Where / Why |
 |---|---|---|---|
-| 1.1 | Problem Statement | **DONE (draft)** | [`phase1_problem_definition.md`](./phase1_problem_definition.md) §1 — owner review before submission |
-| 1.2 | Target Audience | **DONE (draft)** | `phase1_problem_definition.md` §2 |
-| 1.3 | AI Justification | **DONE (draft)** | `phase1_problem_definition.md` §3 |
-| 2.1 | Data collection evidence | **BLOCKED** | No dataset exists yet. Needs schema freeze (HG-04/05/06 → HG-18) + symbolic skeleton generator (WS-B). Teacher-LLM route additionally needs HG-11/HG-13/HG-17 + API keys (HA-02). See §4. |
-| 2.2 | Cleaning scripts | **BLOCKED** | `data/scripts/` scaffold created, but there is no data to clean/validate yet (depends on 2.1). |
-| 2.3 | Feature strategy + EDA charts | **BLOCKED** | Column/feature definitions come from the frozen schemas; charts need the dataset from 2.1. |
-| 3.1a | Professional `README.md` | **DONE** | Root [`README.md`](../README.md) already describes the project (existing file — left untouched per instruction). |
-| 3.1b | `.gitignore` excludes large datasets | **DONE** | Dataset rules added (`data/raw/`, `data/processed/`, `data/external/`, data file formats). |
-| 3.1c | Phase-2 code folder | **DONE (scaffold)** | `data/scripts/` created (owner-specified naming); code lands here once 2.1 unblocks. |
-| 3.1d | Commits from all group members | **BLOCKED (human)** | Only genuine contributions can appear in history; team roles/timeline are still undecided (HG-14). Cannot be manufactured. |
-| 3.2 | LaTeX report + EDA visuals | **BLOCKED** | (a) project rule: LaTeX files are touched only on explicit owner instruction; (b) Phase 2 content and EDA charts do not exist yet (2.1–2.3). |
+| 1.1 | Problem Statement | **DONE** | [`phase1_problem_definition.md`](./phase1_problem_definition.md) §1 (draft for review) |
+| 1.2 | Target Audience | **DONE** | same file §2 |
+| 1.3 | AI Justification | **DONE** | same file §3 |
+| — | Project schemas (the enabler Phase 2 waits on) | **DONE — APPROVED 2026-10-17** | code in `src/fabula/schemas/` (24 tests pass); approval recorded in `docs/decisions.md` (HG-18) |
+| 2.1 | Data-collection evidence | **DONE** | full write-up: [`phase2_data_evidence.md`](./phase2_data_evidence.md) §2; machine logs in `data/reports/collection_log.json` + `dataset_manifest.json` (300 scenarios, sha256, 0 rejected); code `src/fabula/training_data/` |
+| 2.2 | Cleaning scripts | **DONE** | [`phase2_data_evidence.md`](./phase2_data_evidence.md) §3; `data/scripts/clean.py`; report `data/reports/cleaning_report.json` (300 in → 300 out) |
+| 2.3 | Feature strategy + EDA charts | **DONE** | [`phase2_data_evidence.md`](./phase2_data_evidence.md) §4–5 (feature table + chart interpretations); `data/scripts/{features,eda}.py`; charts in [`eda_charts/`](./eda_charts/) |
+| 3.1a | Professional `README.md` | **DONE** | root `README.md` (untouched) |
+| 3.1b | `.gitignore` (no big datasets) | **DONE** | dataset rules + tool-cache rules added |
+| 3.1c | Phase-2 code folder | **DONE** | `data/scripts/` with real collect/clean/features/eda code |
+| 3.1d | Commits from all members | **WAITING (human)** | reason: history only grows from real work; HG-14 still needs names/availability of members |
+| 3.2 | LaTeX report + charts | **WAITING** | reason: (1) project rule — LaTeX only on your explicit instruction; (2) teacher-expanded data (step 4) still pending |
 
 ---
 
-## 3. What Is Being Done Right Now (no decisions required)
+## 3. Completed Work (cumulative)
 
-1. **Phase 1 written in full** → `phase1_problem_definition.md` (problem statement, target audience, AI justification), derived from the sources of truth `docs/features.md` and `docs/md/DOCUMENTATION.md`.
-2. **This status hub** documenting D1 requirements, current state, and every blocker (this file).
-3. **`.gitignore` hardened** so raw/large datasets can never be pushed (checklist item 3.1).
-4. **`data/scripts/` scaffolded** as the dedicated home for all Phase 2 code (checklist item 3.1).
-5. **Collection approach clarified** (§4 below): Fabula satisfies "data gathering" without scraping — scraping is explicitly out of scope by project decision, and the brief's list of evidence types is non-exhaustive ("scripts **or** API logs **or** dataset-download documentation").
+1. **Phase 1 written** → `phase1_problem_definition.md` (all three required sections, plain draft for your review).
+2. **Frozen schemas written and tested** → `src/fabula/schemas/` + `tests/test_schemas.py`: bundle files, all four generation stages, bounds (3–4 locations, 5–6 NPCs, 4–6 clues), accusation options (HG-06), reply shape (HG-08), and a type-level spoiler firewall (a test proves `truth` cannot be passed into a chat prompt).
+3. **Approval request** → `SCHEMA_FREEZE_APPROVAL.md` — **answered: APPROVED 2026-10-17** (with docks→parking change, now in the enum). Time fields are integer minutes (0–10).
+4. **Contract doc written** → `docs/contracts/schema-v1.md` (full detail, reference only).
+5. **Repo hygiene** → `.gitignore` extended (datasets + caches); `pyproject.toml` added; `data/scripts/` scaffolded.
+6. **Collection route confirmed** → HG-17: training data is 100% synthetic → D1 "collection evidence" = our generator scripts + run manifests/logs.
+7. **Validators (A-02)** → `src/fabula/schemas/validators.py` + `tests/test_validators.py`: 8 issue codes (graph/schedule/timeline/time-window/culprit-account/lie-cover/clue-implies/culprit-evidence).
+8. **Skeleton generator (WS-B)** → `src/fabula/training_data/skeletons/`: deterministic per `(type, seed, tone, difficulty)`, all three mystery types; tests generate **100 seeds × 3 types = 300 bundles**, all pass the validators, and prove only the culprit holds a cover story/lie facts.
+9. **Balanced dataset + evidence** → `build_skeleton_dataset.py` exports **300 scenarios** (100/type, balanced tone/difficulty, provenance tags) to gitignored `data/raw/skeletons.jsonl`; run evidence committed in `data/reports/{collection_log,dataset_manifest,cleaning_report}.json`; **narrative evidence pack: [`phase2_data_evidence.md`](./phase2_data_evidence.md)** (numbers, hashes, interpretation, repro commands, evidence index).
+10. **Phase-2 scripts + EDA** → `data/scripts/collect.py`, `clean.py` (re-validate + dedupe), `features.py` (25 columns: 16 numeric min-max scaled + one-hot categoricals → `features_scaled.csv`), `eda.py` → three charts with written interpretation in [`phase2_data_evidence.md`](./phase2_data_evidence.md) §5: [`class_distribution.png`](./eda_charts/class_distribution.png), [`disclosure_distribution.png`](./eda_charts/disclosure_distribution.png), [`feature_correlations.png`](./eda_charts/feature_correlations.png).
+11. **Quality gates** → **52 tests pass; `ruff check` + `ruff format` clean**; full pipeline rerunnable end-to-end (`collect → clean → features → eda`).
 
-Nothing above required answering any open project decision (Human Gate).
+## 4. What Is NOT Done Yet — and the exact reason
 
----
+In order (each step waits only on the one above it):
 
-## 4. What Must Wait, and Why (blockers)
+| Step | What | Waiting on | Who acts |
+|---|---|---|---|
+| 1–3 | ~~Validators, generator, dataset, Phase-2 scripts, charts~~ | **DONE 2026-10-17** | — |
+| 4 | Teacher-expanded data (bigger, natural-language examples) | a Kaggle run — decisions already made (HG-11/13/17), no API keys needed | coding + you (Kaggle) |
+| 5 | LaTeX D1 report (with the charts) | step 4 + **your explicit instruction** to touch LaTeX | you + coding |
+| 6 | Group commit history | team names/availability (HG-14) + everyone committing real work | all members |
 
-### 4.1 The data does not exist yet (blocks 2.1, 2.2, 2.3)
-Fabula's data is **synthetic by decision** (no scraping — `docs/features.md` §5.2). The data pipeline is: **symbolic skeleton generator → teacher-LLM expansion → validator filter → SFT dataset** (`docs/dev_plan/WS-B`, `WS-C`). Its prerequisites, in order:
-
-1. **Schema freeze** — the plan's sole initial blocker. Requires owner answers to **HG-04** (location-type enum), **HG-05** (simulation clock), **HG-06** (accusation rules), then **HG-18** sign-off on the frozen schemas (WS-A).
-2. **Skeleton dataset (WS-B)** — deterministic Python, needs only the frozen schemas. This alone would produce the "raw data" for collection evidence, cleaning, and EDA — **no GPU, no API keys, no gates beyond step 1**.
-3. **Teacher expansion / dataset downloads (WS-C)** — only needed for full natural-language training data. Blocked by **HG-11** (teacher licence; current default = *no teacher pipeline until cleared*), **HG-13** (content boundary), **HG-17** (reference-dataset licences, e.g. MuSR), **HA-02** (API keys).
-
-### 4.2 Human-only items (cannot be done by documentation work)
-- **Commit history of all group members** — blocked by **HG-14** (roles/timeline undecided) plus the simple fact that history reflects real work as it happens.
-- **LaTeX report** — blocked by explicit-instruction rule for LaTeX + missing Phase 2 evidence (EDA charts depend on the dataset).
-
-### 4.3 Suggested unblock order (for the owner)
-1. Answer HG-04 / HG-05 / HG-06 → freeze schemas (HG-18).
-2. Run WS-B skeleton generator → first dataset → write `data/scripts/` (collect / clean / features / EDA) → produce charts.
-3. Decide HG-11 / HG-13 / HG-17 and provide keys (HA-02) only if the teacher-expanded dataset is wanted for D1.
-4. Request the LaTeX report explicitly (and decide where it lives — see open questions).
+**Also still open from your side:** correct deadline (18 Mar vs 23 Oct) · submit under Track A or B · HG-10 (does the course force GA/MLP/K-Means into scope?) · where the D1 LaTeX file should live.
 
 ---
 
@@ -81,19 +73,10 @@ Fabula's data is **synthetic by decision** (no scraping — `docs/features.md` �
 
 | Brief item | Fabula repo | State |
 |---|---|---|
-| Professional `README.md` | root `README.md` | Present (untouched) |
-| `.gitignore` (no large raw datasets) | root `.gitignore` | Updated now |
-| `/data scripts` folder with Phase 2 code | `data/scripts/` | Folder created; code blocked (§4.1) |
-| Active commit history, all members | `git log` | 2 authors so far; blocked (§4.2) |
-| LaTeX PDF report (Phase 1 + Phase 2, EDA visuals) | not started | Blocked (§4.2) |
+| Professional `README.md` | root `README.md` | Present |
+| `.gitignore` (no large raw datasets) | root `.gitignore` | Done |
+| Phase-2 code folder | `data/scripts/` | Done — collect/clean/features/eda |
+| Active commit history, all members | `git log` | Waiting on members (step 6) |
+| LaTeX PDF report + data charts | not started | Waiting (steps 4–5) |
 | Phase 1 content | `deliv1_docs/phase1_problem_definition.md` | Draft complete |
-| Phase 2 evidence + charts | `data/scripts/` (future) | Blocked (§4.1) |
-
----
-
-## 6. Open Questions for the Owner
-
-1. **Deadline:** 18 March 2024 vs 23 October 11:59 PM — which is correct?
-2. **Folder naming:** the brief says a folder named `/data scripts`; per owner instruction we use `data/scripts/` instead — confirm this substitution is acceptable.
-3. **LaTeX report location:** the brief requires a new D1 report (the existing `docs/latex/main.tex` is the project architecture report, not the D1 report). Where should the D1 LaTeX source live, and when should it be created? (LaTeX work starts only on explicit instruction.)
-4. **Track:** the brief's Phase 1 section applies to Tracks A & B identically — confirm Fabula is submitted under one of them.
+| Phase 2 evidence + charts | [`phase2_data_evidence.md`](./phase2_data_evidence.md) + `data/reports/` + [`eda_charts/`](./eda_charts/) | Done (300 scenarios) |

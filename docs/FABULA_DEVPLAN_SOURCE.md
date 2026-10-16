@@ -124,7 +124,7 @@ PHASE 2 (play, ~10 min)
 
 ## C2. World & engine
 - **Headless pure-Python simulation core, zero UI imports [ADOPTED]**; UI is a thin layer. Engine **Pygame (default) vs Arcade** [OPEN → HG-01].
-- Python builds the world from `world.json` [DECIDED]. Locations: 3–4, named/described by the LLM; **`type` must come from a fixed enum** mapped to pre-made placeholder tiles (**enum [OPEN → HG-04]**, default: market, library, café, park, docks). No generated art.
+- Python builds the world from `world.json` [DECIDED]. Locations: 3–4, named/described by the LLM; **`type` must come from a fixed enum** mapped to pre-made placeholder tiles (**enum [DECIDED → HG-04]**: market, library, café, park, parking, residence — docks replaced by parking 2026-10-17). No generated art.
 - Locations/NPCs have explicit coordinates; movement on a small tile map or graph of named location nodes (needed for A*). NPC **perception**: events in own location (optionally adjacent); finalise at schema freeze.
 - **Time model [OPEN → HG-05]**: real-time vs tick-based. Note `schedule.at_minute` assumes a session clock in minutes.
 
@@ -221,7 +221,7 @@ Notes: generic `crime` block serves all types (murder = `type: murder`); solutio
 | HG-01 | Engine: Pygame vs Arcade | Pygame | UI work (WS-H) | WS-H |
 | HG-02 | Exact base model | ~3–4B instruct (Qwen/Gemma/Llama) → plan a small bake-off | Fine-tune | WS-D, WS-E final |
 | HG-03 | Local inference runtime | llama.cpp-style | Generator runtime | WS-E |
-| HG-04 | Location-type enum contents | market, library, café, park, docks | Schema freeze | WS-A onward, tile kit |
+| HG-04 | Location-type enum contents | market, library, café, park, parking, residence (docks→parking 2026-10-17) | Schema freeze | WS-A onward, tile kit |
 | HG-05 | Real-time vs tick-based simulation | undecided (propose; recommend one in plan with rationale) | Schema freeze / sim core | WS-A, WS-F |
 | HG-06 | Accusation rules: count, partial credit, hints, **how/why matching method** [NEW-OPEN] | undecided | Sim core accusation module | WS-F, WS-H, generator schema |
 | HG-07 | Runtime API providers; key model (BYO vs capped dev key) | Gemini + Grok-class; BYO leaning | Conversation module | WS-G, WS-I |

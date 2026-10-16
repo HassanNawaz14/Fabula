@@ -14,7 +14,7 @@ Question: Which exact ~3–4B instruct base? Options: Qwen 3.x ~4B / Gemma 3 ~4B
 Question: Which local inference runtime? Options: A llama.cpp-compatible GGUF runner / B another documented local runtime supporting constrained JSON and CPU · Default: A · Blocks: E-02, J-02. Ask before packaging adapter is finalized. Consequence: affects model artifact format, grammar support, installation.
 
 ### ⛔ HUMAN GATE HG-04 — Location type enum
-Question: Which fixed location types ship? Options: A market, library, café, park, docks / B reduced/expanded owner-provided list · Default: A · Blocks: A-01, A-02 and all downstream schema/tile work. Ask at schema freeze. Consequence: changes accepted bundle values and tile mapping.
+Question: Which fixed location types ship? Options: A market, library, café, park, parking, residence (chosen; see decisions.md) / B reduced/expanded owner-provided list · Default: A · Blocks: A-01, A-02 and all downstream schema/tile work. Ask at schema freeze. Consequence: changes accepted bundle values and tile mapping.
 
 ### ⛔ HUMAN GATE HG-05 — Simulation clock
 Question: Real-time or tick-based simulation? Options: A real-time monotonic clock with minute schedule boundaries / B fixed simulation ticks mapped to real time · Default: B, one simulation minute per 60 real seconds, tick step 1 second; rationale: deterministic tests and schedule reproducibility while retaining the ten-minute session · Blocks: A-01, F-02, F-03, H-01. Ask before schema freeze. Consequence: changes schedule/time APIs and pause behavior.

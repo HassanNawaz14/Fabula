@@ -4,7 +4,7 @@
 - **Sole sources of truth**: `docs/features.md` (product & feature specification) and `docs/FABULA_DEVPLAN_SOURCE.md` (dev-plan source brief). The development plan in `docs/dev_plan/` is generated from them and is up to date.
 - **Synced documents** (derived, never authoritative): `README.md`, `docs/md/DOCUMENTATION.md`, and the diagrams in `assets/`. When a product question arises, consult the truth files first; on conflict, **the truth files win**.
 - `docs/md/`: Markdown documentation (`DOCUMENTATION.md`) — designed for AI models, IDE previews, and fast contextual reading.
-- `docs/latex/`: Academic LaTeX source and deliverables (`main.tex`, `main.pdf`, `.aux`, `.toc`) — designed strictly for the human user and academic submission.
+- `docs/latex/`: Academic LaTeX source and deliverables (`main.tex`, `main.pdf`; build artifacts like `.aux`/`.toc` are always deleted) — designed strictly for the human user and academic submission.
 
 ---
 

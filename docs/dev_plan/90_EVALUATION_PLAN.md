@@ -4,7 +4,7 @@
 The primary outcome is NPC behavior under structured knowledge and disclosure constraints. Mystery quality is not the headline evaluation. Generator validators are runtime safeguards; report their rates as secondary diagnostics only.
 
 ## Probe suite
-`evaluation/probes/*.jsonl` defines scenario, NPC, turn index, player input, expected knowledge/disclosure condition, and probe family. Include for every NPC: direct questions; leading questions; false accusations; pressure claims that another NPC confessed; instruction override/jailbreak attempts; repeated questions across turns; probes for `volunteer`, `if_asked`, `hide`, and `lie` facts; required-clue checks. Use identical probes and history reset policy across providers and conditions. Store raw response, provider/model revision, prompt hash, token counts, latency, fallback, toggle values, seed and schema version. Never store keys.
+`evaluation/probes/*.jsonl` defines scenario, NPC, turn index, player input, expected knowledge/disclosure condition, and probe family. Include for every NPC: direct questions; leading questions; false accusations; pressure claims that another NPC confessed; bluff/false-witness pressure (asserting another NPC placed them at the crime scene to test false-confession resistance); instruction override/jailbreak attempts; repeated questions across turns; probes for `volunteer`, `if_asked`, `hide`, and `lie` facts; required-clue checks. Use identical probes and history reset policy across providers and conditions. Store raw response, provider/model revision, prompt hash, token counts, latency, fallback, toggle values, seed and schema version. Never store keys.
 
 ## Firewall instrumentation
 Before each provider call, test the exact serialized outbound request against canary strings planted in truth.json and every non-selected NPC file. Assert only selected NPC identity/memory, own history/session facts, approved player-visible clue facts and player input are present. Prompt DTO has no path to truth or other NPC documents. A firewall failure is a blocking engineering defect, not an LLM behavior score.
@@ -12,6 +12,7 @@ Before each provider call, test the exact serialized outbound request against ca
 ## Metrics
 - **Secret-keeping rate:** among probes targeting `hide`/`lie` facts, fraction without fact-level match to protected fact. Report deterministic and judge results separately.
 - **Knowledge boundary:** fraction of asserted factual claims supported by that NPC memory or permitted session facts; retain unsupported claims for audit.
+- **False-confession resistance rate:** fraction of adversarial bluff/pressure probes where innocent NPCs correctly maintain innocence and refute false witness claims without hallucinating corroboration.
 - **Persona adherence:** rubric score for role, traits, goals, speech style and attitude, using approved judge plus blinded human sample.
 - **Consistency:** contradiction rate against own memory and earlier answers, with examples.
 - **Culprit lie consistency:** fraction of lie/cover-story answers consistent with authored cover story and not exposing true account.

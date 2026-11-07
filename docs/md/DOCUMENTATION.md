@@ -117,7 +117,7 @@ Game bundle on disk: world.json · truth.json · clues.json · npcs/<id>/identit
 
 Design decisions behind this pipeline:
 - **Staged generation [ADOPTED]**: world → cast → truth → per-NPC files instead of one giant output. Small models stay more consistent, each stage is validated separately, and retries are cheap.
-- **Constrained decoding [ADOPTED]**: grammar- or JSON-schema-constrained output to prevent malformed JSON.
+- **Constrained decoding [ADOPTED]**: grammar- or JSON-schema-constrained output to prevent malformed JSON. To minimize parser overhead on low-end CPUs, the engine uses 4 compact stage-specific GBNF grammars compiled directly from Pydantic models rather than a single monolithic grammar.
 - **Validator + retry loop [ADOPTED]**: checks schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability, and unique-culprit rules after every stage. Failure → retry the stage up to N times (default 3, config) → explicit error screen. This is a **runtime safety guard**, not the project's headline evaluation.
 - **Solvability, concretely [ADOPTED]**: a chain of clues/facts exists from which the player can derive who/how/why; exactly one culprit set; no timeline contradictions; all cross-references resolve; location graph connected; ≥4–6 clues.
 - **Loading screen [ADOPTED]**: local CPU generation of a few thousand JSON tokens may take minutes on low-end machines (estimate — **benchmark early**, HA-03).
@@ -233,7 +233,7 @@ Because the prompt contains only Mira's own facts, **she cannot leak the culprit
 #### Runtime Conversation Requirements
 - **Provider abstraction [ADOPTED]**: swappable adapters for live API providers (Gemini, Grok-class, others; **final list [OPEN → HG-07]**), **≥2 providers in MVP** for robustness evaluation.
 - **API keys [ADOPTED/OPEN]**: bring-your-own key (leaning) or capped developer key (**HG-07**).
-- **Latency budget [ADOPTED]**: ≈2–3 seconds per reply; stream where supported.
+- **Latency budget [ADOPTED]**: ≈2–3 seconds per reply; stream where supported. Prioritize ultra-low TTFT providers (e.g. Gemini 1.5/2.0 Flash, Groq Llama 3.3 70B with sub-500ms time-to-first-token) to eliminate immersion-breaking conversation stalls.
 - **Cost control [ADOPTED]**: per-session token cap.
 - **Failure handling [ADOPTED]**: on API failure/timeout, fall back to canned in-character lines.
 - **No local runtime LLM [DECIDED]**: no Ollama/local fallback; the fine-tuned model never runs during play.
@@ -316,9 +316,9 @@ No scraping and no massive web crawls: all training data is produced by a **synt
 |---|---|---|
 | Base model | Small instruct LLM, **~3–4B** (`unsloth/Qwen2.5-3B-Instruct-bnb-4bit`) | **ADOPTED (HG-02)** |
 | Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** (LoRA rank 16) | **DECIDED / READY** |
-| Curriculum | SFT on 2,048 train pairs (2 epochs, batch size 2, grad accum 4) | ADOPTED |
+| Curriculum | SFT on 2,048 train pairs (2 epochs, batch size 2, grad accum 4; packing option cuts time to ~20 min) | ADOPTED |
 | Export | Quantised **GGUF (Q4_K_M)** for local CPU inference | ADOPTED |
-| Inference runtime | llama.cpp-style runner with GBNF constrained decoding | **ADOPTED (HG-03)** |
+| Inference runtime | llama.cpp-style runner with stage-specific GBNF constrained decoding | **ADOPTED (HG-03)** |
 | Notebook | `training/notebooks/fabula_qlora_sft.ipynb` & `training/scripts/kaggle_qlora_sft.py` | Ready to run |
 
 Check Kaggle's current weekly GPU quota and session limits before scheduling runs (human action **HA-01**).
@@ -408,6 +408,7 @@ A **probe suite per NPC**: direct questions, leading questions, false accusation
 |---|---|---|
 | **Secret-keeping rate** | NPC does not leak facts marked `hide`/`lie` | Fact-match + LLM-judge |
 | **Knowledge boundary** | NPC never claims knowledge absent from its own JSON | Fact-extraction check |
+| **False-confession resistance** | Innocent NPC refutes false witness/bluff claims without admitting guilt | Adversarial false-claim probe |
 | **Persona adherence** | Traits and speech style respected | Rubric (LLM-judge + human sample) |
 | **Consistency** | No contradictions with own `memory.json` or earlier answers | Fact-extraction vs structured facts |
 | **Culprit lie consistency** | Lies stay within the authored `cover_story` | Check against cover story |

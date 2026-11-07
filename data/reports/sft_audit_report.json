@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-11-07T11:41:51+00:00",
+  "duration_seconds": 1.664,
+  "total_records_audited": 2558,
+  "split_counts": {
+    "train.jsonl": 2048,
+    "val.jsonl": 256,
+    "test.jsonl": 254
+  },
+  "stage_counts": {
+    "settings->world": 300,
+    "world->cast": 300,
+    "world+cast->truth+clues": 300,
+    "world+cast+clues+npc_id->identity+memory": 1658
+  },
+  "schema_errors_count": 0,
+  "spoiler_violations_count": 0,
+  "status": "PASSED",
+  "errors": [],
+  "spoiler_violations": []
+}

@@ -25,8 +25,10 @@ timing, environment, dataset hash, and validation results).
 | Integrity hash | `f52b2e1a…5827a` (full SHA-256 in `data/reports/dataset_manifest.json`) |
 | Raw data on disk | `data/raw/skeletons.jsonl` — **gitignored by design** (repo rule: no big raw datasets) |
 
-The 300 scenarios are the **seed corpus** for the fine-tuning chain: skeleton → teacher LLM
-expansion (HG-11, local/Kaggle, no API keys) → ~1,500–2,400 validated stage examples → QLoRA SFT.
+The 300 scenarios served as the **seed corpus** for the fine-tuning chain. On 2026-11-07,
+they were expanded on Kaggle Dual Tesla T4 GPUs via `Qwen/Qwen2.5-7B-Instruct` (Apache 2.0, HG-11)
+in 18.3 minutes into **2,558 validated stage examples** partitioned strictly by seed into
+`train.jsonl` (2,048), `val.jsonl` (256), and `test.jsonl` (254). See §8.
 
 ## 2. How the data was collected (evidence: code + run logs)
 
@@ -159,6 +161,11 @@ Deterministic seeds → same hash on every machine; the SHA-256 in
 | Status hub (requirement → state) | `deliv1_docs/README.md` | yes |
 | Schema-freeze approval record | `deliv1_docs/SCHEMA_FREEZE_APPROVAL.md` | yes |
 | Collection log, manifest, cleaning report | `data/reports/*.json` | yes |
+| SFT audit report (2,558 records, 0 errors) | `data/reports/sft_audit_report.json` | yes |
+| SFT audit script | `data/scripts/audit_sft.py` | yes |
+| Kaggle teacher expansion script | `training/scripts/kaggle_teacher_expansion.py` | yes |
+| Kaggle Unsloth QLoRA script & notebook | `training/scripts/kaggle_qlora_sft.py`, `training/notebooks/` | yes |
+| Training guide & architecture | `training/README.md` | yes |
 | Pipeline scripts (collect/clean/features/eda) | `data/scripts/` | yes |
 | Generator + dataset export code | `src/fabula/training_data/` | yes |
 | Frozen schemas + validators | `src/fabula/schemas/` | yes |
@@ -166,3 +173,25 @@ Deterministic seeds → same hash on every machine; the SHA-256 in
 | Raw & processed datasets | `data/raw/`, `data/processed/` | **no — gitignored by rule** |
 | Schema contract (human-readable) | `docs/contracts/schema-v1.md` | yes |
 | Decision record incl. progress log | `docs/decisions.md` | yes |
+
+---
+
+## 8. Teacher-Expanded SFT Datasets (Step 4, WS-C Complete)
+
+On 2026-11-07, the 300 symbolic skeletons were expanded on Kaggle Dual Tesla T4 GPUs
+using `Qwen/Qwen2.5-7B-Instruct` (Apache 2.0 open-weight teacher, HG-11).
+
+* **Runtime:** 18.3 minutes total.
+* **Total Staged Pairs:** **2,558 pairs** across 4 stages:
+  * Stage 1 (`settings -> world`): 300
+  * Stage 2 (`world -> cast`): 300
+  * Stage 3 (`world + cast -> truth + clues`): 300
+  * Stage 4 (`world + cast + clues + npc_id -> identity + memory`): 1,658
+* **Disjoint Seed-Based Splits (Zero Data Leakage):**
+  * `train.jsonl`: 2,048 pairs (Seeds 0–79, 80%)
+  * `val.jsonl`: 256 pairs (Seeds 80–89, 10%)
+  * `test.jsonl`: 254 pairs (Seeds 90–99, 10% held-out evaluation)
+* **Quality & Spoiler Firewall Verification:**
+  * Re-validated by `data/scripts/audit_sft.py`.
+  * **Result (`data/reports/sft_audit_report.json`):** `STATUS: PASSED`, 0 schema errors,
+    0 spoiler violations across all 2,558 records.

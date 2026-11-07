@@ -305,21 +305,21 @@ No scraping and no massive web crawls: all training data is produced by a **synt
 - Plain Python, **deterministic seeds**, one **template per v1 mystery type** (theft, disappearance, murder), with variation knobs (setting, cast size, culprit type, difficulty, tone).
 - Produces the skeleton that the teacher expands; public murder-mystery datasets do not cover theft/disappearance, hence per-type templates.
 
-### 6.2 Teacher Expansion & Filtering (Workstream C)
-- A strong **teacher LLM** expands each skeleton into stage JSON in the target schema; **licence must permit training on its outputs [OPEN → HG-11]**.
-- The **validator filters** bad examples; the result is SFT examples of `(settings + stage input) → stage JSON`.
-- **Size: ~1,500–3,000 verified examples**, balanced across mystery types; `mystery_type`, tone, and difficulty are conditioning inputs.
-- Licence log for code, data, weights, base model, and reference datasets **[OPEN → HG-17]**; content boundary rules fixed before teacher prompts run **[OPEN → HG-13]**.
+### 6.2 Teacher Expansion & Filtering (Workstream C) [COMPLETED 2026-11-07]
+- A strong open-weight **teacher LLM** (`Qwen/Qwen2.5-7B-Instruct`, Apache 2.0, HG-11) expanded the 300 skeletons into stage JSON in the target schema on Kaggle Dual Tesla T4 GPUs in 18.3 minutes.
+- The **validator filters** verified all generated stages against Pydantic V2 schemas and the spoiler firewall; the resulting SFT dataset contains **2,558 verified examples** (`(settings + stage input) → stage JSON`).
+- **Disjoint Seed Splits:** `train.jsonl` (2,048 pairs, seeds 0–79), `val.jsonl` (256 pairs, seeds 80–89), `test.jsonl` (254 pairs, seeds 90–99).
+- Fully audited and passed in `data/reports/sft_audit_report.json` with 0 schema errors and 0 spoiler leaks. Code in `training/scripts/kaggle_teacher_expansion.py` and `data/scripts/audit_sft.py`.
 
-### 6.3 Fine-Tuning (Workstream D) [DECIDED/ADOPTED]
+### 6.3 Fine-Tuning (Workstream D) [DECIDED/ADOPTED — PREPARED]
 | Item | Choice | Status |
 |---|---|---|
-| Base model | Small instruct LLM, **~3–4B** (Qwen 3.x ~4B / Gemma 3 ~4B / Llama 3.2 3B) | **[OPEN → HG-02]** |
-| Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** | **[DECIDED]** |
-| Curriculum | SFT first; RL (e.g. GRPO) deferred | ADOPTED |
-| Export | Quantised **GGUF (Q4-class)** for local CPU inference | ADOPTED |
-| Inference runtime | llama.cpp-style runner | **[OPEN → HG-03]** |
-| What it learns | Format reliability, schema adherence, scenario/NPC **style** — not world knowledge | ADOPTED |
+| Base model | Small instruct LLM, **~3–4B** (`unsloth/Qwen2.5-3B-Instruct-bnb-4bit`) | **ADOPTED (HG-02)** |
+| Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** (LoRA rank 16) | **DECIDED / READY** |
+| Curriculum | SFT on 2,048 train pairs (2 epochs, batch size 2, grad accum 4) | ADOPTED |
+| Export | Quantised **GGUF (Q4_K_M)** for local CPU inference | ADOPTED |
+| Inference runtime | llama.cpp-style runner with GBNF constrained decoding | **ADOPTED (HG-03)** |
+| Notebook | `training/notebooks/fabula_qlora_sft.ipynb` & `training/scripts/kaggle_qlora_sft.py` | Ready to run |
 
 Check Kaggle's current weekly GPU quota and session limits before scheduling runs (human action **HA-01**).
 

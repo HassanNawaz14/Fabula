@@ -36,7 +36,7 @@
 | 3.1b | `.gitignore` (no big datasets) | **DONE** | dataset rules + tool-cache rules added |
 | 3.1c | Phase-2 code folder | **DONE** | `data/scripts/` with real collect/clean/features/eda code |
 | 3.1d | Commits from all members | **WAITING (human)** | reason: history only grows from real work; HG-14 still needs names/availability of members |
-| 3.2 | LaTeX report + charts | **WAITING** | reason: (1) project rule — LaTeX only on your explicit instruction; (2) teacher-expanded data (step 4) still pending |
+| 3.2 | LaTeX report + charts | **WAITING** | reason: project rule — LaTeX only on your explicit instruction (teacher-expanded data is completed) |
 
 ---
 
@@ -61,8 +61,8 @@ In order (each step waits only on the one above it):
 | Step | What | Waiting on | Who acts |
 |---|---|---|---|
 | 1–3 | ~~Validators, generator, dataset, Phase-2 scripts, charts~~ | **DONE 2026-10-17** | — |
-| 4 | Teacher-expanded data (bigger, natural-language examples) | a Kaggle run — decisions already made (HG-11/13/17), no API keys needed | coding + you (Kaggle) |
-| 5 | LaTeX D1 report (with the charts) | step 4 + **your explicit instruction** to touch LaTeX | you + coding |
+| 4 | ~~Teacher-expanded data (2,558 staged examples, train/val/test splits)~~ | **DONE 2026-11-07** | Kaggle Dual T4 (Qwen2.5-7B-Instruct, Apache 2.0, 18.3 mins) |
+| 5 | LaTeX D1 report (with the charts) | **your explicit instruction** to touch LaTeX | you + coding |
 | 6 | Group commit history | team names/availability (HG-14) + everyone committing real work | all members |
 
 **Also still open from your side:** correct deadline (18 Mar vs 23 Oct) · submit under Track A or B · HG-10 (does the course force GA/MLP/K-Means into scope?) · where the D1 LaTeX file should live.

@@ -1,7 +1,7 @@
 {
   "step": "cleaning",
-  "input": "C:\\Users\\HP\\OneDrive\\Desktop\\Fabula\\data\\raw\\skeletons.jsonl",
-  "output": "C:\\Users\\HP\\OneDrive\\Desktop\\Fabula\\data\\processed\\clean_skeletons.jsonl",
+  "input": "D:\\Semester Projects\\Fabula\\data\\raw\\skeletons.jsonl",
+  "output": "D:\\Semester Projects\\Fabula\\data\\processed\\clean_skeletons.jsonl",
   "rows_in": 300,
   "invalid_removed": 0,
   "duplicates_removed": 0,

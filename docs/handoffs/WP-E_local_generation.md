@@ -9,11 +9,11 @@
 |---|---|
 | Continuation branch | `wp-e-local-generation` |
 | Remote | `origin/wp-e-local-generation` (pushed, tracking) |
-| Base | `origin/main` @ `4132036` |
+| Base | `origin/main` @ `4132036` (workflow policy sync merged from `1259b4a`) |
 | E-01 commit | `2de6019` — `feat(generation): implement E-01 staged orchestrator with mock runner` |
 | PR | **Not opened.** Do not merge WP-E until E-02 and E-03 are complete. |
 
-Git workflow (mandatory): one work package per branch; branch from the latest `origin/main`; open a PR into `main` only when the whole WP is complete; never merge locally. The full policy is in `AGENTS.md` §4, which currently lives on `docs/git-workflow` pending its own PR.
+Git workflow (mandatory): one work package per branch; branch from the latest `origin/main`; open a PR into `main` only when the whole WP is complete; never merge locally. The full policy is in `AGENTS.md` §4, merged into `main` via PR #2.
 
 ## 2. Done — E-01 staged orchestrator (complete)
 

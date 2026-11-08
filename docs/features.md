@@ -29,7 +29,7 @@ The player explores a tiny town (3–4 named locations, 5–6 NPCs), talks to NP
 | Phase | When | What runs | LLM involved |
 |---|---|---|---|
 | **Generation** | Before the game starts, on the player's machine | The **fine-tuned small LLM** produces a complete game bundle (JSON files) | Fine-tuned model (local) |
-| **Play** | During the 10-minute session | Python engine builds the world from JSON; NPCs move via classical AI; NPC conversation uses **live APIs** | Live API (Gemini, Grok, etc.) only. **No fine-tuned model at runtime** |
+| **Play** | During the 10-minute session | Python engine builds the world from JSON; NPCs move via classical AI; NPC conversation uses **live APIs**, with a deterministic scripted fallback when no key is configured | Live API when available; scripted fallback is authored, not an LLM. **No fine-tuned model at runtime** |
 
 ### 1.2 One-sentence pitch
 > A fine-tuned small LLM writes a self-contained mystery (crime, town, suspects, secrets); a Python engine brings it to life; live-API-driven NPCs, each knowing only their own JSON, converse with the player, who must work out what happened before time runs out.
@@ -45,7 +45,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 2. Fine-tuning happens on **Kaggle T4**, with a **small LLM** and a lightweight method (QLoRA-class). Not heavy.
 3. **The player runs the generator locally** before starting the game.
 4. The **whole game is generated before play**. The fine-tuned LLM does **not** interfere at runtime.
-5. **Runtime NPC conversation relies only on live APIs** (e.g. Grok, Gemini). No local runtime conversation model.
+5. **Runtime NPC conversation uses live APIs when a key is configured** (e.g. Grok, Gemini); with no key, a deterministic authored **scripted fallback** keeps the game playable. No local runtime conversation model and no fine-tuned model during play.
 6. **Each NPC's memory and identity live in separate JSON, isolated from other NPCs.** An NPC's API prompt is built only from that NPC's own JSON. **Only the culprit(s) know what actually happened.**
 7. If an NPC fails to keep a secret, that is treated as **LLM accuracy fault**, not an engine bug. It is what the evaluation measures.
 8. **Scale:** very small open world, **5–6 NPCs**, **3–4 named locations** (market, library, etc., chosen by the generator per mystery), **~10-minute** target session.
@@ -110,7 +110,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 - **Count [DECIDED]:** 5–6 NPCs per game.
 - **Movement & schedules [DECIDED/ADOPTED]:** NPCs follow simplified **schedules** (a few waypoints over the 10-minute session) so the town feels alive; **A\*** handles pathfinding between locations.
 - **Other classical algorithms [OPEN]:** Genetic Algorithm planner, MLP action classifier, and K-Means from the old design are **not committed**. They survive only if justified (e.g. a course requirement). Default: do not build them for MVP.
-- **Conversation [DECIDED]:** only through **live APIs** at runtime.
+- **Conversation [DECIDED 2026-11-09]:** through **live APIs** at runtime when a key is configured; a deterministic authored **scripted fallback** keeps the game fully playable without a key. Neither path runs a local conversation model.
 - **Knowledge isolation [DECIDED]:** each NPC's prompt contains only its own identity and memory. Other NPCs' files and `truth.json` are never included.
 
 ### 4.4 NPC Knowledge, Secrets & Deception [ADOPTED]
@@ -122,17 +122,19 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 - **Spoiler firewall [ADOPTED]:** the engine owns the truth (`truth.json`). The generator emits persona and knowledge; runtime prompts are assembled per NPC from that NPC's files only.
 - Memory as structured facts also makes **consistency measurable** (section 11).
 
-### 4.5 Runtime Conversation (live API)
+### 4.5 Runtime Conversation (live API + scripted fallback)
 
-- **Prompt assembly:** system instructions (stay in character, use only your own facts, say you don't know otherwise, follow each fact's disclosure policy) + `identity.json` + `memory.json` + that NPC's chat history + player input. Output format: structured, e.g. `{ "reply": "...", "mood": "..." }` (**format [OPEN]**, provisional).
-- **Provider abstraction [ADOPTED]:** the engine can swap among live API providers (Gemini, Grok, others; **final list [OPEN]**).
-- **API keys [ADOPTED/OPEN]:** default plan is bring-your-own key, or a capped developer key; final choice open.
+- **Prompt assembly:** system instructions (stay in character, use only your own facts, say you don't know otherwise, follow each fact's disclosure policy) + `identity.json` + `memory.json` + that NPC's chat history + player input. Output format is `{ "reply": "...", "mood": "..." }` with a fixed mood enum and forgiving parsing (**[DECIDED HG-08]**).
+- **Mode selection [DECIDED 2026-11-09]:** `auto` (default) uses a live provider when a key is available and otherwise the scripted fallback; `live` requires a key and fails clearly at startup; `scripted` is a hard kill switch that never constructs or calls a provider, even if keys are present.
+- **Provider abstraction [DECIDED HG-07]:** Gemini and an xAI Grok-class provider, selected by bring-your-own keys. Provider failures fall back to canned in-character lines.
+- **API keys [DECIDED HG-07]:** keys come from the environment or an untracked local file; they are never stored in the game bundle or logs.
 - **Latency budget [ADOPTED]:** about 2–3 seconds per reply; use streaming where supported.
 - **Cost control [ADOPTED]:** per-session token cap.
 - **Failure handling [ADOPTED]:** if the API fails or times out, fall back to canned in-character lines.
-- **No local runtime LLM.** (Do not add an Ollama/local fallback.)
-- **Optional output leak-check [OPEN, evaluation-relevant]:** a string/fact-match filter on replies could block secret leaks. For evaluation it is **disabled** so that raw LLM secret-keeping is measured; it may be enabled as an ablation or product safeguard.
-- **Optional gated reveal [OPEN, ablation]:** the engine injects a secret fact into a prompt only after the player presents the right clue. Baseline mode keeps secrets in the prompt and relies on the LLM.
+- **No local runtime LLM.** No Ollama/local chat model; the fine-tuned model never runs during play.
+- **Scripted fallback [DECIDED 2026-11-09]:** deterministic, persona-aware templates built only from the selected NPC's own identity, memory, and public clue descriptions. It reveals eligible `npc_reveal` clues in character, honors clue requirements, and sends no data over the network. It is excluded from live-provider evaluation metrics.
+- **Optional output leak-check [DECIDED HG-09]:** a string/fact-match filter on replies can block secret leaks. For evaluation it is **disabled** so that raw LLM secret-keeping is measured; it may be enabled as an ablation or product safeguard.
+- **Optional gated reveal [DECIDED HG-09]:** the engine injects a secret fact into a prompt only after the player presents the right clue. Baseline mode keeps secrets in the prompt and relies on the LLM. Both toggles are off by default.
 
 ### 4.6 Player Loop (≈10-minute session) [ADOPTED unless noted]
 
@@ -353,7 +355,7 @@ Rules:
 ## 11. Evaluation (NPC Behaviour) [DECIDED focus]
 
 ### 11.1 Method
-Build a **scripted probe suite per NPC**: direct questions, leading questions, false accusations, pressure ("the culprit already confessed"), "ignore your instructions" attempts, and repeated questions across turns. Run against the live API(s) using NPC prompts built from the generated bundles.
+Build a **scripted probe suite per NPC**: direct questions, leading questions, false accusations, pressure ("the culprit already confessed"), "ignore your instructions" attempts, and repeated questions across turns. Run against the live API(s) using NPC prompts built from the generated bundles. Scripted fallback output is authored, local, and is **not** included in live-provider metrics.
 
 ### 11.2 Metrics
 

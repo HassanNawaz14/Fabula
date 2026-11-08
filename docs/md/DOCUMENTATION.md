@@ -1,6 +1,6 @@
 # Fabula — System Architecture & Technical Documentation
 
-> **A two-phase mystery game: a fine-tuned small LLM generates the complete game (mystery, town, cast, NPC knowledge) before play begins; a headless Python engine runs it; live APIs give each NPC its voice — grounded strictly in that NPC's own JSON files.**
+> **A two-phase mystery game: a fine-tuned small LLM generates the complete game (mystery, town, cast, NPC knowledge) before play begins; a headless Python engine runs it; live APIs give each NPC its voice — grounded strictly in that NPC's own JSON files — with a deterministic authored fallback when no key is configured.**
 
 > **Source of truth:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` (corroborated by the generated plan in `docs/dev_plan/`). If anything in this document conflicts with them, **those files win**.
 > **Tags:** **[DECIDED]** = owner decision · **[ADOPTED]** = accepted proposal · **[OPEN]** = unresolved (default shown where one exists). Human Gates are numbered **HG-xx** and defined in `docs/dev_plan/01_HUMAN_GATES.md`.
@@ -30,7 +30,7 @@ The player explores a tiny town (**3–4 named locations, 5–6 NPCs**), talks t
 Each NPC:
 - **Lives in its own isolated JSON pair** — `identity.json` (who they are) and `memory.json` (structured facts of what they know, hide, or lie about).
 - **Moves like a classical agent** — it follows a simplified schedule across the session, using $A^*$ pathfinding between named locations.
-- **Speaks only through a live API** — its prompt is assembled *exclusively* from its own JSON files plus chat history; no local conversation model runs at runtime.
+- **Speaks through a live API when a key is configured** — its prompt is assembled *exclusively* from its own JSON files plus chat history. Without a key, a deterministic authored **scripted fallback** keeps the game playable; neither path runs a local conversation model at runtime.
 - **Knows only what its memory contains** — only the culprit(s) hold the true account of the crime; everyone else holds partial observations and their own secrets.
 
 A human player can walk up to any NPC and engage in natural conversation. The NPC responds in-character, bounded by its own knowledge, and the player must work out what happened before time runs out.
@@ -40,7 +40,7 @@ A human player can walk up to any NPC and engage in natural conversation. The NP
 │                            THE FABULA CONCEPT (TWO PHASES)                            │
 ├──────────────────────────────┬───────────────────────────┬────────────────────────────┤
 │ GENERATOR (Phase 1, local)   │ THE BODY (Phase 2)        │ THE VOICE (Phase 2)        │
-│ fine-tuned ~3–4B LLM         │ classical AI + engine     │ live API only              │
+│ fine-tuned ~3–4B LLM         │ classical AI + engine     │ live API / scripted        │
 ├──────────────────────────────┼───────────────────────────┼────────────────────────────┤
 │ • Staged: world → cast →     │ • Schedules + A* movement │ • Free-text conversation   │
 │   truth → per-NPC files      │ • Perception & physics    │ • Persona & disclosure     │
@@ -55,7 +55,7 @@ A human player can walk up to any NPC and engage in natural conversation. The NP
 | Phase | When | What runs | LLM involved |
 |---|---|---|---|
 | **Generation** | Before the game starts, on the player's machine | The **fine-tuned small LLM** produces a complete game bundle (JSON files) | Fine-tuned model (local, CPU-class) |
-| **Play** | During the ~10-minute session | Python engine builds the world from JSON; NPCs move via classical AI; NPC conversation uses **live APIs** | Live API (Gemini, Grok, …) only. **No fine-tuned model at runtime** |
+| **Play** | During the ~10-minute session | Python engine builds the world from JSON; NPCs move via classical AI; NPC conversation uses **live APIs**, with a deterministic scripted fallback when no key is configured | Live API when available; scripted fallback is authored, not an LLM. **No fine-tuned model at runtime** |
 
 ### 1.3 One-Sentence Pitch
 > A fine-tuned small LLM writes a self-contained mystery (crime, town, suspects, secrets); a Python engine brings it to life; live-API-driven NPCs, each knowing only their own JSON, converse with the player, who must work out what happened before time runs out.
@@ -162,7 +162,7 @@ Each character has two read-only JSON stores plus session state:
 
 #### 4. Decision & Communication (Body / Voice dispatch)
 - Moving between locations? → the current **schedule waypoint + $A^*$ search**.
-- Speaking with the player? → **prompt assembler** (that NPC's identity + memory only) → **live API** → in-character reply.
+- Speaking with the player? → **prompt assembler** (that NPC's identity + memory only) → **live API** when a key is configured (otherwise the scripted responder) → in-character reply.
 
 #### 5. Action Execution & Feedback
 - The engine validates the action physically, advances the clock, and appends the event to session state.
@@ -175,10 +175,10 @@ Each character has two read-only JSON stores plus session state:
 
 ## 4. The Hybrid NPC Architecture: Classical AI ("Body") & Live API ("Voice")
 
-The architecture assigns each responsibility to the technology best suited for it: deterministic algorithms for anything physical, a fine-tuned model for pre-play content, and live APIs for speech.
+The architecture assigns each responsibility to the technology best suited for it: deterministic algorithms for anything physical, a fine-tuned model for pre-play content, and live APIs for speech, with deterministic authored templates as the no-key fallback.
 
 ![Decision Engine: Task & Tool Routing](../../assets/decision_engine_dispatch.png)
-*Figure 2: Runtime dispatch — schedules + $A^*$ for the Body, prompt assembler + live API for the Voice. ([Vector SVG](../../assets/decision_engine_dispatch.svg))*
+*Figure 2: Runtime dispatch — schedules + $A^*$ for the Body, prompt assembler + live API (or scripted fallback) for the Voice. ([Vector SVG](../../assets/decision_engine_dispatch.svg))*
 
 ### 4.1 Search & Pathfinding ($A^*$)
 - **Role**: deterministic town navigation **[ADOPTED]**.
@@ -200,7 +200,7 @@ The following components from the older design are **excluded by default** **[OP
 | MLP action classifier | Reflexive action prediction from state vectors | **Not built** unless a course requirement is stated |
 | K-Means trajectory clustering | Post-hoc behaviour archetypes | **Not built** unless a course requirement is stated |
 
-### 4.4 The Voice — Runtime Conversation (live API only) [DECIDED]
+### 4.4 The Voice — Runtime Conversation (live API + scripted fallback) [DECIDED]
 
 #### How a Prompt is Formed
 When the player addresses an NPC, the prompt assembler compiles a controlled prompt from **that NPC's files only**:
@@ -221,24 +221,26 @@ When the player addresses an NPC, the prompt assembler compiles a controlled pro
 }
 ```
 
-#### Grounded Output (provisional format, **[OPEN → HG-08]**)
+#### Grounded Output (decided format, HG-08)
 ```json
 {
   "reply": "I did, actually — right by my stall, quick as anything. But I only saw a shape slipping toward the north gate. Who it was, I couldn't swear to.",
-  "mood": "wary"
+  "mood": "nervous"
 }
 ```
 Because the prompt contains only Mira's own facts, **she cannot leak the culprit's account or another NPC's secrets** — preserving the mystery. An NPC asked about something outside its memory says it does not know.
 
 #### Runtime Conversation Requirements
-- **Provider abstraction [ADOPTED]**: swappable adapters for live API providers (Gemini, Grok-class, others; **final list [OPEN → HG-07]**), **≥2 providers in MVP** for robustness evaluation.
-- **API keys [ADOPTED/OPEN]**: bring-your-own key (leaning) or capped developer key (**HG-07**).
-- **Latency budget [ADOPTED]**: ≈2–3 seconds per reply; stream where supported. Prioritize ultra-low TTFT providers (e.g. Gemini 1.5/2.0 Flash, Groq Llama 3.3 70B with sub-500ms time-to-first-token) to eliminate immersion-breaking conversation stalls.
+- **Mode selection [DECIDED 2026-11-09]**: `auto` (default) uses a live provider when a key is available and otherwise the scripted fallback; `live` requires a key and fails clearly at startup; `scripted` is a hard kill switch that never constructs or calls a provider.
+- **Provider abstraction [DECIDED HG-07]**: Gemini and an xAI Grok-class provider, selected by bring-your-own keys; **≥2 live providers** remain supported for robustness evaluation.
+- **API keys [DECIDED HG-07]**: keys come from the environment or an untracked local file; they are never stored in the bundle or logs.
+- **Latency budget [ADOPTED]**: ≈2–3 seconds per reply; stream where supported. Prioritize ultra-low TTFT providers to eliminate immersion-breaking conversation stalls.
 - **Cost control [ADOPTED]**: per-session token cap.
 - **Failure handling [ADOPTED]**: on API failure/timeout, fall back to canned in-character lines.
-- **No local runtime LLM [DECIDED]**: no Ollama/local fallback; the fine-tuned model never runs during play.
-- **Content safety [ADOPTED]**: filter player-typed input before any API call (**boundary specifics [OPEN → HG-13]**).
-- **Optional toggles [OPEN → HG-09]**: an output **leak-filter** and a **gated reveal** (engine injects a secret only after the player presents the required clue). Both are **off by default**, implemented as toggles used for evaluation ablations; product use is an open decision.
+- **No local runtime LLM [DECIDED]**: no Ollama/local chat model; the fine-tuned model never runs during play.
+- **Scripted fallback [DECIDED 2026-11-09]**: deterministic persona-aware templates built only from the selected NPC's own identity, memory, and public clue descriptions. It reveals eligible `npc_reveal` clues in character, honors clue requirements, and makes zero network calls. It is excluded from live-provider evaluation metrics.
+- **Content safety [DECIDED HG-13]**: filter player-typed input before any API call; hate/sexual/self-harm content is blocked, and prompt-injection attempts are not stripped because they are evaluation probes.
+- **Optional toggles [DECIDED HG-09]**: an output **leak-filter** and a **gated reveal** (engine injects a secret only after the player presents the required clue). Both are **off by default**, implemented as toggles used for evaluation ablations.
 
 ---
 
@@ -342,7 +344,7 @@ The operational, task-level plan lives in **`docs/dev_plan/`** (`00_OVERVIEW.md`
 | **D** Fine-tuning | Baseline harness, Kaggle Unsloth QLoRA notebook, held-out eval, GGUF export | C, HG-02, HA-01 |
 | **E** Local generation runtime | Staged generator, constrained decoding, retry loop, CLI, CPU benchmark | A, D, HG-03/16 |
 | **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, A*, perception, journal, accusation, timer | A, HG-05/06 |
-| **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, token cap, fallbacks, input filter, toggles | A, HG-07/08/09/13 |
+| **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, token cap, fallbacks, input filter, toggles, deterministic scripted no-key mode | A, HG-07/08/09/13 |
 | **H** UI / game loop | Engine layer, tile kit, map render, movement, dialog, journal, timer, accusation UI, loading/error screens | F, G, HG-01, HA-06 |
 | **I** Evaluation | Probe suite, metric scripts, judge integration, base-vs-FT experiment, ablations, report | E, G, HG-12, HA-02/05 |
 | **J** Integration & release | End-to-end wiring, packaging, playtests, docs, licences, acceptance | all, HG-14/16/17 |
@@ -435,7 +437,7 @@ Which model/provider acts as LLM-judge, and the human-sampling protocol (a human
 
 1. **A genuinely generated game**: the fine-tuned ~3–4B LLM is the most crucial component — it authors the mystery, town, cast, and every NPC's private knowledge before play **[DECIDED]**.
 2. **Architectural grounding**: the engine owns absolute truth (`truth.json`), each NPC's prompt is built only from its own JSON, and the spoiler firewall is enforced by tests — eliminating game-breaking hallucinations and accidental spoilers while keeping roleplay natural.
-3. **Two-phase, resource-sensible design**: generation runs locally once (loading screen, validators, retries); play needs only a CPU-class machine plus live APIs — no fine-tuned model or local chat model at runtime **[DECIDED]**.
+3. **Two-phase, resource-sensible design**: generation runs locally once (loading screen, validators, retries); play needs only a CPU-class machine plus optional live APIs — no fine-tuned model or local chat model at runtime, and the scripted fallback keeps play available without a key **[DECIDED]**.
 4. **Measurable claims**: evaluation targets NPC behaviour with concrete metrics (secret-keeping, knowledge boundary, consistency, persona, disclosure adherence, provider robustness) and a base-vs-fine-tune experiment per mystery type.
 5. **Small, complete product**: 5–6 NPCs, 3–4 locations, ~4–6 clues, three mystery types, and a ~10-minute session with journal, timer, and a who/how/why accusation.
 6. **Course alignment**: classical search ($A^*$), constrained structured generation, QLoRA fine-tuning, grounded prompt engineering, and behavioural LLM evaluation — all inside one working game.

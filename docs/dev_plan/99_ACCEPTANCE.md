@@ -11,6 +11,7 @@ A release decision requires evidence for each mandatory item and recorded human 
 - Headless Python simulation loads bundle, schedules NPC movement with A*, handles perception, clues, journal, visible ~10-minute timer and deterministic who/how/why accusations.
 - Thin selected-engine UI supports movement, examine, free-text chat, journal, timer and accusation.
 - Input filter runs before each API call; token/latency limits and canned failure fallback work.
+- With no API key, `auto` mode switches to the deterministic scripted fallback, makes zero network calls, and still lets the player collect NPC-reveal clues and finish the mystery; `live` mode without a key fails clearly.
 - NPC behavior probe suite and report include required metrics and ablations; generator checks are secondary.
 
 ## Mandatory engineering checks

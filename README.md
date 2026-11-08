@@ -17,6 +17,7 @@ For the complete technical breakdown including architecture, schemas, prompts, e
 - 📐 **LaTeX Source (for User / TeX Compilation)**: **[docs/latex/main.tex](docs/latex/main.tex)**
 - 🧭 **Product Specification (single source of truth)**: **[docs/features.md](docs/features.md)** · **[docs/FABULA_DEVPLAN_SOURCE.md](docs/FABULA_DEVPLAN_SOURCE.md)**
 - 🗂️ **Development Plan (generated)**: **[docs/dev_plan/](docs/dev_plan/)**
+- 💬 **Runtime Conversation Guide**: **[docs/conversation.md](docs/conversation.md)**
 
 > **Documentation status:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` are the sole sources of truth; everything else is synced to them. The LaTeX report (`docs/latex/main.pdf`) was regenerated from the synced documentation on 2026-10-16 and is updated only on explicit request.
 
@@ -26,7 +27,7 @@ For the complete technical breakdown including architecture, schemas, prompts, e
 The game runs in two phases — **generation** (local, before play) and **play** (~10 minutes):
 
 - **Phase 1**: player settings (`mystery_type`, `tone`, `difficulty`) → the fine-tuned ~3–4B LLM generates the bundle in stages (`world → cast → truth → per-NPC files`) with constrained JSON decoding → validators + retries → a JSON game bundle on disk.
-- **Phase 2**: the engine builds the world from `world.json`; NPCs move via **schedules + A\***; NPC conversation goes through **live APIs only**, with prompts assembled from that NPC's own `identity.json` + `memory.json`; `truth.json` stays engine-only.
+- **Phase 2**: the engine builds the world from `world.json`; NPCs move via **schedules + A\***; NPC conversation uses **live APIs** when a key is configured, with a deterministic **scripted fallback** when no key is present. Prompts are assembled from that NPC's own `identity.json` + `memory.json`; `truth.json` stays engine-only.
 
 ![System Architecture: Generation & Play](assets/system_architecture.png)
 
@@ -60,8 +61,28 @@ All diagrams are designed with a minimalist light theme (simple boxes, clear arr
 1. **World**: the engine loads the bundle read-only and builds the town (3–4 locations from a fixed type enum → placeholder tiles).
 2. **Body**: NPCs follow simplified schedules using $A^*$ pathfinding and perceive events only in their own location.
 3. **Player loop**: walk, examine ~4–6 clues, type free-text questions to 5–6 NPCs, watch the visible timer.
-4. **Voice**: each reply comes from a live API whose prompt contains only that NPC's `identity.json`, `memory.json`, and chat history — `truth.json` never leaves the engine (enforced by tests).
+4. **Voice**: each reply comes from a live API when a key is configured; otherwise authored scripted NPCs keep the game playable. A live prompt contains only that NPC's `identity.json`, `memory.json`, and chat history — `truth.json` never leaves the engine (enforced by tests).
 5. **Verdict**: the journal records clues; the player accuses **who / how / why**; the engine checks the accusation against `truth.json` → win or lose.
+
+---
+
+## ⚡ Quick Start: Runtime Conversation
+
+**No key required.** With `FABULA_CONVERSATION_MODE` unset (`auto`) and no provider key, the game uses deterministic scripted NPCs that can reveal clues and finish the mystery. Start here to play or run offline:
+
+```powershell
+python -m pip install -e .
+python -m pytest -q
+```
+
+**Optional live voice.** Set one key and `auto` resolves to that provider:
+
+```powershell
+$env:GEMINI_API_KEY = "your-gemini-key"   # or $env:XAI_API_KEY = "..."
+$env:FABULA_CONVERSATION_MODE = "auto"
+```
+
+Use `live` to require a key and fail clearly if it is missing, or `scripted` as a hard kill switch that never constructs a provider. Keys are read from the environment or an untracked JSON file (`FABULA_KEYS_FILE`) and are never written to a bundle or log. See **[docs/conversation.md](docs/conversation.md)** for the mode matrix, model overrides, privacy, toggles, troubleshooting, and evaluation notes.
 
 ---
 
@@ -78,4 +99,4 @@ Week 7: Evaluation, playtests
 Week 8: Fixes, report, licence review, release decision
 ```
 
-> **Compute requirements**: generation runs on the player's CPU (with a loading screen); fine-tuning runs on free Kaggle T4 GPUs (QLoRA + Unsloth); play needs only live-API keys — no local model at runtime.
+> **Compute requirements**: generation runs on the player's CPU (with a loading screen); fine-tuning runs on free Kaggle T4 GPUs (QLoRA + Unsloth); play needs no local model. Live API keys are optional; without one, the scripted fallback keeps the game playable.

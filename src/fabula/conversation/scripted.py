@@ -76,6 +76,12 @@ _CHAT = (
     "The weather's been decent, I suppose.",
 )
 
+_ACCUSATION = (
+    "That is a serious accusation. I won't pretend it doesn't sting.",
+    "You can think what you like, but I have told you the truth.",
+    "Careful. Accusing people without proof only makes noise.",
+    "I am shocked you would think that of me.",
+)
 
 _FAREWELL = (
     "Take care. Come back if you think of the right question.",
@@ -239,6 +245,10 @@ def _detect_intent(text: str) -> _Intent:
         "saw",
         "see",
         "know",
+        "knows",
+        "heard",
+        "notice",
+        "noticed",
         "happened",
         "missing",
         "stolen",
@@ -247,7 +257,9 @@ def _detect_intent(text: str) -> _Intent:
         "alibi",
         "suspect",
         "investigate",
+        "tell",
         "evidence",
+        "anything",
     }:
         return _Intent.CASE
     return _Intent.CHAT

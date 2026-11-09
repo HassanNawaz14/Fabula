@@ -17,6 +17,7 @@ class _Intent(StrEnum):
     IDENTITY = "identity"
     STORY = "story"
     CASE = "case"
+    CHAT = "chat"
     ACCUSATION = "accusation"
     FAREWELL = "farewell"
     UNKNOWN = "unknown"
@@ -33,18 +34,22 @@ _GREETINGS = (
     "Good to see you. I'm {name}; I'm {role} here.",
     "Hello there. {name}. I look after things as {role}.",
     "Morning to you. I'm {name}, {role}.",
+    "Oh, hello. {name} here, {role}. What brings you by?",
+    "Need something? {name}, at your service as {role}.",
 )
 
 _IDENTITY = (
     "I'm {name}. Around here I'm {role}. People would tell you I'm {traits}.",
     "The name is {name}. I'm {role}, and I like to think I'm {traits}.",
     "I'm {name}, {role}. {traits} — that's the short version.",
+    "Just {name}. Being {role} takes up most of my day. I'm {traits}.",
 )
 
 _STORY = (
     "For what it's worth: {backstory}",
     "There is not much to tell, but here it is: {backstory}",
     "Since you ask: {backstory}",
+    "It's a long story, but essentially: {backstory}",
 )
 
 _CASE_WITH_CLUE = (
@@ -52,30 +57,44 @@ _CASE_WITH_CLUE = (
     "As {role}, I notice things. {description}",
     "I can tell you this much: {description}",
     "Between us — {description}",
+    "Actually, now that you mention it: {description}",
+    "I recall something relevant: {description}",
 )
 
 _CASE_EMPTY = (
     "I've told you what I know. I don't want to guess beyond that.",
     "That is all I can say with a clear conscience.",
     "I wish I could help more, but I won't invent details.",
+    "I'm afraid I don't know anything else about that.",
+    "I've shared everything I'm comfortable sharing.",
+)
+
+_CHAT = (
+    "It's a quiet day, isn't it?",
+    "I'm just passing time here until my shift ends.",
+    "Not much to say, really. Just keeping busy.",
+    "The weather's been decent, I suppose.",
 )
 
 _ACCUSATION = (
     "That is a serious accusation. I won't pretend it doesn't sting.",
     "You can think what you like, but I have told you the truth.",
     "Careful. Accusing people without proof only makes noise.",
+    "I am shocked you would think that of me.",
 )
 
 _FAREWELL = (
     "Take care. Come back if you think of the right question.",
     "I'll be here. Ask again if something else comes to mind.",
     "Good luck. Keep your eyes open.",
+    "Farewell. Don't work too hard.",
 )
 
 _UNKNOWN = (
     "I'm not sure I follow. Ask me about what I saw or what I know about that day.",
     "You've lost me. Try asking plainly about the matter at hand.",
     "I don't have an answer to that. Ask me something about what happened.",
+    "That's a bit vague. Could you be more specific?",
 )
 
 
@@ -130,6 +149,9 @@ class ScriptedResponder:
             mood = Mood.NEUTRAL
         elif intent is _Intent.CASE:
             text = rng.choice(_CASE_EMPTY)
+            mood = Mood.NEUTRAL
+        elif intent is _Intent.CHAT:
+            text = rng.choice(_CHAT)
             mood = Mood.NEUTRAL
         elif intent is _Intent.ACCUSATION:
             text = rng.choice(_ACCUSATION)
@@ -240,4 +262,4 @@ def _detect_intent(text: str) -> _Intent:
         "anything",
     }:
         return _Intent.CASE
-    return _Intent.UNKNOWN
+    return _Intent.CHAT

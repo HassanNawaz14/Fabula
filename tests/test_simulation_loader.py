@@ -82,7 +82,15 @@ def test_loading_does_not_modify_the_bundle(bundle_dir: Path, digest) -> None:
 
 
 def test_simulation_package_has_no_ui_imports() -> None:
-    import fabula.simulation  # noqa: F401
+    pygame_mod = sys.modules.pop("pygame", None)
+    arcade_mod = sys.modules.pop("arcade", None)
+    try:
+        import fabula.simulation  # noqa: F401
 
-    assert "pygame" not in sys.modules
-    assert "arcade" not in sys.modules
+        assert "pygame" not in sys.modules
+        assert "arcade" not in sys.modules
+    finally:
+        if pygame_mod is not None:
+            sys.modules["pygame"] = pygame_mod
+        if arcade_mod is not None:
+            sys.modules["arcade"] = arcade_mod

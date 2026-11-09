@@ -7,6 +7,8 @@ from fabula.simulation.clock import Clock, FakeClock
 from fabula.simulation.clues import ClueIndex
 from fabula.simulation.journal import Journal, JournalEntry
 from fabula.simulation.loader import LoadedBundle
+from fabula.simulation.pathfinding import location_graph
+from fabula.simulation.schedules import location_at
 
 
 class Session:
@@ -18,6 +20,28 @@ class Session:
         self._statements: dict[str, list[str]] = {
             roster_entry.id: [] for roster_entry in loaded.world.npcs
         }
+        self.player_location = loaded.world.locations[0].id
+        self.npc_cycle_index = 0
+
+    def move_player(self, location_id: str) -> None:
+        graph = location_graph(self.loaded.world)
+        if location_id not in graph:
+            raise ValueError(f"unknown location {location_id!r}")
+        if location_id != self.player_location and location_id not in graph[self.player_location]:
+            raise ValueError(
+                f"location {location_id!r} is not adjacent to "
+                f"player location {self.player_location!r}"
+            )
+        self.player_location = location_id
+        self.npc_cycle_index = 0
+
+    def npcs_at(self, location_id: str) -> tuple[str, ...]:
+        present = []
+        for roster_entry in self.loaded.world.npcs:
+            loc = location_at(roster_entry, self.clock.minute)
+            if loc == location_id:
+                present.append(roster_entry.id)
+        return tuple(present)
 
     @property
     def discovered_ids(self) -> frozenset[str]:

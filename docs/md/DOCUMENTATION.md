@@ -313,17 +313,18 @@ No scraping and no massive web crawls: all training data is produced by a **synt
 - **Disjoint Seed Splits:** `train.jsonl` (2,048 pairs, seeds 0–79), `val.jsonl` (256 pairs, seeds 80–89), `test.jsonl` (254 pairs, seeds 90–99).
 - Fully audited and passed in `data/reports/sft_audit_report.json` with 0 schema errors and 0 spoiler leaks. Code in `training/scripts/kaggle_teacher_expansion.py` and `data/scripts/audit_sft.py`.
 
-### 6.3 Fine-Tuning (Workstream D) [DECIDED/ADOPTED — PREPARED]
+### 6.3 Fine-Tuning (Workstream D) [COMPLETED 2026-11-11]
 | Item | Choice | Status |
 |---|---|---|
 | Base model | Small instruct LLM, **~3–4B** (`unsloth/Qwen2.5-3B-Instruct-bnb-4bit`) | **ADOPTED (HG-02)** |
-| Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** (LoRA rank 16) | **DECIDED / READY** |
-| Curriculum | SFT on 2,048 train pairs (2 epochs, batch size 2, grad accum 4; packing option cuts time to ~20 min) | ADOPTED |
-| Export | Quantised **GGUF (Q4_K_M)** for local CPU inference | ADOPTED |
+| Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** (LoRA rank 16) | **COMPLETED (HA-01)** |
+| Curriculum | SFT on 2,048 train pairs (2 full epochs, 512 steps, response-only loss masking) | **CONVERGED (0.867 → 0.088)** |
+| Export | Quantised **GGUF (Q4_K_M)** for local CPU inference | **EXPORTED (1.93 GB)** |
 | Inference runtime | llama.cpp-style runner with stage-specific GBNF constrained decoding | **ADOPTED (HG-03)** |
-| Notebook | `training/notebooks/fabula_qlora_sft.ipynb` & `training/scripts/kaggle_qlora_sft.py` | Ready to run |
+| Artifact | `models/Qwen2.5-3B-Instruct.Q4_K_M.gguf` (SHA-256: `7EDCCECC...`) | Ready in `models/` |
+| Notebooks | `training/notebooks/fabula_qlora_sft.ipynb` & `training/scripts/kaggle_qlora_sft.py` | Complete & verified |
 
-Check Kaggle's current weekly GPU quota and session limits before scheduling runs (human action **HA-01**).
+Fine-tuning executed on Kaggle Tesla T4 GPU in 2 hours 45 minutes with step checkpointing and auto-resume. LoRA adapter saved to `/kaggle/working/fabula_qlora_adapter` and standalone GGUF model exported to `/kaggle/working/fabula_gguf_gguf/Qwen2.5-3B-Instruct.Q4_K_M.gguf`.
 
 ### 6.4 Baselines
 Before/while fine-tuning, test **base model + good prompting** and a large API model on the same generation task. The fine-tune must show a measurable benefit (Section 8.3) — owner sign-off is required at the baseline comparison.

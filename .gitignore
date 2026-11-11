@@ -44,6 +44,13 @@ data/**/*.parquet
 *.joblib
 *.h5
 
+# Model weights & large binaries (never commit weights to git)
+models/
+*.gguf
+*.bin
+*.safetensors
+*.pt
+
 # OS metadata, backups & IDEs
 .DS_Store
 Thumbs.db

@@ -18,8 +18,8 @@ class MapView:
         self.tick = 0
         self._init_layout()
         
-        self.font = pygame.font.Font(None, 24)
-        self.font_small = pygame.font.Font(None, 18)
+        self.font = pygame.font.Font(None, 28)
+        self.font_small = pygame.font.Font(None, 20)
         self.font_title = pygame.font.Font(None, 40)
         
         self.panel = Panel(pygame.Rect(0, self.height - 80, self.width, 80))
@@ -41,10 +41,12 @@ class MapView:
         return {"action": "talk_menu", "npc_id": npc_id}
 
     def _init_layout(self) -> None:
+        # Optimized grid for bigger buildings
         locations = self.session.loaded.world.locations
         for i, loc in enumerate(locations):
-            x = 200 + (i % 3) * 250
-            y = 150 + (i // 3) * 200
+            # 2x2 grid fits 4 locations nicely
+            x = 250 + (i % 2) * 450
+            y = 200 + (i // 2) * 300
             self.location_coords[loc.id] = (x, y)
 
     def handle_event(self, event: pygame.event.Event) -> str | dict[str, Any] | None:
@@ -54,7 +56,7 @@ class MapView:
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for loc_id, (x, y) in self.location_coords.items():
-                if pygame.Rect(x-60, y-60, 120, 120).collidepoint(event.pos):
+                if pygame.Rect(x-180, y-180, 360, 360).collidepoint(event.pos):
                     if loc_id == self.session.player_location:
                         return {"action": "examine_menu"}
                     elif loc_id in location_graph(self.session.loaded.world).get(self.session.player_location, []):
@@ -77,36 +79,35 @@ class MapView:
             if self.status_timer == 0: self.status_message = None
         for btn in self.buttons: btn.update()
 
-    def _draw_npc(self, surface: pygame.Surface, pos: tuple[int, int], npc_files: Any) -> None:
+    def _draw_npc(self, surface: pygame.Surface, pos: tuple[int, int], npc_files: Any, index: int) -> None:
         role = npc_files.identity.role.lower() if npc_files else "vendor"
         color = (150, 200, 255)
         if "police" in role: color = (100, 100, 200)
         elif "baker" in role: color = (200, 150, 100)
         
+        # Animate
+        wobble_x = math.sin(self.tick * 0.05 + index) * 30
+        wobble_y = math.cos(self.tick * 0.05 + index) * 10
+        npc_x, npc_y = pos[0] + wobble_x, pos[1] + wobble_y
+        
         # Figure
-        pygame.draw.ellipse(surface, color, (pos[0]-12, pos[1]-40, 24, 30)) # Body
-        pygame.draw.circle(surface, (255, 220, 180), (pos[0], pos[1]-45), 10) # Head
+        pygame.draw.ellipse(surface, color, (npc_x-20, npc_y-60, 40, 60)) # Body
+        pygame.draw.circle(surface, (255, 220, 180), (npc_x, npc_y-70), 20) # Head
         
         # Name and Role
         name = npc_files.identity.name if npc_files else "NPC"
         surf = self.font_small.render(name, True, (255, 255, 255))
-        surface.blit(surf, (pos[0] - surf.get_width()//2, pos[1]-5))
+        surface.blit(surf, (npc_x - surf.get_width()//2, npc_y+10))
 
     def _draw_building(self, surface: pygame.Surface, pos: tuple[int, int], loc_type: str, is_player: bool) -> None:
-        rect = pygame.Rect(pos[0]-60, pos[1]-60, 120, 120)
-        color = (150, 200, 150) if is_player else (100, 120, 150)
-        pygame.draw.rect(surface, color, rect, border_radius=15)
-        pygame.draw.rect(surface, (255, 255, 255), rect, 6, border_radius=15)
+        rect = pygame.Rect(pos[0]-180, pos[1]-180, 360, 360)
+        color = (100, 220, 140) if is_player else (100, 120, 150)
+        pygame.draw.rect(surface, color, rect, border_radius=30)
+        pygame.draw.rect(surface, (255, 255, 255), rect, 8, border_radius=30)
         
-        # Building details
-        if loc_type == "market":
-            pygame.draw.rect(surface, (80, 50, 50), (pos[0]-40, pos[1]-20, 80, 40))
-        elif loc_type == "library":
-            pygame.draw.rect(surface, (100, 80, 60), (pos[0]-40, pos[1]-20, 80, 40))
-            pygame.draw.line(surface, (255,255,255), (pos[0]-30, pos[1]-20), (pos[0]-30, pos[1]+20), 5)
-            pygame.draw.line(surface, (255,255,255), (pos[0]+30, pos[1]-20), (pos[0]+30, pos[1]+20), 5)
-        elif loc_type == "residence":
-            pygame.draw.polygon(surface, (150, 70, 70), [(pos[0]-70, pos[1]-60), (pos[0]+70, pos[1]-60), (pos[0], pos[1]-100)])
+        # Building detail
+        detail_rect = pygame.Rect(pos[0]-100, pos[1]-50, 200, 150)
+        pygame.draw.rect(surface, (60, 40, 30), detail_rect, border_radius=10)
         
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((40, 50, 40))
@@ -119,7 +120,7 @@ class MapView:
             for n_id in neighbors:
                 end = self.location_coords.get(n_id)
                 if end and loc_id < n_id:
-                    pygame.draw.line(surface, (80, 70, 60), start, end, 20)
+                    pygame.draw.line(surface, (80, 70, 60), start, end, 30)
 
         # Draw Buildings & NPCs
         for loc in self.session.loaded.world.locations:
@@ -128,13 +129,14 @@ class MapView:
             self._draw_building(surface, pos, loc.type.value, loc.id == self.session.player_location)
             
             # Name
-            name_surf = self.font.render(loc.name, True, (255, 255, 255))
-            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 40))
+            name_surf = self.font_title.render(loc.name, True, (255, 255, 255))
+            pygame.draw.rect(surface, (0,0,0,180), (pos[0]-name_surf.get_width()//2-10, pos[1]-160, name_surf.get_width()+20, 40), border_radius=10)
+            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] - 155))
             
             # NPCs
             npcs_here = self.session.npcs_at(loc.id)
             for i, npc_id in enumerate(npcs_here):
-                self._draw_npc(surface, (pos[0] - 60 + i*40, pos[1] + 100), self.session.loaded.npcs.get(npc_id))
+                self._draw_npc(surface, (pos[0] - 100 + i*100, pos[1] + 50), self.session.loaded.npcs.get(npc_id), i)
 
         # UI
         self.panel.draw(surface)

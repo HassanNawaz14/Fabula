@@ -44,6 +44,23 @@ data/**/*.parquet
 *.joblib
 *.h5
 
+# Model weights & large binaries (never commit weights to git)
+models/*
+!models/model_manifest.json
+*.gguf
+*.bin
+*.safetensors
+*.pt
+
+# Local scratch artifacts (never commit)
+bundle/
+bundles/
+generate_test_bundle.py
+run_ui_test.py
+test_intent.py
+test_npc.py
+plan.md
+
 # OS metadata, backups & IDEs
 .DS_Store
 Thumbs.db

@@ -75,7 +75,7 @@ Two phases:
 | Phase | When | What runs |
 |---|---|---|
 | **Generation** | Before play, on the player's machine (local, CPU-class) | Fine-tuned small LLM produces a **game bundle** (JSON) |
-| **Play** | ~10-minute session | Python engine builds the world from JSON; NPC movement via classical AI; NPC conversation via **live APIs only**. **The fine-tuned model is not used at runtime.** |
+| **Play** | ~10-minute session | Python engine builds the world from JSON; NPC movement via classical AI; NPC conversation via **live APIs**, with a deterministic authored **scripted fallback** when no key is configured. **The fine-tuned model is not used at runtime.** |
 
 Pitch: *a fine-tuned small LLM writes a self-contained mystery; a Python engine brings it to life; live-API NPCs, each knowing only their own JSON, talk to the player, who must work out what happened before time runs out.*
 
@@ -86,7 +86,7 @@ Pitch: *a fine-tuned small LLM writes a self-contained mystery; a Python engine 
 2. Fine-tuning on **Kaggle T4**, **small LLM**, lightweight method (**QLoRA SFT, Unsloth**). Not heavy.
 3. **The player runs the generator locally** before the game.
 4. The whole game is generated **before play**; the fine-tuned LLM never runs during play.
-5. **Runtime NPC conversation uses only live APIs** (Gemini, Grok-class, …). No local runtime chat model, **no Ollama/local fallback**.
+5. **Runtime NPC conversation uses live APIs when a key is configured** (Gemini, Grok-class, …); with no key, a deterministic authored **scripted fallback** keeps the game playable. No local runtime chat model and **no Ollama/local LLM fallback**.
 6. **Each NPC's identity and memory live in separate JSON, isolated.** An NPC's API prompt is built **only** from that NPC's own files (+ its chat history, session facts). **Only culprit(s) know what actually happened.**
 7. NPC secret-leaking is an **LLM accuracy fault, not an engine bug**; it is what evaluation measures.
 8. Scale: **5–6 NPCs, 3–4 locations, ~10-minute session.**
@@ -131,7 +131,7 @@ PHASE 2 (play, ~10 min)
 ## C3. NPC behaviour
 - **Body (classical AI) vs Voice (live API).** 5–6 NPCs. Simplified **schedules** (a few waypoints across the session) + **A\*** pathfinding [DECIDED/ADOPTED].
 - GA planner, MLP action classifier, K-Means from an older design: **not built for MVP** [OPEN → HG-10, default: skip].
-- Conversation only via live API [DECIDED].
+- Conversation through live APIs when a key is configured; a deterministic authored **scripted fallback** keeps the game fully playable without one [DECIDED 2026-11-09]. Neither path runs a local LLM.
 
 ## C4. NPC knowledge, secrets, deception [ADOPTED]
 - Memory = **structured facts**, each with `source` ∈ {did, witnessed, heard, inferred} and `disclosure` ∈ {volunteer, if_asked, hide, lie}.
@@ -140,11 +140,13 @@ PHASE 2 (play, ~10 min)
 - **Spoiler firewall:** engine owns `truth.json`; runtime prompts come from that NPC's files only.
 - Structured facts make secret-keeping and consistency machine-checkable (evaluation).
 
-## C5. Runtime conversation (live API)
-- **Prompt =** system rules (stay in character; use only your own facts; say you don't know otherwise; obey each fact's disclosure policy) + `identity.json` + `memory.json` + that NPC's chat history + player input. Reply format provisional `{ "reply": "...", "mood": "..." }` [OPEN → HG-08].
-- **Provider abstraction** (Gemini, Grok-class, others; list [OPEN → HG-07]); ≥2 providers in MVP. Keys: BYO (leaning) or capped dev key [OPEN → HG-07].
+## C5. Runtime conversation (live API + scripted fallback)
+- **Prompt =** system rules (stay in character; use only your own facts; say you don't know otherwise; obey each fact's disclosure policy) + `identity.json` + `memory.json` + that NPC's chat history + player input. Reply format `{ "reply": "...", "mood": "..." }` with a fixed mood enum and forgiving parsing [DECIDED HG-08].
+- **Modes:** `auto` (live when a key exists, otherwise scripted), `live` (requires a key and fails clearly), `scripted` (kill switch, zero provider calls) [DECIDED 2026-11-09].
+- **Provider abstraction** (Gemini + xAI Grok-class; ≥2 providers in MVP) [DECIDED HG-07]. Keys: bring-your-own via environment or untracked local file; never in the bundle or logs [DECIDED HG-07].
 - **Latency** ≈2–3 s/reply, stream where supported. **Per-session token cap.** **Fallback:** on failure/timeout use canned in-character lines.
-- **Optional output leak-filter** and **gated reveal** (engine injects a secret only after the player presents the required clue): **off by default, implemented as toggles**, used as evaluation ablations; product use [OPEN → HG-09].
+- **Optional output leak-filter** and **gated reveal** (engine injects a secret only after the player presents the required clue): **off by default, implemented as toggles**, used as evaluation ablations [DECIDED HG-09].
+- **Scripted fallback** uses only the selected NPC's identity, memory, and public clue descriptions; it reveals eligible `npc_reveal` clues, makes zero network calls, and is excluded from live-provider evaluation metrics [DECIDED 2026-11-09].
 - In-session memory additions (e.g. what the player told an NPC) live in session state; shipped bundle stays read-only.
 
 ## C6. Game bundle & isolation rules
@@ -262,7 +264,7 @@ Also require owner sign-off at: end of baseline comparison (is fine-tune justifi
 | **D** Fine-tuning | Baseline comparison harness, Kaggle Unsloth QLoRA notebook, eval-on-held-out, GGUF export | C, HG-02, HA-01 |
 | **E** Local generation runtime | Staged generator, constrained decoding, retry loop, config, CLI, loading/error hooks, CPU benchmark, works first with base model/mocks | A, HG-03 |
 | **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, A*, perception, session state, clue discovery, journal model, accusation checker, timer | A, HG-05/06 |
-| **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, streaming, token cap, fallback lines, input filter, leak-filter & gated-reveal toggles | A, HG-07/08/09/13 |
+| **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, streaming, token cap, fallback lines, input filter, leak-filter & gated-reveal toggles, deterministic scripted no-key mode | A, HG-07/08/09/13 |
 | **H** UI / game loop | Engine layer, tile kit, map render, movement, dialog box, journal, timer, accusation UI, loading/error screens | F, G, HG-01 |
 | **I** Evaluation | Probe suite per NPC, metric scripts (secret-keeping, knowledge boundary, persona, consistency, culprit-lie consistency, disclosure adherence, provider robustness), judge integration, base-vs-FT experiment by mystery type, ablations, report | E, G, HG-12, HA-05 |
 | **J** Integration & release | End-to-end wiring, packaging, playtests, docs, licences, final acceptance | all |

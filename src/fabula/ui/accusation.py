@@ -15,11 +15,9 @@ class AccusationView:
         self.height = height
         self.session = session
         self.accusation_service = AccusationService(
-            session.loaded.accusation_truth(),
-            session.loaded.world,
-            clock=session.clock
+            session.loaded.accusation_truth(), session.loaded.world, clock=session.clock
         )
-        
+
         # Options from bundle
         self.npcs = session.loaded.world.npcs
         self.methods = session.loaded.world.accusation_options.methods
@@ -109,9 +107,7 @@ class AccusationView:
         y = 90
         if font_section:
             sel_1 = "[SELECTED] " if self.focus_field == 0 else ""
-            s1 = font_section.render(
-                f"1. Culprit (Suspect): {sel_1}", True, (220, 220, 255)
-            )
+            s1 = font_section.render(f"1. Culprit (Suspect): {sel_1}", True, (220, 220, 255))
             surface.blit(s1, (30, y))
             y += 25
             npc_obj = self.npcs[self.selected_npc_idx]
@@ -122,9 +118,7 @@ class AccusationView:
             y += 40
 
             sel_2 = "[SELECTED] " if self.focus_field == 1 else ""
-            s2 = font_section.render(
-                f"2. Method: {sel_2}", True, (220, 220, 255)
-            )
+            s2 = font_section.render(f"2. Method: {sel_2}", True, (220, 220, 255))
             surface.blit(s2, (30, y))
             y += 25
             meth_obj = self.methods[self.selected_method_idx]
@@ -135,9 +129,7 @@ class AccusationView:
             y += 40
 
             sel_3 = "[SELECTED] " if self.focus_field == 2 else ""
-            s3 = font_section.render(
-                f"3. Motive: {sel_3}", True, (220, 220, 255)
-            )
+            s3 = font_section.render(f"3. Motive: {sel_3}", True, (220, 220, 255))
             surface.blit(s3, (30, y))
             y += 25
             mot_obj = self.motives[self.selected_motive_idx]
@@ -152,11 +144,7 @@ class AccusationView:
                 surface.blit(msg_surf, (30, y))
                 y += 30
 
-            btn_label = (
-                "[> SUBMIT ACCUSATION <]"
-                if self.focus_field == 3
-                else "Submit Accusation"
-            )
+            btn_label = "[> SUBMIT ACCUSATION <]" if self.focus_field == 3 else "Submit Accusation"
             used = self.accusation_service.attempts_used
             sub_text = f"{btn_label} (Attempts used: {used})"
             sub_surf = font_section.render(sub_text, True, (100, 255, 150))

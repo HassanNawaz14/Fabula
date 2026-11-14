@@ -93,14 +93,24 @@ class MapView:
                     pygame.draw.line(surface, (100, 90, 80), start, end, 15)
                     pygame.draw.line(surface, (120, 110, 100), start, end, 3)
 
-        # Location visuals
-        visual_map = {
-            "market": "🛒",
-            "library": "📚",
-            "cafe": "☕",
-            "park": "🌳",
-            "parking": "🚗",
-            "residence": "🏠"
+        # NPC Visual Map
+        npc_visuals = {
+            "police": "👮",
+            "vendor": "🛍️",
+            "teacher": "👨‍🏫",
+            "grocer": "🍎",
+            "shepherd": "🐑",
+            "baker": "🥖"
+        }
+        
+        # Location visual map
+        location_visuals = {
+            "market": {"icon": "🛒", "color": (120, 100, 80)},
+            "library": {"icon": "📚", "color": (100, 80, 120)},
+            "cafe": {"icon": "☕", "color": (150, 100, 60)},
+            "park": {"icon": "🌳", "color": (60, 120, 60)},
+            "parking": {"icon": "🚗", "color": (80, 80, 80)},
+            "residence": {"icon": "🏠", "color": (120, 70, 70)}
         }
 
         for loc in self.session.loaded.world.locations:
@@ -109,29 +119,41 @@ class MapView:
             is_player_here = loc.id == self.session.player_location
             
             # Place visual
-            icon = visual_map.get(loc.type.value, "📍")
-            rect = pygame.Rect(pos[0]-50, pos[1]-50, 100, 100)
+            visual = location_visuals.get(loc.type.value, {"icon": "📍", "color": (100, 100, 100)})
+            rect = pygame.Rect(pos[0]-60, pos[1]-60, 120, 120)
             
-            # Background
-            pygame.draw.rect(surface, (50, 60, 50), rect, border_radius=15)
-            pygame.draw.rect(surface, (150, 150, 150) if is_player_here else (100, 100, 100), rect, 4, border_radius=15)
+            # Draw styled location box
+            pygame.draw.rect(surface, visual["color"], rect, border_radius=20)
+            pygame.draw.rect(surface, (255, 255, 255) if is_player_here else (200, 200, 200), rect, 6, border_radius=20)
             
             # Icon
-            font_big = pygame.font.Font(None, 60)
-            icon_surf = font_big.render(icon, True, (255, 255, 255))
-            surface.blit(icon_surf, (pos[0] - icon_surf.get_width() // 2, pos[1] - 30))
+            font_big = pygame.font.Font(None, 80)
+            icon_surf = font_big.render(visual["icon"], True, (255, 255, 255))
+            surface.blit(icon_surf, (pos[0] - icon_surf.get_width() // 2, pos[1] - 40))
 
             # Name
             name_surf = self.font.render(loc.name, True, (255, 255, 255))
-            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 30))
+            pygame.draw.rect(surface, (20, 20, 20, 150), (pos[0]-name_surf.get_width()//2-5, pos[1]+35, name_surf.get_width()+10, 25), border_radius=5)
+            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 35))
 
             # NPCs
             npcs_here = self.session.npcs_at(loc.id)
             for i, npc_id in enumerate(npcs_here):
-                # Distinct colored circles for NPCs
-                npc_pos = (pos[0] - 40 + i*30, pos[1] - 40)
-                pygame.draw.circle(surface, (255, 220, 100), npc_pos, 10)
-                pygame.draw.circle(surface, (0, 0, 0), npc_pos, 10, 2)
+                npc_files = self.session.loaded.npcs.get(npc_id)
+                role = npc_files.identity.role.lower() if npc_files else "vendor"
+                
+                # Determine icon based on role keywords
+                icon = "👤"
+                if "police" in role: icon = "👮"
+                elif "vendor" in role or "grocer" in role: icon = "🛍️"
+                elif "teacher" in role: icon = "👨‍🏫"
+                elif "baker" in role: icon = "🥖"
+                
+                # NPC positioning
+                npc_pos = (pos[0] - 40 + i*40, pos[1] + 60)
+                surf = self.font.render(icon, True, (255, 255, 255))
+                surface.blit(surf, npc_pos)
+
 
 
         # UI

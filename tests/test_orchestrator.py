@@ -18,6 +18,7 @@ from fabula.generation.protocols import ProgressEvent, StageName
 from fabula.schemas import (
     Bundle,
     CluesDocument,
+    FactSource,
     GenerationSettings,
     Identity,
     Memory,
@@ -175,6 +176,71 @@ class _MismatchedTruthRunner(MockModelRunner):
             payload["truth"]["crime"]["type"] = MysteryType.MURDER.value
             return json.dumps(payload)
         return raw
+
+
+class _NoEvidenceRunner(MockModelRunner):
+    def generate(self, stage, stage_input, output_model, seed):  # type: ignore[no-untyped-def]
+        raw = super().generate(stage, stage_input, output_model, seed)
+        if stage == "world+cast->truth+clues":
+            payload = json.loads(raw)
+            for clue in payload["clues"]["clues"]:
+                clue["implies"] = []
+            return json.dumps(payload)
+        return raw
+
+
+class _MissingAccountRunner(MockModelRunner):
+    def generate(self, stage, stage_input, output_model, seed):  # type: ignore[no-untyped-def]
+        raw = super().generate(stage, stage_input, output_model, seed)
+        if stage == "world+cast->truth+clues":
+            payload = json.loads(raw)
+            for clue in payload["clues"]["clues"]:
+                clue["implies"] = []
+            return json.dumps(payload)
+        if stage == NPC_STAGE:
+            culprit_id = self.bundle.truth.solution.correct_culprit_id
+            if stage_input.npc_id == culprit_id:
+                payload = json.loads(raw)
+                payload["memory"]["facts"] = [
+                    fact
+                    for fact in payload["memory"]["facts"]
+                    if not (fact["source"] == FactSource.DID and fact["secret"])
+                ]
+                return json.dumps(payload)
+        return raw
+
+
+def test_missing_culprit_account_is_repaired_before_publish(tmp_path: Path) -> None:
+    runner = _MissingAccountRunner(
+        generate_skeleton(MysteryType.THEFT, seed=3, tone="cozy", difficulty="easy")
+    )
+
+    result = generate_bundle(SETTINGS, runner, tmp_path / "bundle")
+
+    assert validate_bundle(result.bundle) == []
+    culprit_id = result.bundle.truth.solution.correct_culprit_id
+    assert any(
+        fact.source == FactSource.DID and fact.secret
+        for fact in result.bundle.npcs[culprit_id].memory.facts
+    )
+
+
+def test_missing_culprit_evidence_is_repaired_before_publish(tmp_path: Path) -> None:
+    runner = _NoEvidenceRunner(
+        generate_skeleton(MysteryType.THEFT, seed=3, tone="cozy", difficulty="easy")
+    )
+
+    result = generate_bundle(SETTINGS, runner, tmp_path / "bundle")
+
+    assert validate_bundle(result.bundle) == []
+    culprit_id = result.bundle.truth.solution.correct_culprit_id
+    account_ids = {
+        fact.id
+        for fact in result.bundle.npcs[culprit_id].memory.facts
+        if fact.source == FactSource.DID and fact.secret
+    }
+    assert account_ids
+    assert any(set(clue.implies) & account_ids for clue in result.bundle.clues.clues)
 
 
 def test_cross_stage_inconsistency_fails_final_validation(tmp_path: Path) -> None:

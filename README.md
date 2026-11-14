@@ -18,6 +18,7 @@ For the complete technical breakdown including architecture, schemas, prompts, e
 - 🧭 **Product Specification (single source of truth)**: **[docs/features.md](docs/features.md)** · **[docs/FABULA_DEVPLAN_SOURCE.md](docs/FABULA_DEVPLAN_SOURCE.md)**
 - 🗂️ **Development Plan (generated)**: **[docs/dev_plan/](docs/dev_plan/)**
 - 💬 **Runtime Conversation Guide**: **[docs/conversation.md](docs/conversation.md)**
+- **Local Generation Guide**: **[docs/local-generation.md](docs/local-generation.md)**
 
 > **Documentation status:** `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` are the sole sources of truth; everything else is synced to them. The LaTeX report (`docs/latex/main.pdf`) was regenerated from the synced documentation on 2026-10-16 and is updated only on explicit request.
 
@@ -83,6 +84,21 @@ $env:FABULA_CONVERSATION_MODE = "auto"
 ```
 
 Use `live` to require a key and fail clearly if it is missing, or `scripted` as a hard kill switch that never constructs a provider. Keys are read from the environment or an untracked JSON file (`FABULA_KEYS_FILE`) and are never written to a bundle or log. See **[docs/conversation.md](docs/conversation.md)** for the mode matrix, model overrides, privacy, toggles, troubleshooting, and evaluation notes.
+
+---
+
+## 🧩 Generate a Mystery
+
+The fine-tuned GGUF is not committed. Place `Qwen2.5-3B-Instruct.Q4_K_M.gguf` in `models/`, install the CPU runtime, verify the checksum, then generate:
+
+```powershell
+python -m pip install -e .
+python -m pip install llama-cpp-python --prefer-binary --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+python -m fabula model check
+python -m fabula generate --type theft --seed 1 --out bundles/my-case
+```
+
+Generation runs before play and writes `world.json`, `truth.json`, `clues.json`, and per-NPC `identity.json`/`memory.json`. The engine validates every stage, retries failed stages, atomically publishes only a complete bundle, and repairs a missing culprit account/evidence link when needed. See **[docs/local-generation.md](docs/local-generation.md)** for artifact hashes, environment overrides, grammar safeguards, benchmarks and troubleshooting.
 
 ---
 

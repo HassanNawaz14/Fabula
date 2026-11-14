@@ -9,6 +9,14 @@ class GenerationError(Exception):
     """Base class for all pre-play generation failures."""
 
 
+class GenerationSetupError(GenerationError):
+    """The model artifact, runtime dependency, or configuration is unavailable."""
+
+
+class LocalInferenceError(GenerationError):
+    """The local model backend failed while generating a stage."""
+
+
 class StageValidationError(GenerationError):
     """A single stage attempt produced invalid or semantically unusable output."""
 

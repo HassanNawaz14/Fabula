@@ -1,0 +1,10 @@
+{
+  "filename": "Qwen2.5-3B-Instruct.Q4_K_M.gguf",
+  "sha256": "7edcceccf2201e6859520209f9ba578b350f52c6ceb29826e3e0c8d042c067dc",
+  "base_model": "unsloth/Qwen2.5-3B-Instruct-bnb-4bit",
+  "fine_tune_task": "WP-D / D-02",
+  "quantization": "Q4_K_M",
+  "license": "Apache-2.0",
+  "source": "Kaggle WP-D output",
+  "weights_in_git": false
+}

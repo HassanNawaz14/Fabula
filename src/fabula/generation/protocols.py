@@ -40,6 +40,25 @@ class ModelRunner(Protocol):
     ) -> str: ...
 
 
+class LocalBackend(Protocol):
+    """A low-level local text-generation backend (for example llama.cpp)."""
+
+    def generate(
+        self,
+        prompt: str,
+        *,
+        grammar: str | None,
+        max_tokens: int,
+        temperature: float,
+        top_p: float,
+        repeat_penalty: float,
+        seed: int,
+        stop: tuple[str, ...],
+    ) -> str: ...
+
+    def close(self) -> None: ...
+
+
 class CancellationToken(Protocol):
     def is_cancelled(self) -> bool: ...
 

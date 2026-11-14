@@ -118,8 +118,11 @@ Game bundle on disk: world.json · truth.json · clues.json · npcs/<id>/identit
 Design decisions behind this pipeline:
 - **Staged generation [ADOPTED]**: world → cast → truth → per-NPC files instead of one giant output. Small models stay more consistent, each stage is validated separately, and retries are cheap.
 - **Constrained decoding [ADOPTED]**: grammar- or JSON-schema-constrained output to prevent malformed JSON. To minimize parser overhead on low-end CPUs, the engine uses 4 compact stage-specific GBNF grammars compiled directly from Pydantic models rather than a single monolithic grammar.
-- **Validator + retry loop [ADOPTED]**: checks schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability, and unique-culprit rules after every stage. Failure → retry the stage up to N times (default 3, config) → explicit error screen. This is a **runtime safety guard**, not the project's headline evaluation.
-- **Solvability, concretely [ADOPTED]**: a chain of clues/facts exists from which the player can derive who/how/why; exactly one culprit set; no timeline contradictions; all cross-references resolve; location graph connected; ≥4–6 clues.
+- **Local runtime [DECIDED 2026-11-14]**: `llama-cpp-python 0.3.36` (CPU wheel) loads the verified `Qwen2.5-3B-Instruct.Q4_K_M.gguf` lazily. `python -m fabula model check` verifies the manifest SHA-256; `python -m fabula generate` runs the staged pipeline. Weights stay gitignored; only `models/model_manifest.json` is committed. See `docs/local-generation.md`.
+- **Grammar safeguards [DECIDED 2026-11-14]**: before compilation, strip `minLength`/`pattern`/metadata and cap `maxLength` at 300 characters (llama.cpp expands large `maxLength` values into deeply nested rules and can overflow its grammar compiler; the cap also bounds CPU generation time) while retaining `minItems`/`maxItems` cardinality. For NPC stages, pin `identity.id`, `memory.npc_id`, and `fact.who` to the requested NPC id so memory ownership cannot cross NPCs.
+- **Final repair [DECIDED 2026-11-14]**: if final validation finds a missing culprit account or no clue pointing at a culprit-owned fact, the orchestrator adds a truth-backed secret `did` account fact (crime type/target/location + solution `how`) and links the crime-scene clue to it. The repair is engine-only, never enters a prompt, and guarantees a solvable case without exposing `truth.json`.
+- **Validator + retry loop [ADOPTED]**: checks schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability, and unique-culprit rules after every stage. Failure → retry the stage up to N times (default 3, config) → explicit error screen. The bundle is written to a temporary directory and atomically published only after full validation; a failed run preserves the previous bundle. This is a **runtime safety guard**, not the project's headline evaluation.
+- **Solvability, concretely [ADOPTED]**: a chain of clues/facts exists from which the player can derive who/how/why; exactly one culprit set; no timeline contradictions; all cross-references resolve; location graph connected; 4–6 clues.
 - **Loading screen [ADOPTED]**: local CPU generation of a few thousand JSON tokens may take minutes on low-end machines (estimate — **benchmark early**, HA-03).
 
 ### 3.2 The Game Bundle (output of Phase 1)
@@ -320,8 +323,9 @@ No scraping and no massive web crawls: all training data is produced by a **synt
 | Method | **QLoRA supervised fine-tuning with Unsloth on Kaggle T4** (LoRA rank 16) | **COMPLETED (HA-01)** |
 | Curriculum | SFT on 2,048 train pairs (2 full epochs, 512 steps, response-only loss masking) | **CONVERGED (0.867 → 0.088)** |
 | Export | Quantised **GGUF (Q4_K_M)** for local CPU inference | **EXPORTED (1.93 GB)** |
-| Inference runtime | llama.cpp-style runner with stage-specific GBNF constrained decoding | **ADOPTED (HG-03)** |
-| Artifact | `models/Qwen2.5-3B-Instruct.Q4_K_M.gguf` (SHA-256: `7EDCCECC...`) | Ready in `models/` |
+| Inference runtime | `llama-cpp-python 0.3.36` CPU wheel, stage-specific JSON-schema grammars | **WIRED (WP-E)** |
+| Artifact | `models/Qwen2.5-3B-Instruct.Q4_K_M.gguf` (SHA-256: `7EDCCECCF2201E6859520209F9BA578B350F52C6CEB29826E3E0C8D042C067DC`) | **VERIFIED** locally; weights gitignored, manifest committed |
+| CLI | `python -m fabula model check` / `python -m fabula generate` | **IMPLEMENTED (WP-E)** |
 | Notebooks | `training/notebooks/fabula_qlora_sft.ipynb` & `training/scripts/kaggle_qlora_sft.py` | Complete & verified |
 
 Fine-tuning executed on Kaggle Tesla T4 GPU in 2 hours 45 minutes with step checkpointing and auto-resume. LoRA adapter saved to `/kaggle/working/fabula_qlora_adapter` and standalone GGUF model exported to `/kaggle/working/fabula_gguf_gguf/Qwen2.5-3B-Instruct.Q4_K_M.gguf`.

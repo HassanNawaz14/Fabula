@@ -55,6 +55,7 @@ models/*
 # Local scratch artifacts (never commit)
 bundle/
 bundles/
+evaluation/results/
 generate_test_bundle.py
 run_ui_test.py
 test_intent.py

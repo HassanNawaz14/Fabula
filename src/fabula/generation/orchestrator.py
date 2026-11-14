@@ -30,7 +30,12 @@ from fabula.schemas import (
     Bundle,
     CastDocument,
     CastStageInput,
+    Disclosure,
+    DiscoveryMethod,
+    Fact,
+    FactSource,
     GenerationSettings,
+    IssueCode,
     MysteryType,
     NpcFiles,
     NpcStageInput,
@@ -179,6 +184,81 @@ def _check_npc_files(output: NpcStageOutput, npc_id: str) -> None:
         raise ValueError(f"memory npc_id {output.memory.npc_id!r} does not match npc {npc_id!r}")
 
 
+def _account_fact_id(culprit_id: str, existing: set[str]) -> str:
+    base = f"account_{culprit_id}"[:60]
+    candidate = base
+    index = 2
+    while candidate in existing:
+        candidate = f"{base[:56]}_{index}"
+        index += 1
+    return candidate
+
+
+def repair_culprit_account(bundle: Bundle) -> Bundle:
+    """Add the truth-backed culprit account when the model omitted it."""
+    culprit_id = bundle.truth.solution.correct_culprit_id
+    npc_files = bundle.npcs[culprit_id]
+    memory = npc_files.memory
+    if any(fact.source == FactSource.DID and fact.secret for fact in memory.facts):
+        return bundle
+
+    crime = bundle.truth.crime
+    solution = bundle.truth.solution
+    fact_id = _account_fact_id(culprit_id, {fact.id for fact in memory.facts})
+    what = (
+        f"I committed the {crime.type.value} of {crime.target} at the "
+        f"{crime.location_id}. {solution.how}"
+    )[:4000]
+    account = Fact(
+        id=fact_id,
+        who=culprit_id,
+        what=what,
+        where=crime.location_id,
+        when=f"minute {crime.time_window.start}",
+        source=FactSource.DID,
+        secret=True,
+        disclosure=Disclosure.HIDE,
+        reveal_requires=[],
+        cover_story_id=None,
+    )
+    updated_memory = memory.model_copy(update={"facts": [account, *memory.facts]})
+    updated_files = npc_files.model_copy(update={"memory": updated_memory})
+    updated_npcs = dict(bundle.npcs)
+    updated_npcs[culprit_id] = updated_files
+    return bundle.model_copy(update={"npcs": updated_npcs})
+
+
+def repair_culprit_evidence(bundle: Bundle) -> Bundle:
+    """Link the crime-scene clue to the culprit's account when evidence is missing."""
+    culprit_id = bundle.truth.solution.correct_culprit_id
+    memory = bundle.npcs[culprit_id].memory
+    account = next(
+        (fact for fact in memory.facts if fact.source == FactSource.DID and fact.secret),
+        None,
+    )
+    if account is None:
+        return bundle
+    if any(account.id in clue.implies for clue in bundle.clues.clues):
+        return bundle
+
+    crime_location = bundle.truth.crime.location_id
+    candidates = sorted(
+        enumerate(bundle.clues.clues),
+        key=lambda item: (
+            item[1].location_id != crime_location,
+            item[1].discovery != DiscoveryMethod.EXAMINE,
+            item[0],
+        ),
+    )
+    index, clue = candidates[0]
+    updated_clue = clue.model_copy(update={"implies": [*clue.implies, account.id]})
+    updated_clues = list(bundle.clues.clues)
+    updated_clues[index] = updated_clue
+    return bundle.model_copy(
+        update={"clues": bundle.clues.model_copy(update={"clues": updated_clues})}
+    )
+
+
 def generate_bundle(
     settings: GenerationSettings | dict[str, object],
     runner: ModelRunner,
@@ -281,6 +361,11 @@ def generate_bundle(
         raise FinalBundleError(_short(exc)) from exc
 
     issues = validate_bundle(bundle)
+    repair_codes = {IssueCode.E_CULPRIT_MISSING_ACCOUNT, IssueCode.E_NO_CULPRIT_EVIDENCE}
+    if any(issue.code in repair_codes for issue in issues):
+        bundle = repair_culprit_account(bundle)
+        bundle = repair_culprit_evidence(bundle)
+        issues = validate_bundle(bundle)
     if issues:
         detail = "; ".join(f"{issue.code}: {issue.message}" for issue in issues)
         raise FinalBundleError(detail, issues=tuple(issues))

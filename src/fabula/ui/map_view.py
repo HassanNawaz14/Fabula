@@ -19,12 +19,10 @@ class MapView:
         self._init_layout()
         
         self.font = pygame.font.Font(None, 24)
-        self.font_title = pygame.font.Font(None, 36)
+        self.font_small = pygame.font.Font(None, 18)
+        self.font_title = pygame.font.Font(None, 40)
         
-        # HUD Panel
         self.panel = Panel(pygame.Rect(0, self.height - 80, self.width, 80))
-        
-        # Buttons
         self.buttons = [
             Button(pygame.Rect(40, self.height - 60, 120, 40), "Examine [E]", lambda: {"action": "examine_location"}, self.font),
             Button(pygame.Rect(180, self.height - 60, 120, 40), "Talk [T]", self._talk_action, self.font),
@@ -45,7 +43,7 @@ class MapView:
     def _init_layout(self) -> None:
         locations = self.session.loaded.world.locations
         for i, loc in enumerate(locations):
-            x = 150 + (i % 3) * 300
+            x = 200 + (i % 3) * 250
             y = 150 + (i // 3) * 200
             self.location_coords[loc.id] = (x, y)
 
@@ -56,7 +54,7 @@ class MapView:
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             for loc_id, (x, y) in self.location_coords.items():
-                if pygame.Rect(x-60, y-40, 120, 80).collidepoint(event.pos):
+                if pygame.Rect(x-60, y-60, 120, 120).collidepoint(event.pos):
                     if loc_id == self.session.player_location:
                         return {"action": "examine_menu"}
                     elif loc_id in location_graph(self.session.loaded.world).get(self.session.player_location, []):
@@ -79,94 +77,74 @@ class MapView:
             if self.status_timer == 0: self.status_message = None
         for btn in self.buttons: btn.update()
 
-    def draw(self, surface: pygame.Surface) -> None:
-        surface.fill((40, 50, 40)) # Grass ground
+    def _draw_npc(self, surface: pygame.Surface, pos: tuple[int, int], npc_files: Any) -> None:
+        role = npc_files.identity.role.lower() if npc_files else "vendor"
+        color = (150, 200, 255)
+        if "police" in role: color = (100, 100, 200)
+        elif "baker" in role: color = (200, 150, 100)
+        
+        # Figure
+        pygame.draw.ellipse(surface, color, (pos[0]-12, pos[1]-40, 24, 30)) # Body
+        pygame.draw.circle(surface, (255, 220, 180), (pos[0], pos[1]-45), 10) # Head
+        
+        # Name and Role
+        name = npc_files.identity.name if npc_files else "NPC"
+        surf = self.font_small.render(name, True, (255, 255, 255))
+        surface.blit(surf, (pos[0] - surf.get_width()//2, pos[1]-5))
 
-        # Roads
+    def _draw_building(self, surface: pygame.Surface, pos: tuple[int, int], loc_type: str, is_player: bool) -> None:
+        rect = pygame.Rect(pos[0]-60, pos[1]-60, 120, 120)
+        color = (150, 200, 150) if is_player else (100, 120, 150)
+        pygame.draw.rect(surface, color, rect, border_radius=15)
+        pygame.draw.rect(surface, (255, 255, 255), rect, 6, border_radius=15)
+        
+        # Building details
+        if loc_type == "market":
+            pygame.draw.rect(surface, (80, 50, 50), (pos[0]-40, pos[1]-20, 80, 40))
+        elif loc_type == "library":
+            pygame.draw.rect(surface, (100, 80, 60), (pos[0]-40, pos[1]-20, 80, 40))
+            pygame.draw.line(surface, (255,255,255), (pos[0]-30, pos[1]-20), (pos[0]-30, pos[1]+20), 5)
+            pygame.draw.line(surface, (255,255,255), (pos[0]+30, pos[1]-20), (pos[0]+30, pos[1]+20), 5)
+        elif loc_type == "residence":
+            pygame.draw.polygon(surface, (150, 70, 70), [(pos[0]-70, pos[1]-60), (pos[0]+70, pos[1]-60), (pos[0], pos[1]-100)])
+        
+    def draw(self, surface: pygame.Surface) -> None:
+        surface.fill((40, 50, 40))
         graph = location_graph(self.session.loaded.world)
+        
+        # Draw Roads
         for loc_id, neighbors in graph.items():
             start = self.location_coords.get(loc_id)
             if not start: continue
             for n_id in neighbors:
                 end = self.location_coords.get(n_id)
                 if end and loc_id < n_id:
-                    pygame.draw.line(surface, (100, 90, 80), start, end, 15)
-                    pygame.draw.line(surface, (120, 110, 100), start, end, 3)
+                    pygame.draw.line(surface, (80, 70, 60), start, end, 20)
 
-        # NPC Visual Map
-        npc_visuals = {
-            "police": "👮",
-            "vendor": "🛍️",
-            "teacher": "👨‍🏫",
-            "grocer": "🍎",
-            "shepherd": "🐑",
-            "baker": "🥖"
-        }
-        
-        # Location visual map
-        location_visuals = {
-            "market": {"icon": "🛒", "color": (120, 100, 80)},
-            "library": {"icon": "📚", "color": (100, 80, 120)},
-            "cafe": {"icon": "☕", "color": (150, 100, 60)},
-            "park": {"icon": "🌳", "color": (60, 120, 60)},
-            "parking": {"icon": "🚗", "color": (80, 80, 80)},
-            "residence": {"icon": "🏠", "color": (120, 70, 70)}
-        }
-
+        # Draw Buildings & NPCs
         for loc in self.session.loaded.world.locations:
             pos = self.location_coords.get(loc.id)
             if not pos: continue
-            is_player_here = loc.id == self.session.player_location
+            self._draw_building(surface, pos, loc.type.value, loc.id == self.session.player_location)
             
-            # Place visual
-            visual = location_visuals.get(loc.type.value, {"icon": "📍", "color": (100, 100, 100)})
-            rect = pygame.Rect(pos[0]-60, pos[1]-60, 120, 120)
-            
-            # Draw styled location box
-            pygame.draw.rect(surface, visual["color"], rect, border_radius=20)
-            pygame.draw.rect(surface, (255, 255, 255) if is_player_here else (200, 200, 200), rect, 6, border_radius=20)
-            
-            # Icon
-            font_big = pygame.font.Font(None, 80)
-            icon_surf = font_big.render(visual["icon"], True, (255, 255, 255))
-            surface.blit(icon_surf, (pos[0] - icon_surf.get_width() // 2, pos[1] - 40))
-
             # Name
             name_surf = self.font.render(loc.name, True, (255, 255, 255))
-            pygame.draw.rect(surface, (20, 20, 20, 150), (pos[0]-name_surf.get_width()//2-5, pos[1]+35, name_surf.get_width()+10, 25), border_radius=5)
-            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 35))
-
+            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 40))
+            
             # NPCs
             npcs_here = self.session.npcs_at(loc.id)
             for i, npc_id in enumerate(npcs_here):
-                npc_files = self.session.loaded.npcs.get(npc_id)
-                role = npc_files.identity.role.lower() if npc_files else "vendor"
-                
-                # Determine icon based on role keywords
-                icon = "👤"
-                if "police" in role: icon = "👮"
-                elif "vendor" in role or "grocer" in role: icon = "🛍️"
-                elif "teacher" in role: icon = "👨‍🏫"
-                elif "baker" in role: icon = "🥖"
-                
-                # NPC positioning
-                npc_pos = (pos[0] - 40 + i*40, pos[1] + 60)
-                surf = self.font.render(icon, True, (255, 255, 255))
-                surface.blit(surf, npc_pos)
-
-
+                self._draw_npc(surface, (pos[0] - 60 + i*40, pos[1] + 100), self.session.loaded.npcs.get(npc_id))
 
         # UI
         self.panel.draw(surface)
         for btn in self.buttons: btn.draw(surface)
         
+        # HUD
         title_surf = self.font_title.render(f"{self.session.loaded.world.mystery_type.value.capitalize()} Case", True, (255, 100, 100))
         surface.blit(title_surf, (20, 20))
-        
         minute = self.session.clock.minute
-        time_text = f"Time: {minute//60:02d}:{minute%60:02d}"
-        surface.blit(self.font.render(time_text, True, (200, 200, 200)), (self.width - 150, 20))
-        
+        surface.blit(self.font.render(f"Time: {minute//60:02d}:{minute%60:02d}", True, (200, 200, 200)), (self.width - 150, 20))
         if self.status_message:
             surf = self.font.render(self.status_message, True, (255, 255, 200))
-            surface.blit(surf, (self.width//2 - surf.get_width()//2, self.height - 120))
+            surface.blit(surf, (self.width//2 - surf.get_width()//2, self.height - 110))

@@ -1,15 +1,21 @@
 from __future__ import annotations
 
+from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 import pygame
 
 from fabula.simulation import Session
+from fabula.simulation.loader import LoadedBundle
+from fabula.training_data import generate_skeleton
 from fabula.ui.accusation import AccusationView
 from fabula.ui.dialogue import DialogueView
 from fabula.ui.generation_screen import GenerationScreen
 from fabula.ui.journal import JournalView
 from fabula.ui.map_view import MapView
+from fabula.ui.settings import SettingsView
+from fabula.ui.start_menu import StartMenuView
 
 
 class FabulaApp:
@@ -26,6 +32,7 @@ class FabulaApp:
         self.height = height
         self.session = session
         self.conversation_service = conversation_service
+        self.settings = {"conversation_mode": "auto", "api_key": "Set in env"}
 
         if not pygame.get_init():
             pygame.init()
@@ -34,12 +41,12 @@ class FabulaApp:
         pygame.display.set_caption("Fabula — Mystery Investigation Game")
         self.clock = pygame.time.Clock()
 
-        if self.session:
-            self.state = "map"
-            self.current_view = MapView(self.width, self.height, self.session)
+        if session is None:
+            self.state = "start_menu"
+            self.current_view = StartMenuView(self.width, self.height, self)
         else:
-            self.state = "generation"
-            self.current_view = GenerationScreen(self.width, self.height)
+            self.state = "map"
+            self.current_view = MapView(self.width, self.height, session)
 
     def set_session(self, session: Session) -> None:
         self.session = session
@@ -72,8 +79,27 @@ class FabulaApp:
 
     def _handle_view_action(self, result: Any) -> None:
         if isinstance(result, str):
-            if result == "start_game" and isinstance(self.current_view, GenerationScreen):
-                pass  # needs session set
+            if result == "start_dummy":
+                bundle = generate_skeleton("theft", seed=1, tone="cozy", difficulty="easy")
+                loaded = LoadedBundle(
+                    root=Path("."),
+                    world=bundle.world,
+                    clues=bundle.clues,
+                    npcs=MappingProxyType(
+                        {npc.id: bundle.npcs[npc.id] for npc in bundle.world.npcs}
+                    ),
+                    _truth=bundle.truth,
+                )
+                self.set_session(Session(loaded))
+            elif result == "go_generation":
+                self.state = "generation"
+                self.current_view = GenerationScreen(self.width, self.height)
+            elif result == "go_settings":
+                self.state = "settings"
+                self.current_view = SettingsView(self.width, self.height, self)
+            elif result == "back_to_menu":
+                self.state = "start_menu"
+                self.current_view = StartMenuView(self.width, self.height, self)
             elif result == "back_to_map" and self.session:
                 self.state = "map"
                 self.current_view = MapView(self.width, self.height, self.session)
@@ -85,49 +111,27 @@ class FabulaApp:
                 self.current_view = AccusationView(self.width, self.height, self.session)
             elif result == "quit_game":
                 pygame.quit()
+                exit()
         elif isinstance(result, dict):
+            # Existing handling for map actions
             action = result.get("action")
             if action == "move" and self.session:
-                loc_id = result.get("location_id")
-                try:
-                    self.session.move_player(loc_id)
-                except Exception as e:
-                    print(f"Movement error: {e}")
+                self.session.move_player(result.get("location_id"))
+            elif action == "talk_menu" and self.session:
+                npc_id = result.get("npc_id")
+                self.state = "dialogue"
+                self.current_view = DialogueView(
+                    self.width, self.height, self.session, self.conversation_service, npc_id
+                )
             elif action in ("examine_menu", "examine_location") and self.session:
-                # Examine local clues if any
                 loc_id = self.session.player_location
                 clues = [
                     c
                     for c in self.session.loaded.clues.clues
                     if c.location_id == loc_id and c.id not in self.session.discovered_ids
                 ]
-                results = []
                 for clue in clues:
-                    try:
-                        self.session.examine(loc_id, clue.id)
-                        results.append(f"Found: {clue.description[:30]}...")
-                    except Exception:
-                        pass
+                    self.session.examine(loc_id, clue.id)
                 if isinstance(self.current_view, MapView):
-                    if results:
-                        self.current_view.status_message = results[0]
-                    else:
-                        self.current_view.status_message = "Nothing here."
-                    self.current_view.status_timer = 120
-            elif action == "talk_menu" and self.session:
-                npc_id = result.get("npc_id")
-                if npc_id:
-                    self.state = "dialogue"
-                    self.current_view = DialogueView(
-                        self.width,
-                        self.height,
-                        self.session,
-                        self.conversation_service,
-                        npc_id,
-                    )
-            elif action == "open_journal" and self.session:
-                self.state = "journal"
-                self.current_view = JournalView(self.width, self.height, self.session)
-            elif action == "open_accusation" and self.session:
-                self.state = "accusation"
-                self.current_view = AccusationView(self.width, self.height, self.session)
+                    self.current_view.status_message = "Examined."
+                    self.current_view.status_timer = 60

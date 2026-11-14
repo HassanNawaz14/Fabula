@@ -1,22 +1,21 @@
 from __future__ import annotations
 
+from pathlib import Path
+from types import MappingProxyType
 from typing import Any
 
 import pygame
 
 from fabula.simulation import Session
+from fabula.simulation.loader import LoadedBundle
+from fabula.training_data import generate_skeleton
 from fabula.ui.accusation import AccusationView
 from fabula.ui.dialogue import DialogueView
 from fabula.ui.generation_screen import GenerationScreen
 from fabula.ui.journal import JournalView
 from fabula.ui.map_view import MapView
-from fabula.ui.start_menu import StartMenuView
 from fabula.ui.settings import SettingsView
-from fabula.simulation.loader import load_bundle, LoadedBundle
-from fabula.simulation import Session
-from fabula.training_data import generate_skeleton
-from types import MappingProxyType
-from pathlib import Path
+from fabula.ui.start_menu import StartMenuView
 
 
 class FabulaApp:
@@ -42,8 +41,12 @@ class FabulaApp:
         pygame.display.set_caption("Fabula — Mystery Investigation Game")
         self.clock = pygame.time.Clock()
 
-        self.state = "start_menu"
-        self.current_view = StartMenuView(self.width, self.height, self)
+        if session is None:
+            self.state = "start_menu"
+            self.current_view = StartMenuView(self.width, self.height, self)
+        else:
+            self.state = "map"
+            self.current_view = MapView(self.width, self.height, session)
 
     def set_session(self, session: Session) -> None:
         self.session = session
@@ -78,7 +81,15 @@ class FabulaApp:
         if isinstance(result, str):
             if result == "start_dummy":
                 bundle = generate_skeleton("theft", seed=1, tone="cozy", difficulty="easy")
-                loaded = LoadedBundle(root=Path("."), world=bundle.world, clues=bundle.clues, npcs=MappingProxyType({npc.id: bundle.npcs[npc.id] for npc in bundle.world.npcs}), _truth=bundle.truth)
+                loaded = LoadedBundle(
+                    root=Path("."),
+                    world=bundle.world,
+                    clues=bundle.clues,
+                    npcs=MappingProxyType(
+                        {npc.id: bundle.npcs[npc.id] for npc in bundle.world.npcs}
+                    ),
+                    _truth=bundle.truth,
+                )
                 self.set_session(Session(loaded))
             elif result == "go_generation":
                 self.state = "generation"
@@ -109,13 +120,18 @@ class FabulaApp:
             elif action == "talk_menu" and self.session:
                 npc_id = result.get("npc_id")
                 self.state = "dialogue"
-                self.current_view = DialogueView(self.width, self.height, self.session, self.conversation_service, npc_id)
+                self.current_view = DialogueView(
+                    self.width, self.height, self.session, self.conversation_service, npc_id
+                )
             elif action in ("examine_menu", "examine_location") and self.session:
                 loc_id = self.session.player_location
-                clues = [c for c in self.session.loaded.clues.clues if c.location_id == loc_id and c.id not in self.session.discovered_ids]
+                clues = [
+                    c
+                    for c in self.session.loaded.clues.clues
+                    if c.location_id == loc_id and c.id not in self.session.discovered_ids
+                ]
                 for clue in clues:
                     self.session.examine(loc_id, clue.id)
                 if isinstance(self.current_view, MapView):
                     self.current_view.status_message = "Examined."
                     self.current_view.status_timer = 60
-

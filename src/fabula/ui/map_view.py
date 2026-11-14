@@ -18,8 +18,8 @@ class MapView:
         self.tick = 0
         self._init_layout()
         
-        self.font = pygame.font.Font(None, 28)
-        self.font_small = pygame.font.Font(None, 20)
+        self.font = pygame.font.Font(None, 24)
+        self.font_small = pygame.font.Font(None, 18)
         self.font_title = pygame.font.Font(None, 40)
         
         self.panel = Panel(pygame.Rect(0, self.height - 80, self.width, 80))
@@ -41,13 +41,15 @@ class MapView:
         return {"action": "talk_menu", "npc_id": npc_id}
 
     def _init_layout(self) -> None:
-        # Optimized grid for bigger buildings
+        # Smaller grid layout
         locations = self.session.loaded.world.locations
         for i, loc in enumerate(locations):
-            # 2x2 grid fits 4 locations nicely
-            x = 250 + (i % 2) * 450
-            y = 200 + (i // 2) * 300
+            x = 150 + (i % 3) * 300
+            y = 150 + (i // 3) * 200
             self.location_coords[loc.id] = (x, y)
+
+    def _get_npc_rect(self, pos: tuple[int, int], i: int) -> pygame.Rect:
+        return pygame.Rect(pos[0] - 60 + i*60 - 20, pos[1] + 20 + math.sin(self.tick * 0.1 + i) * 5 - 60, 40, 80)
 
     def handle_event(self, event: pygame.event.Event) -> str | dict[str, Any] | None:
         for btn in self.buttons:
@@ -55,8 +57,17 @@ class MapView:
             if res: return res
 
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+            # Check NPCs first
+            npcs_here = self.session.npcs_at(self.session.player_location)
+            pos = self.location_coords.get(self.session.player_location)
+            if pos:
+                for i, npc_id in enumerate(npcs_here):
+                    if self._get_npc_rect(pos, i).collidepoint(event.pos):
+                        return {"action": "talk_menu", "npc_id": npc_id}
+            
+            # Check locations
             for loc_id, (x, y) in self.location_coords.items():
-                if pygame.Rect(x-180, y-180, 360, 360).collidepoint(event.pos):
+                if pygame.Rect(x-60, y-60, 120, 120).collidepoint(event.pos):
                     if loc_id == self.session.player_location:
                         return {"action": "examine_menu"}
                     elif loc_id in location_graph(self.session.loaded.world).get(self.session.player_location, []):
@@ -79,50 +90,49 @@ class MapView:
             if self.status_timer == 0: self.status_message = None
         for btn in self.buttons: btn.update()
 
-    def _draw_npc(self, surface: pygame.Surface, pos: tuple[int, int], npc_files: Any, index: int) -> None:
+    def _draw_npc(self, surface: pygame.Surface, pos: tuple[int, int], npc_id: str, npc_files: Any, i: int) -> None:
         role = npc_files.identity.role.lower() if npc_files else "vendor"
         color = (150, 200, 255)
         if "police" in role: color = (100, 100, 200)
         elif "baker" in role: color = (200, 150, 100)
         
-        # Animate
-        wobble_x = math.sin(self.tick * 0.05 + index) * 30
-        wobble_y = math.cos(self.tick * 0.05 + index) * 10
-        npc_x, npc_y = pos[0] + wobble_x, pos[1] + wobble_y
+        # Vertical-only wobble
+        wobble_y = math.sin(self.tick * 0.1 + i) * 5
+        npc_x = pos[0] - 60 + i*60
+        npc_y = pos[1] + 20 + wobble_y
         
         # Figure
-        pygame.draw.ellipse(surface, color, (npc_x-20, npc_y-60, 40, 60)) # Body
-        pygame.draw.circle(surface, (255, 220, 180), (npc_x, npc_y-70), 20) # Head
+        pygame.draw.ellipse(surface, color, (npc_x-20, npc_y-60, 40, 50)) # Body
+        pygame.draw.circle(surface, (255, 220, 180), (npc_x, npc_y-65), 15) # Head
         
         # Name and Role
         name = npc_files.identity.name if npc_files else "NPC"
         surf = self.font_small.render(name, True, (255, 255, 255))
-        surface.blit(surf, (npc_x - surf.get_width()//2, npc_y+10))
+        surface.blit(surf, (npc_x - surf.get_width()//2, npc_y+15))
 
     def _draw_building(self, surface: pygame.Surface, pos: tuple[int, int], loc_type: str, is_player: bool) -> None:
-        rect = pygame.Rect(pos[0]-180, pos[1]-180, 360, 360)
+        rect = pygame.Rect(pos[0]-60, pos[1]-60, 120, 120)
         color = (100, 220, 140) if is_player else (100, 120, 150)
-        pygame.draw.rect(surface, color, rect, border_radius=30)
-        pygame.draw.rect(surface, (255, 255, 255), rect, 8, border_radius=30)
+        pygame.draw.rect(surface, color, rect, border_radius=15)
+        pygame.draw.rect(surface, (255, 255, 255), rect, 6, border_radius=15)
         
-        # Building detail
-        detail_rect = pygame.Rect(pos[0]-100, pos[1]-50, 200, 150)
-        pygame.draw.rect(surface, (60, 40, 30), detail_rect, border_radius=10)
+        # Detail
+        pygame.draw.rect(surface, (60, 40, 30), (pos[0]-30, pos[1]-20, 60, 60), border_radius=10)
         
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((40, 50, 40))
         graph = location_graph(self.session.loaded.world)
         
-        # Draw Roads
+        # Roads
         for loc_id, neighbors in graph.items():
             start = self.location_coords.get(loc_id)
             if not start: continue
             for n_id in neighbors:
                 end = self.location_coords.get(n_id)
                 if end and loc_id < n_id:
-                    pygame.draw.line(surface, (80, 70, 60), start, end, 30)
+                    pygame.draw.line(surface, (80, 70, 60), start, end, 20)
 
-        # Draw Buildings & NPCs
+        # Buildings & NPCs
         for loc in self.session.loaded.world.locations:
             pos = self.location_coords.get(loc.id)
             if not pos: continue
@@ -130,13 +140,13 @@ class MapView:
             
             # Name
             name_surf = self.font_title.render(loc.name, True, (255, 255, 255))
-            pygame.draw.rect(surface, (0,0,0,180), (pos[0]-name_surf.get_width()//2-10, pos[1]-160, name_surf.get_width()+20, 40), border_radius=10)
-            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] - 155))
+            pygame.draw.rect(surface, (0,0,0,180), (pos[0]-name_surf.get_width()//2-10, pos[1]-100, name_surf.get_width()+20, 30), border_radius=10)
+            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] - 95))
             
             # NPCs
             npcs_here = self.session.npcs_at(loc.id)
             for i, npc_id in enumerate(npcs_here):
-                self._draw_npc(surface, (pos[0] - 100 + i*100, pos[1] + 50), self.session.loaded.npcs.get(npc_id), i)
+                self._draw_npc(surface, pos, npc_id, self.session.loaded.npcs.get(npc_id), i)
 
         # UI
         self.panel.draw(surface)

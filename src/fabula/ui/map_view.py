@@ -26,6 +26,7 @@ class MapView:
         center_x, center_y = self.width // 2, self.height // 2 - 40
         radius = min(self.width, self.height) // 3
         import math
+
         for i, loc in enumerate(locations):
             angle = (2 * math.pi * i) / max(1, n)
             x = int(center_x + radius * math.cos(angle))
@@ -40,11 +41,8 @@ class MapView:
                 if (mouse_pos[0] - x) ** 2 + (mouse_pos[1] - y) ** 2 <= 35**2:
                     if loc_id == self.session.player_location:
                         return {"action": "examine_menu"}
-                    elif (
-                        loc_id
-                        in location_graph(self.session.loaded.world).get(
-                            self.session.player_location, []
-                        )
+                    elif loc_id in location_graph(self.session.loaded.world).get(
+                        self.session.player_location, []
                     ):
                         return {"action": "move", "location_id": loc_id}
 
@@ -75,7 +73,6 @@ class MapView:
             if self.status_timer == 0:
                 self.status_message = None
 
-
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((30, 30, 45))
         try:
@@ -101,7 +98,7 @@ class MapView:
             pos = self.location_coords.get(loc.id)
             if not pos:
                 continue
-            is_player_here = (loc.id == self.session.player_location)
+            is_player_here = loc.id == self.session.player_location
             color = (80, 200, 120) if is_player_here else (70, 100, 150)
             pygame.draw.circle(surface, color, pos, 35)
             pygame.draw.circle(surface, (255, 255, 255), pos, 35, 2)
@@ -128,7 +125,7 @@ class MapView:
             m_surf = font_title.render(mystery_text, True, (255, 100, 100))
             # Display mystery description below the title
             surface.blit(m_surf, (self.width - 220, 20))
-            
+
             desc_text = f"Objective: {self.session.loaded.world.title}"
             desc_surf = font_body.render(desc_text, True, (255, 255, 255))
             surface.blit(desc_surf, (self.width - 220, 50))
@@ -152,9 +149,12 @@ class MapView:
             minute = self.session.clock.minute
             time_str = f"Time: {minute // 60:02d}:{minute % 60:02d} (Min {minute})"
             loc_name = next(
-                (loc_item.name for loc_item in self.session.loaded.world.locations
-                 if loc_item.id == self.session.player_location),
-                ""
+                (
+                    loc_item.name
+                    for loc_item in self.session.loaded.world.locations
+                    if loc_item.id == self.session.player_location
+                ),
+                "",
             )
             hud_text = f"Location: {loc_name} | {time_str}"
             info_surf = font_body.render(hud_text, True, (220, 220, 240))

@@ -89,7 +89,5 @@ class JournalView:
                     y += 22
 
         if font_section:
-            exit_surf = font_section.render(
-                "[ESC or J] Return to Map", True, (180, 180, 180)
-            )
+            exit_surf = font_section.render("[ESC or J] Return to Map", True, (180, 180, 180))
             surface.blit(exit_surf, (30, self.height - 50))

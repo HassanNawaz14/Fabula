@@ -22,6 +22,7 @@ testpaths = ["tests"]
 [tool.ruff]
 line-length = 100
 src = ["src", "tests"]
+extend-exclude = ["training/notebooks"]
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "UP", "B"]

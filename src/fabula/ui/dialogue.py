@@ -63,18 +63,18 @@ class DialogueView:
                     self.session.npc_reveal(self.npc_id, clue_id)
                 except Exception:
                     pass
-            self.history.append({
-                "speaker": self.npc.display_name,
-                "text": reply_dto.text,
-                "mood": reply_dto.mood
-            })
+            self.history.append(
+                {"speaker": self.npc.display_name, "text": reply_dto.text, "mood": reply_dto.mood}
+            )
             self.current_mood = reply_dto.mood
         except Exception as e:
-            self.history.append({
-                "speaker": self.npc.display_name,
-                "text": f"(Error reaching conversation service: {e})",
-                "mood": "nervous"
-            })
+            self.history.append(
+                {
+                    "speaker": self.npc.display_name,
+                    "text": f"(Error reaching conversation service: {e})",
+                    "mood": "nervous",
+                }
+            )
         finally:
             self.loading = False
 
@@ -93,9 +93,7 @@ class DialogueView:
         # Header
         pygame.draw.rect(surface, (40, 45, 60), (0, 0, self.width, 60))
         if font_title:
-            title_text = (
-                f"Conversation with {self.npc.display_name} — Mood: {self.current_mood}"
-            )
+            title_text = f"Conversation with {self.npc.display_name} — Mood: {self.current_mood}"
             title_surf = font_title.render(title_text, True, (255, 255, 255))
             surface.blit(title_surf, (20, 18))
 

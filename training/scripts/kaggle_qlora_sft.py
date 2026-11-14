@@ -80,8 +80,13 @@ def main():
 
     # 3. Add Parameter-Efficient LoRA Adapters (Rank 16)
     target_modules = [
-        "q_proj", "k_proj", "v_proj", "o_proj",
-        "gate_proj", "up_proj", "down_proj",
+        "q_proj",
+        "k_proj",
+        "v_proj",
+        "o_proj",
+        "gate_proj",
+        "up_proj",
+        "down_proj",
     ]
     model = FastLanguageModel.get_peft_model(
         model,
@@ -190,6 +195,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-
-

@@ -99,8 +99,7 @@ class FabulaApp:
                 clues = [
                     c
                     for c in self.session.loaded.clues.clues
-                    if c.location_id == loc_id
-                    and c.id not in self.session.discovered_ids
+                    if c.location_id == loc_id and c.id not in self.session.discovered_ids
                 ]
                 results = []
                 for clue in clues:

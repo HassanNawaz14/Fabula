@@ -5,6 +5,7 @@ from typing import Any
 import pygame
 
 from fabula.simulation import location_graph
+from fabula.ui.components import Button, Panel
 
 
 class MapView:
@@ -19,6 +20,24 @@ class MapView:
         self.status_message: str | None = None
         self.status_timer = 0
         self._init_layout()
+        
+        self.font = pygame.font.Font(None, 20)
+        self.buttons = [
+            Button(pygame.Rect(20, self.height - 60, 80, 30), "Examine [E]", lambda: {"action": "examine_location"}, self.font),
+            Button(pygame.Rect(110, self.height - 60, 80, 30), "Talk [T]", self._talk_action, self.font),
+            Button(pygame.Rect(200, self.height - 60, 80, 30), "Journal [J]", lambda: {"action": "open_journal"}, self.font),
+            Button(pygame.Rect(290, self.height - 60, 80, 30), "Accuse [A]", lambda: {"action": "open_accusation"}, self.font),
+        ]
+
+    def _talk_action(self) -> dict[str, Any] | None:
+        npcs = self.session.npcs_at(self.session.player_location)
+        if not npcs:
+            self.status_message = "No NPCs here."
+            self.status_timer = 60
+            return None
+        npc_id = npcs[self.session.npc_cycle_index % len(npcs)]
+        self.session.npc_cycle_index += 1
+        return {"action": "talk_menu", "npc_id": npc_id}
 
     def _init_layout(self) -> None:
         locations = self.session.loaded.world.locations
@@ -34,6 +53,12 @@ class MapView:
             self.location_coords[loc.id] = (x, y)
 
     def handle_event(self, event: pygame.event.Event) -> str | dict[str, Any] | None:
+        # Handle buttons
+        for btn in self.buttons:
+            res = btn.handle_event(event)
+            if res:
+                return res
+
         if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
             mouse_pos = event.pos
             # Check click on location nodes
@@ -52,14 +77,7 @@ class MapView:
             elif event.key == pygame.K_a:
                 return {"action": "open_accusation"}
             elif event.key == pygame.K_t:
-                npcs = self.session.npcs_at(self.session.player_location)
-                if not npcs:
-                    self.status_message = "No NPCs here."
-                    self.status_timer = 60
-                    return None
-                npc_id = npcs[self.session.npc_cycle_index % len(npcs)]
-                self.session.npc_cycle_index += 1
-                return {"action": "talk_menu", "npc_id": npc_id}
+                return self._talk_action()
             elif event.key == pygame.K_e:
                 self.status_message = "Examining..."
                 self.status_timer = 60
@@ -72,6 +90,8 @@ class MapView:
             self.status_timer -= 1
             if self.status_timer == 0:
                 self.status_message = None
+        for btn in self.buttons:
+            btn.update()
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((30, 30, 45))
@@ -145,6 +165,10 @@ class MapView:
             2,
         )
 
+        # Draw buttons
+        for btn in self.buttons:
+            btn.draw(surface)
+
         if font_body:
             minute = self.session.clock.minute
             time_str = f"Time: {minute // 60:02d}:{minute % 60:02d} (Min {minute})"
@@ -160,6 +184,3 @@ class MapView:
             info_surf = font_body.render(hud_text, True, (220, 220, 240))
             surface.blit(info_surf, (20, self.height - 45))
 
-            controls_text = "[Click adjacent to move] [E] Examine [T] Talk [J] Journal [A] Accuse"
-            ctrl_surf = font_body.render(controls_text, True, (160, 180, 200))
-            surface.blit(ctrl_surf, (20, self.height - 25))

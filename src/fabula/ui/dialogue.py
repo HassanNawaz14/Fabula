@@ -4,6 +4,8 @@ from typing import Any
 
 import pygame
 
+from fabula.ui.components import Button, Panel
+
 
 class DialogueView:
     """Renders conversation UI with an NPC using ConversationService."""
@@ -26,6 +28,12 @@ class DialogueView:
         self.history: list[dict[str, str]] = []
         self.current_mood = "neutral"
         self.loading = False
+        
+        self.font_title = pygame.font.Font(None, 28)
+        self.font_body = pygame.font.Font(None, 20)
+        
+        self.panel = Panel(pygame.Rect(10, 80, width - 20, height - 160))
+        self.exit_button = Button(pygame.Rect(width - 150, 15, 120, 30), "Return [ESC]", lambda: "back_to_map", self.font_body)
 
         # Load initial greeting or recent messages if any
         existing_statements = session.statements_for(npc_id)
@@ -33,6 +41,8 @@ class DialogueView:
             self.history.append({"speaker": "Player", "text": st, "mood": ""})
 
     def handle_event(self, event: pygame.event.Event) -> str | None:
+        if self.exit_button.handle_event(event):
+            return "back_to_map"
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "back_to_map"
@@ -79,51 +89,38 @@ class DialogueView:
             self.loading = False
 
     def update(self) -> None:
-        pass
+        self.exit_button.update()
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((25, 30, 40))
-        try:
-            font_title = pygame.font.Font(None, 28)
-            font_body = pygame.font.Font(None, 18)
-        except Exception:
-            font_title = None
-            font_body = None
-
+        
         # Header
         pygame.draw.rect(surface, (40, 45, 60), (0, 0, self.width, 60))
-        if font_title:
-            title_text = f"Conversation with {self.npc.display_name} — Mood: {self.current_mood}"
-            title_surf = font_title.render(title_text, True, (255, 255, 255))
-            surface.blit(title_surf, (20, 18))
+        title_text = f"Conversation with {self.npc.display_name} — Mood: {self.current_mood}"
+        title_surf = self.font_title.render(title_text, True, (255, 255, 255))
+        surface.blit(title_surf, (20, 18))
+        self.exit_button.draw(surface)
 
         # Chat history area
-        y_offset = 80
-        max_y = self.height - 80
-        for msg in self.history[-8:]:  # show last 8 messages
+        self.panel.draw(surface)
+        y_offset = 90
+        for msg in self.history[-10:]:  # show last 10 messages
             speaker = msg["speaker"]
             txt = msg["text"]
             mood_str = f" [{msg['mood']}]" if msg["mood"] else ""
             line = f"{speaker}{mood_str}: {txt}"
             color = (255, 220, 100) if speaker != "Player" else (150, 220, 255)
-            if font_body:
-                # Wrap text roughly or render line
-                text_surf = font_body.render(line[:110], True, color)
-                surface.blit(text_surf, (20, y_offset))
-                y_offset += 25
-                if y_offset > max_y - 40:
-                    break
+            text_surf = self.font_body.render(line[:100], True, color)
+            surface.blit(text_surf, (20, y_offset))
+            y_offset += 25
 
         # Input box footer
         pygame.draw.rect(surface, (40, 40, 50), (10, self.height - 60, self.width - 20, 45))
         pygame.draw.rect(surface, (100, 120, 160), (10, self.height - 60, self.width - 20, 45), 2)
 
-        if font_body:
-            prompt_str = f"> {self.input_text}"
-            if self.loading:
-                prompt_str = "Thinking..."
-            input_surf = font_body.render(prompt_str, True, (240, 240, 255))
-            surface.blit(input_surf, (20, self.height - 47))
+        prompt_str = f"> {self.input_text}"
+        if self.loading:
+            prompt_str = "Thinking..."
+        input_surf = self.font_body.render(prompt_str, True, (240, 240, 255))
+        surface.blit(input_surf, (20, self.height - 47))
 
-            exit_surf = font_body.render("[ESC] Return to Map", True, (150, 150, 170))
-            surface.blit(exit_surf, (self.width - 180, 20))

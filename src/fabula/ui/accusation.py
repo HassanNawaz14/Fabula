@@ -5,6 +5,7 @@ from typing import Any
 import pygame
 
 from fabula.simulation import AccusationService
+from fabula.ui.components import Button, Panel
 
 
 class AccusationView:
@@ -26,9 +27,17 @@ class AccusationView:
         self.selected_npc_idx = 0
         self.selected_method_idx = 0
         self.selected_motive_idx = 0
-        self.focus_field = 0  # 0: npc, 1: method, 2: motive, 3: submit button
         self.message = ""
         self.game_over_status: str | None = None
+        
+        self.font_title = pygame.font.Font(None, 36)
+        self.font_section = pygame.font.Font(None, 24)
+        self.font_body = pygame.font.Font(None, 20)
+
+        # UI Components
+        self.panel = Panel(pygame.Rect(20, 80, width - 40, height - 200))
+        self.submit_button = Button(pygame.Rect(width // 2 - 100, height - 100, 200, 40), "Submit Accusation", self._submit_accusation, self.font_section)
+        self.exit_button = Button(pygame.Rect(width - 200, height - 60, 180, 40), "Back [ESC]", lambda: "back_to_map", self.font_section)
 
     def handle_event(self, event: pygame.event.Event) -> str | None:
         if self.game_over_status:
@@ -36,28 +45,21 @@ class AccusationView:
                 return "quit_game"
             return None
 
+        if self.submit_button.handle_event(event):
+            pass
+        if self.exit_button.handle_event(event):
+            return "back_to_map"
+
         if event.type == pygame.KEYDOWN:
             if event.key == pygame.K_ESCAPE:
                 return "back_to_map"
-            elif event.key == pygame.K_TAB:
-                self.focus_field = (self.focus_field + 1) % 4
-            elif event.key == pygame.K_UP:
-                if self.focus_field == 0:
-                    self.selected_npc_idx = (self.selected_npc_idx - 1) % len(self.npcs)
-                elif self.focus_field == 1:
-                    self.selected_method_idx = (self.selected_method_idx - 1) % len(self.methods)
-                elif self.focus_field == 2:
-                    self.selected_motive_idx = (self.selected_motive_idx - 1) % len(self.motives)
-            elif event.key == pygame.K_DOWN:
-                if self.focus_field == 0:
-                    self.selected_npc_idx = (self.selected_npc_idx + 1) % len(self.npcs)
-                elif self.focus_field == 1:
-                    self.selected_method_idx = (self.selected_method_idx + 1) % len(self.methods)
-                elif self.focus_field == 2:
-                    self.selected_motive_idx = (self.selected_motive_idx + 1) % len(self.motives)
-            elif event.key == pygame.K_RETURN:
-                if self.focus_field == 3 or True:  # submit
-                    self._submit_accusation()
+            # Cycle options (simplified for now to keep it usable)
+            elif event.key == pygame.K_1:
+                self.selected_npc_idx = (self.selected_npc_idx + 1) % len(self.npcs)
+            elif event.key == pygame.K_2:
+                self.selected_method_idx = (self.selected_method_idx + 1) % len(self.methods)
+            elif event.key == pygame.K_3:
+                self.selected_motive_idx = (self.selected_motive_idx + 1) % len(self.motives)
         return None
 
     def _submit_accusation(self) -> None:
@@ -79,77 +81,43 @@ class AccusationView:
             self.message = f"Accusation error: {e}"
 
     def update(self) -> None:
-        pass
+        self.submit_button.update()
+        self.exit_button.update()
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((30, 20, 30))
-        try:
-            font_title = pygame.font.Font(None, 36)
-            font_section = pygame.font.Font(None, 24)
-            font_body = pygame.font.Font(None, 18)
-        except Exception:
-            font_title = None
-            font_section = None
-            font_body = None
-
-        if font_title:
-            t = font_title.render("Formal Accusation (Who / How / Why)", True, (255, 150, 150))
-            surface.blit(t, (30, 30))
+        t = self.font_title.render("Formal Accusation (Who / How / Why)", True, (255, 150, 150))
+        surface.blit(t, (30, 30))
 
         if self.game_over_status:
-            if font_section:
-                go_surf = font_section.render(self.game_over_status, True, (255, 255, 100))
-                surface.blit(go_surf, (30, 150))
-                ret_surf = font_section.render("Press ENTER to Exit", True, (200, 200, 200))
-                surface.blit(ret_surf, (30, 200))
+            go_surf = self.font_section.render(self.game_over_status, True, (255, 255, 100))
+            surface.blit(go_surf, (30, 150))
             return
 
-        y = 90
-        if font_section:
-            sel_1 = "[SELECTED] " if self.focus_field == 0 else ""
-            s1 = font_section.render(f"1. Culprit (Suspect): {sel_1}", True, (220, 220, 255))
-            surface.blit(s1, (30, y))
-            y += 25
-            npc_obj = self.npcs[self.selected_npc_idx]
-            surface.blit(
-                font_body.render(f"   > {npc_obj.display_name}", True, (255, 220, 100)),
-                (40, y),
-            )
-            y += 40
+        self.panel.draw(surface)
+        y = 100
+        # Draw selection fields
+        self._draw_field(surface, "1. Culprit", self.npcs[self.selected_npc_idx].display_name, y)
+        y += 60
+        self._draw_field(surface, "2. Method", self.methods[self.selected_method_idx].text, y)
+        y += 60
+        self._draw_field(surface, "3. Motive", self.motives[self.selected_motive_idx].text, y)
+        y += 60
+        
+        if self.message:
+            msg_surf = self.font_body.render(self.message, True, (255, 100, 100))
+            surface.blit(msg_surf, (40, y))
 
-            sel_2 = "[SELECTED] " if self.focus_field == 1 else ""
-            s2 = font_section.render(f"2. Method: {sel_2}", True, (220, 220, 255))
-            surface.blit(s2, (30, y))
-            y += 25
-            meth_obj = self.methods[self.selected_method_idx]
-            surface.blit(
-                font_body.render(f"   > {meth_obj.text}", True, (255, 220, 100)),
-                (40, y),
-            )
-            y += 40
+        self.submit_button.draw(surface)
+        self.exit_button.draw(surface)
+        
+        ctrl_text = "[1] Suspect [2] Method [3] Motive [ESC] Back"
+        ctrl_surf = self.font_body.render(ctrl_text, True, (150, 150, 170))
+        surface.blit(ctrl_surf, (30, self.height - 40))
 
-            sel_3 = "[SELECTED] " if self.focus_field == 2 else ""
-            s3 = font_section.render(f"3. Motive: {sel_3}", True, (220, 220, 255))
-            surface.blit(s3, (30, y))
-            y += 25
-            mot_obj = self.motives[self.selected_motive_idx]
-            surface.blit(
-                font_body.render(f"   > {mot_obj.text}", True, (255, 220, 100)),
-                (40, y),
-            )
-            y += 50
+    def _draw_field(self, surface, label, value, y):
+        l_surf = self.font_section.render(label, True, (220, 220, 255))
+        surface.blit(l_surf, (40, y))
+        v_surf = self.font_body.render(f"> {value}", True, (255, 220, 100))
+        surface.blit(v_surf, (60, y + 25))
 
-            if self.message:
-                msg_surf = font_body.render(self.message, True, (255, 100, 100))
-                surface.blit(msg_surf, (30, y))
-                y += 30
-
-            btn_label = "[> SUBMIT ACCUSATION <]" if self.focus_field == 3 else "Submit Accusation"
-            used = self.accusation_service.attempts_used
-            sub_text = f"{btn_label} (Attempts used: {used})"
-            sub_surf = font_section.render(sub_text, True, (100, 255, 150))
-            surface.blit(sub_surf, (30, y))
-
-            ctrl_text = "[TAB] Field [UP/DOWN] Option [ENTER] Submit [ESC] Back"
-            ctrl_surf = font_body.render(ctrl_text, True, (150, 150, 170))
-            surface.blit(ctrl_surf, (30, self.height - 40))

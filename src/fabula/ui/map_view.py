@@ -93,28 +93,46 @@ class MapView:
                     pygame.draw.line(surface, (100, 90, 80), start, end, 15)
                     pygame.draw.line(surface, (120, 110, 100), start, end, 3)
 
-        # Locations
+        # Location visuals
+        visual_map = {
+            "market": "🛒",
+            "library": "📚",
+            "cafe": "☕",
+            "park": "🌳",
+            "parking": "🚗",
+            "residence": "🏠"
+        }
+
         for loc in self.session.loaded.world.locations:
             pos = self.location_coords.get(loc.id)
             if not pos: continue
+            is_player_here = loc.id == self.session.player_location
             
-            # Pulse effect
-            pulse = math.sin(self.tick * 0.1) * 5
-            rect = pygame.Rect(pos[0]-60-pulse, pos[1]-40-pulse, 120+2*pulse, 80+2*pulse)
+            # Place visual
+            icon = visual_map.get(loc.type.value, "📍")
+            rect = pygame.Rect(pos[0]-50, pos[1]-50, 100, 100)
             
-            color = (100, 200, 150) if loc.id == self.session.player_location else (60, 90, 140)
-            pygame.draw.rect(surface, color, rect, border_radius=15)
-            pygame.draw.rect(surface, (255, 255, 255), rect, 4, border_radius=15)
+            # Background
+            pygame.draw.rect(surface, (50, 60, 50), rect, border_radius=15)
+            pygame.draw.rect(surface, (150, 150, 150) if is_player_here else (100, 100, 100), rect, 4, border_radius=15)
             
-            name_surf = self.font.render(loc.name, True, (255, 255, 255))
-            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] - 20))
+            # Icon
+            font_big = pygame.font.Font(None, 60)
+            icon_surf = font_big.render(icon, True, (255, 255, 255))
+            surface.blit(icon_surf, (pos[0] - icon_surf.get_width() // 2, pos[1] - 30))
 
-            # Animated NPCs
+            # Name
+            name_surf = self.font.render(loc.name, True, (255, 255, 255))
+            surface.blit(name_surf, (pos[0] - name_surf.get_width() // 2, pos[1] + 30))
+
+            # NPCs
             npcs_here = self.session.npcs_at(loc.id)
             for i, npc_id in enumerate(npcs_here):
-                npc_pos = (pos[0] - 40 + i*30 + math.sin(self.tick*0.2 + i)*5, pos[1] + 20 + math.cos(self.tick*0.2 + i)*5)
-                npc_surf = self.font.render("👤", True, (255, 220, 100))
-                surface.blit(npc_surf, npc_pos)
+                # Distinct colored circles for NPCs
+                npc_pos = (pos[0] - 40 + i*30, pos[1] - 40)
+                pygame.draw.circle(surface, (255, 220, 100), npc_pos, 10)
+                pygame.draw.circle(surface, (0, 0, 0), npc_pos, 10, 2)
+
 
         # UI
         self.panel.draw(surface)

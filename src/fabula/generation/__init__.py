@@ -1,0 +1,96 @@
+"""Pre-play staged generation with validation, retries and atomic publication."""
+
+from fabula.generation.config import (
+    DEFAULT_MODEL_FILENAME,
+    DEFAULT_MODEL_PATH,
+    STAGE_MAX_TOKENS,
+    GenerationConfig,
+    config_from_env,
+    load_model_manifest,
+    manifest_sha256,
+    resolve_model_path,
+    sha256_file,
+    verify_model_artifact,
+)
+from fabula.generation.errors import (
+    BundlePublishError,
+    FinalBundleError,
+    GenerationCancelled,
+    GenerationError,
+    GenerationSetupError,
+    LocalInferenceError,
+    StageExhaustedError,
+    StageValidationError,
+)
+from fabula.generation.local_runner import LlamaCppBackend, LocalModelRunner
+from fabula.generation.mock_runner import MockModelRunner, cast_from_bundle, skeleton_runner
+from fabula.generation.orchestrator import (
+    NPC_STAGE,
+    GenerationResult,
+    StageAttemptRecord,
+    generate_bundle,
+    resolve_mystery_type,
+)
+from fabula.generation.prompts import (
+    CHATML_TEMPLATE,
+    STAGE_SYSTEM_PROMPTS,
+    STOP_TOKENS,
+    build_stage_payload,
+    build_stage_prompt,
+)
+from fabula.generation.protocols import (
+    STAGES,
+    CancellationFlag,
+    CancellationToken,
+    LocalBackend,
+    ModelRunner,
+    ProgressCallback,
+    ProgressEvent,
+    StageName,
+)
+from fabula.generation.retries import RetryPolicy
+
+__all__ = [
+    "CHATML_TEMPLATE",
+    "DEFAULT_MODEL_FILENAME",
+    "DEFAULT_MODEL_PATH",
+    "NPC_STAGE",
+    "STAGES",
+    "STAGE_MAX_TOKENS",
+    "STAGE_SYSTEM_PROMPTS",
+    "STOP_TOKENS",
+    "BundlePublishError",
+    "CancellationFlag",
+    "CancellationToken",
+    "FinalBundleError",
+    "GenerationCancelled",
+    "GenerationConfig",
+    "GenerationError",
+    "GenerationResult",
+    "GenerationSetupError",
+    "LlamaCppBackend",
+    "LocalBackend",
+    "LocalInferenceError",
+    "LocalModelRunner",
+    "MockModelRunner",
+    "ModelRunner",
+    "ProgressCallback",
+    "ProgressEvent",
+    "RetryPolicy",
+    "StageAttemptRecord",
+    "StageExhaustedError",
+    "StageName",
+    "StageValidationError",
+    "build_stage_payload",
+    "build_stage_prompt",
+    "cast_from_bundle",
+    "config_from_env",
+    "generate_bundle",
+    "load_model_manifest",
+    "manifest_sha256",
+    "resolve_mystery_type",
+    "resolve_model_path",
+    "sha256_file",
+    "skeleton_runner",
+    "verify_model_artifact",
+]

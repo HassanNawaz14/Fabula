@@ -58,6 +58,18 @@ class FakeRunner:
     def generate(self, stage, stage_input, output_model, seed):
         return self.inner.generate(stage, stage_input, output_model, seed)
 
+    def generate_blueprint(self, mystery_type: str, tone: str, difficulty: str, seed: int) -> str:
+        return (
+            "[CASE:theft|cozy|seed_42]\n"
+            "PREMISE: test premise\n"
+            "CAST: vict:v | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05\n"
+            "CRIME: mot:debt | meth:theft | scene:loc_library | time:3\n"
+            "TIMELINE:\n"
+            "- 2 | npc_01 | loc_library | stole\n"
+            "CLUES:\n"
+            "- c1 | loc_library | physical | links:npc_01 | proves:meth\n"
+        )
+
     def close(self) -> None:
         self.closed = True
 
@@ -81,6 +93,53 @@ def test_generate_command_with_fake_runner(tmp_path: Path, monkeypatch, capsys) 
     assert "Seed: 7" in output
     assert "Resolved type: theft" in output
     assert (tmp_path / "bundle" / "world.json").is_file()
+    assert len(FakeRunner.instances) == 1
+    assert FakeRunner.instances[0].closed is True
+
+
+def test_generate_command_fast_mode(tmp_path: Path, capsys) -> None:
+    args = argparse.Namespace(
+        mystery_type="murder",
+        tone="dark",
+        difficulty="normal",
+        seed=42,
+        out=tmp_path / "fast_bundle",
+        retries=1,
+        model=None,
+        fast_mode=True,
+    )
+    assert run_generate(args) == 0
+
+    output = capsys.readouterr().out
+    assert "Seed: 42" in output
+    assert "Resolved type: murder" in output
+    assert (tmp_path / "fast_bundle" / "world.json").is_file()
+    assert (tmp_path / "fast_bundle" / "truth.json").is_file()
+    assert (tmp_path / "fast_bundle" / "clues.json").is_file()
+    assert (tmp_path / "fast_bundle" / "npcs" / "npc_01" / "identity.json").is_file()
+
+
+def test_generate_command_fast_mode_with_runner(tmp_path: Path, monkeypatch, capsys) -> None:
+    monkeypatch.setattr("fabula.generation.cli.LocalModelRunner", FakeRunner)
+    FakeRunner.instances.clear()
+    fake_model = tmp_path / "fake_model.gguf"
+    fake_model.write_bytes(b"data")
+    args = argparse.Namespace(
+        mystery_type="theft",
+        tone="cozy",
+        difficulty="easy",
+        seed=42,
+        out=tmp_path / "fast_bundle_runner",
+        retries=1,
+        model=fake_model,
+        fast_mode=True,
+    )
+    assert run_generate(args) == 0
+
+    output = capsys.readouterr().out
+    assert "Seed: 42" in output
+    assert "Resolved type: theft" in output
+    assert (tmp_path / "fast_bundle_runner" / "world.json").is_file()
     assert len(FakeRunner.instances) == 1
     assert FakeRunner.instances[0].closed is True
 

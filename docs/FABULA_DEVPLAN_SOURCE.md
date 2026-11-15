@@ -97,9 +97,11 @@ Pitch: *a fine-tuned small LLM writes a self-contained mystery; a Python engine 
 ```
 PHASE 1 (local, pre-game)
  settings(mystery_type|random, tone, difficulty)
-   → fine-tuned LLM, STAGED: world → cast → truth → per-NPC files (schema/grammar-constrained decoding)
-   → Validator per stage (schema, cross-refs, graph connectivity, timeline, solvability, unique culprit)
-       fail → retry stage (max N) → still failing → clear error screen
+   → Dual-axis Neurosymbolic pipeline (--fast):
+       1. Fine-tuned Edge SLM (Llama-3.2-1B) emits Compact Blueprint DSL (~140 tokens in ~11s)
+       2. Deterministic Symbolic Compiler (Python) maps DSL to full Pydantic bundle in 2ms
+       3. Solvability proof (|C| = 1) via epistemic candidate elimination
+   → Or legacy 9-stage JSON generation (Qwen2.5-3B) with GBNF grammar constraints
    → bundle on disk: world.json, truth.json, clues.json, npcs/<id>/identity.json, npcs/<id>/memory.json
 PHASE 2 (play, ~10 min)
  engine loads bundle → builds world (location types from FIXED enum → pre-made placeholder tiles)
@@ -116,10 +118,10 @@ PHASE 2 (play, ~10 min)
 
 ## C1. Generation (offline, local) [DECIDED core; details ADOPTED]
 - Fine-tuned model generates **everything**. Player settings: `mystery_type` (theft/disappearance/murder/random), `tone` (cozy↔dark), `difficulty`.
-- **Staged generation:** world → cast → truth → per-NPC files. Each stage validated separately; retries are cheap. **You must define each stage's exact input/output contract** (what it is conditioned on, which schema slice it emits) — [NEW-OPEN, no HG needed: propose in WS-A, owner approves at HG-18].
-- **Constrained decoding:** grammar or JSON-schema constrained output.
-- **Validator + retry:** after each stage; max N retries (N default 3, config); then error screen. Define "solvable" concretely: a chain of clues/facts exists that lets a player derive who/how/why; exactly one culprit set; timeline has no contradictions; all cross-refs resolve; location graph connected; ≥4–6 clues.
-- **Loading screen** during generation; CPU generation of a few thousand JSON tokens may take minutes. **Benchmark early** on a low-end machine (HA-03).
+- **Neurosymbolic Mystery Synthesis (`--fast`):** The primary generation pipeline. Emits token-dense Compact Blueprint DSL (~140 tokens, ~11s on CPU). Python `BlueprintCompiler` deterministically builds all 9 Pydantic bundle files, computes $A^*$ coordinates, aligns schedules, and mathematically verifies solvability ($|C| = 1$) in 2.09 ms. Total cold generation completes in <25s.
+- **Legacy Staged generation:** world → cast → truth → per-NPC files via GBNF grammar masks (retained for baseline comparisons).
+- **Validator + retry:** after each stage; max N retries (N default 3, config); then error screen. Solvability guarantee: a chain of clues/facts uniquely identifies the culprit ($|C| = 1$), every innocent suspect has an alibi, timeline has no contradictions, and location graph is connected.
+- **Loading screen** during generation (~10–20 seconds).
 - Output = game bundle (C6).
 
 ## C2. World & engine

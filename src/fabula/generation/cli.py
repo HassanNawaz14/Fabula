@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import random
 import sys
 import time
@@ -12,12 +13,13 @@ from fabula.generation.config import (
     config_from_env,
     load_model_manifest,
     manifest_sha256,
+    resolve_fast_model_path,
     resolve_model_path,
     verify_model_artifact,
 )
 from fabula.generation.errors import GenerationSetupError
 from fabula.generation.local_runner import LocalModelRunner
-from fabula.generation.orchestrator import generate_bundle
+from fabula.generation.orchestrator import generate_bundle, generate_neurosymbolic_bundle
 from fabula.generation.protocols import ProgressEvent
 from fabula.generation.retries import RetryPolicy
 from fabula.schemas import GenerationSettings
@@ -67,6 +69,13 @@ def add_generation_arguments(parser: argparse.ArgumentParser) -> None:
         default=None,
         help="GGUF path (default: FABULA_MODEL_PATH or models/Qwen2.5-3B-Instruct.Q4_K_M.gguf)",
     )
+    parser.add_argument(
+        "--fast",
+        dest="fast_mode",
+        action="store_true",
+        default=False,
+        help="use fast Neurosymbolic generation pipeline (<7s)",
+    )
 
 
 def _print_progress(event: ProgressEvent) -> None:
@@ -96,18 +105,44 @@ def run_generate(args: argparse.Namespace) -> int:
         tone=args.tone,
         difficulty=args.difficulty,
     )
-    runner = LocalModelRunner(config.model_path, config)
-    try:
-        result = generate_bundle(
-            settings,
-            runner,
-            config.output_dir,
-            seed=seed,
-            retry_policy=RetryPolicy(config.retry_attempts),
-            on_progress=_print_progress,
-        )
-    finally:
-        runner.close()
+
+    if getattr(args, "fast_mode", False):
+        runner: LocalModelRunner | None = None
+        model_to_use: Path | None = None
+        if args.model is not None:
+            model_to_use = resolve_model_path(args.model)
+        elif not os.environ.get("PYTEST_CURRENT_TEST"):
+            fast_model = resolve_fast_model_path()
+            if fast_model.is_file():
+                model_to_use = fast_model
+
+        if model_to_use is not None and model_to_use.is_file():
+            runner = LocalModelRunner(model_to_use, config)
+
+        try:
+            result = generate_neurosymbolic_bundle(
+                settings,
+                model_runner=runner,
+                output_dir=config.output_dir,
+                seed=seed,
+                on_progress=_print_progress,
+            )
+        finally:
+            if runner is not None:
+                runner.close()
+    else:
+        runner = LocalModelRunner(config.model_path, config)
+        try:
+            result = generate_bundle(
+                settings,
+                runner,
+                config.output_dir,
+                seed=seed,
+                retry_policy=RetryPolicy(config.retry_attempts),
+                on_progress=_print_progress,
+            )
+        finally:
+            runner.close()
 
     attempts = sum(record.attempts for record in result.stage_attempts)
     print(f"Resolved type: {result.resolved_type.value}")

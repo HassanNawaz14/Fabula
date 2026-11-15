@@ -45,6 +45,14 @@ def build_parser() -> argparse.ArgumentParser:
         default=None,
         help="model manifest path (default: models/model_manifest.json)",
     )
+
+    play = subparsers.add_parser("play", help="launch and play a generated mystery case")
+    play.add_argument(
+        "--bundle",
+        type=Path,
+        default=Path("bundles/latest"),
+        help="bundle directory to play (default: bundles/latest)",
+    )
     return parser
 
 
@@ -58,6 +66,17 @@ def main(argv: Sequence[str] | None = None) -> int:
             return run_kaggle_batch(args)
         if args.command == "model" and args.model_command == "check":
             return run_model_check(args)
+        if args.command == "play":
+            from fabula.conversation import ConversationConfig, create_conversation_service
+            from fabula.simulation import Session, load_bundle
+            from fabula.ui.app import FabulaApp
+
+            loaded = load_bundle(args.bundle)
+            session = Session(loaded)
+            service = create_conversation_service(ConversationConfig(mode="scripted"))
+            app = FabulaApp(session=session, conversation_service=service)
+            app.run()
+            return 0
         parser.error("unknown command")
     except GenerationSetupError as exc:
         print(f"setup error: {exc}", file=sys.stderr)

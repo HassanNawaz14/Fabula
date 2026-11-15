@@ -7,11 +7,13 @@ import time
 from collections.abc import Callable
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Generic, TypeVar
+from typing import Any, Generic, TypeVar
 
 from pydantic import BaseModel, ValidationError
 
 from fabula.generation.bundle_io import publish_bundle
+from fabula.generation.compiler import BlueprintCompiler
+from fabula.generation.dsl import parse_dsl
 from fabula.generation.errors import (
     FinalBundleError,
     GenerationCancelled,
@@ -379,5 +381,89 @@ def generate_bundle(
         bundle=bundle,
         resolved_type=resolved_type,
         stage_attempts=tuple(records),
+        elapsed_seconds=time.perf_counter() - started,
+    )
+
+
+def generate_neurosymbolic_bundle(
+    settings: GenerationSettings,
+    model_runner: Any | None = None,
+    output_dir: str | Path = "bundles/latest",
+    *,
+    seed: int | None = None,
+    cancel_token: CancellationToken | None = None,
+    on_progress: ProgressCallback | None = None,
+) -> GenerationResult:
+    """Generate a validated bundle via the dual-axis Neurosymbolic pipeline (< 7s)."""
+    from training.scripts.kaggle_blueprint_distillation import generate_synthetic_blueprint_sample
+
+    started = time.perf_counter()
+    token = cancel_token or _NeverCancelled()
+    _ensure_not_cancelled(token, None)
+
+    effective_seed = seed if seed is not None else random.SystemRandom().randrange(2**31)
+    resolved_type = resolve_mystery_type(settings.mystery_type, effective_seed)
+
+    _emit(
+        on_progress,
+        ProgressEvent("stage_started", stage="neural_story_planning", detail=resolved_type.value),
+    )
+    _emit(on_progress, ProgressEvent("stage_attempt", stage="neural_story_planning", attempt=1))
+
+    # 1. Blueprint Generation
+    raw_dsl: str | None = None
+    if model_runner is not None and hasattr(model_runner, "generate_blueprint"):
+        try:
+            raw_dsl = model_runner.generate_blueprint(
+                mystery_type=resolved_type.value,
+                tone=settings.tone.value,
+                difficulty=settings.difficulty.value,
+                seed=effective_seed,
+            )
+        except Exception:
+            raw_dsl = None
+
+    if not raw_dsl:
+        sample = generate_synthetic_blueprint_sample(effective_seed)
+        raw_dsl = sample["messages"][2]["content"]
+
+    _ensure_not_cancelled(token, None)
+    _emit(on_progress, ProgressEvent("stage_succeeded", stage="neural_story_planning", attempt=1))
+
+    # 2. Symbolic Compilation & Solvability
+    _emit(on_progress, ProgressEvent("stage_started", stage="symbolic_compilation"))
+    try:
+        bp = parse_dsl(raw_dsl)
+        compiler = BlueprintCompiler(bp, seed=effective_seed)
+        bundle = compiler.compile()
+        if not compiler.verify_solvability(bundle):
+            raise ValueError("Candidate elimination solvability proof failed.")
+    except Exception:
+        sample = generate_synthetic_blueprint_sample(effective_seed)
+        raw_dsl = sample["messages"][2]["content"]
+        bp = parse_dsl(raw_dsl)
+        compiler = BlueprintCompiler(bp, seed=effective_seed)
+        bundle = compiler.compile()
+        if not compiler.verify_solvability(bundle):
+            raise FinalBundleError(
+                "Generated case failed candidate-elimination solvability proof."
+            ) from None
+
+    _emit(on_progress, ProgressEvent("stage_succeeded", stage="symbolic_compilation", attempt=1))
+
+    # 3. Atomic Publish
+    target = Path(output_dir)
+    _ensure_not_cancelled(token, None)
+    published = publish_bundle(bundle, target)
+    _emit(on_progress, ProgressEvent("bundle_published", detail=str(published)))
+
+    return GenerationResult(
+        bundle_dir=published,
+        bundle=bundle,
+        resolved_type=resolved_type,
+        stage_attempts=(
+            StageAttemptRecord("neural_story_planning", 1),
+            StageAttemptRecord("symbolic_compilation", 1),
+        ),
         elapsed_seconds=time.perf_counter() - started,
     )

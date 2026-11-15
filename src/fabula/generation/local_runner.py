@@ -26,6 +26,7 @@ INSTALL_COMMAND = (
 _GRAMMAR_UNSAFE_KEYWORDS = frozenset(
     {
         "minLength",
+        "maxLength",
         "pattern",
         "default",
         "title",
@@ -33,7 +34,6 @@ _GRAMMAR_UNSAFE_KEYWORDS = frozenset(
         "examples",
     }
 )
-_GRAMMAR_MAX_STRING_LENGTH = 300
 
 
 _SCHEMA_NAME_MAPS = frozenset(
@@ -42,7 +42,11 @@ _SCHEMA_NAME_MAPS = frozenset(
 
 
 def simplify_json_schema(value: Any, *, key: str | None = None) -> Any:
-    """Cap or drop constraints that make llama.cpp emit deeply nested GBNF groups."""
+    """Drop schema keywords that make llama.cpp emit deeply nested GBNF groups.
+
+    ``maxLength`` expands into one nested group per character, and llama.cpp
+    builds newer than 0.3.3x reject grammars nested beyond 256 levels.
+    """
     if isinstance(value, dict):
         if key in _SCHEMA_NAME_MAPS:
             return {name: simplify_json_schema(item) for name, item in value.items()}
@@ -50,10 +54,7 @@ def simplify_json_schema(value: Any, *, key: str | None = None) -> Any:
         for name, item in value.items():
             if name in _GRAMMAR_UNSAFE_KEYWORDS:
                 continue
-            if name == "maxLength" and isinstance(item, int):
-                result[name] = min(item, _GRAMMAR_MAX_STRING_LENGTH)
-            else:
-                result[name] = simplify_json_schema(item, key=name)
+            result[name] = simplify_json_schema(item, key=name)
         return result
     if isinstance(value, list):
         return [simplify_json_schema(item) for item in value]
@@ -110,6 +111,7 @@ class LlamaCppBackend:
                 model_path=str(model_path),
                 n_ctx=config.n_ctx,
                 n_threads=threads,
+                n_gpu_layers=config.n_gpu_layers,
                 verbose=False,
                 seed=0,
             )

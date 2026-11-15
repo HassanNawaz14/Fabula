@@ -34,6 +34,7 @@ class GenerationConfig:
     model_path: Path = DEFAULT_MODEL_PATH
     n_ctx: int = DEFAULT_N_CTX
     n_threads: int | None = None
+    n_gpu_layers: int = 0
     temperature: float = DEFAULT_TEMPERATURE
     top_p: float = DEFAULT_TOP_P
     repeat_penalty: float = DEFAULT_REPEAT_PENALTY
@@ -49,6 +50,8 @@ class GenerationConfig:
             raise ValueError("n_ctx must be at least 512")
         if self.n_threads is not None and self.n_threads < 1:
             raise ValueError("n_threads must be positive when set")
+        if self.n_gpu_layers < -1:
+            raise ValueError("n_gpu_layers must be -1 (all layers) or a non-negative count")
         if self.retry_attempts < 1:
             raise ValueError("retry_attempts must be at least 1")
         if not 0.0 < self.temperature <= 2.0:
@@ -109,6 +112,7 @@ def config_from_env(
         model_path=resolve_model_path(model_path, environ=env),
         n_ctx=n_ctx if n_ctx is not None else DEFAULT_N_CTX,
         n_threads=_env_int(env, "FABULA_MODEL_THREADS", None),
+        n_gpu_layers=_env_int(env, "FABULA_MODEL_GPU_LAYERS", 0) or 0,
         retry_attempts=(
             resolved_retries if resolved_retries is not None else DEFAULT_RETRY_ATTEMPTS
         ),

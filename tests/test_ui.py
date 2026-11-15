@@ -23,12 +23,14 @@ from fabula.ui.assets import (
     render_place,
     resolve_look,
 )
+from fabula.ui.case_picker import CasePickerView
 from fabula.ui.dialogue import DialogueView
 from fabula.ui.generation_screen import GenerationScreen
 from fabula.ui.how_to_play import _SECTIONS as HOW_TO_PLAY_SECTIONS
 from fabula.ui.how_to_play import HowToPlayView
 from fabula.ui.journal import JournalView
 from fabula.ui.map_view import MapView
+from fabula.ui.new_game import NewGameView
 from fabula.ui.start_menu import StartMenuView
 
 
@@ -305,17 +307,23 @@ def test_app_can_start_at_the_menu_with_a_loaded_session(loaded) -> None:
     caption_bottom = menu.caption_pos[1] + sum(line.get_height() for line in menu.caption)
     assert caption_bottom <= menu.footer_pos[1]
 
-    assert menu.play_button.text == "Play Mystery"
+    assert menu.play_button.text == "New Game"
     app._handle_view_action(menu.play_button.callback())
+    assert app.state == "new_game"
+    assert isinstance(app.current_view, NewGameView)
+    app._handle_view_action("start_dummy")
     assert app.state == "map"
     assert app.session is session
 
 
-def test_start_menu_without_session_offers_the_demo(loaded) -> None:
+def test_start_menu_without_session_offers_the_new_game_routes(loaded) -> None:
     service = create_conversation_service(ConversationConfig(mode="scripted"))
     app = FabulaApp(conversation_service=service, width=800, height=600)
     assert app.state == "start_menu"
-    assert app.current_view.play_button.text == "Play Demo Mystery"
+    assert app.current_view.play_button.text == "New Game"
+    app._handle_view_action("go_new_game")
+    assert app.state == "new_game"
+    assert isinstance(app.current_view, NewGameView)
 
 
 def test_how_to_play_navigation_and_scrolling(loaded) -> None:
@@ -355,13 +363,159 @@ def test_how_to_play_explains_the_ai_plainly() -> None:
     assert "Characters with minds of their own" in text
     assert "Cases written before you arrive" in text
     assert "solution is locked away" in text
-    assert "Generate New Game" in text
+    assert "Play a Ready Case" in text
+    assert "Generate on Kaggle" in text
+    assert "Generate Locally" in text
 
 
 def test_generation_screen_can_return_to_the_menu() -> None:
     screen = GenerationScreen(800, 600)
     event = pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)
     assert screen.handle_event(event) == "back_to_menu"
+
+
+def test_new_game_menu_offers_three_routes() -> None:
+    view = NewGameView(800, 600)
+    surface = pygame.Surface((800, 600))
+    view.update()
+    view.draw(surface)
+
+    assert [button.text for button in view.buttons] == [
+        "Play a Ready Case",
+        "Generate on Kaggle",
+        "Generate Locally",
+    ]
+    for button in view.buttons:
+        assert surface.get_rect().contains(button.rect)
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_1)) == (
+        "open_case_library"
+    )
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_2)) == (
+        "start_kaggle_generation"
+    )
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_3)) == (
+        "start_local_generation"
+    )
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)) == (
+        "back_to_menu"
+    )
+
+
+def test_case_picker_lists_and_starts_a_ready_case(tmp_path) -> None:
+    from fabula.generation.bundle_io import publish_bundle
+    from fabula.training_data import generate_skeleton
+
+    bundle = generate_skeleton("theft", 5, tone="cozy", difficulty="easy")
+    target = publish_bundle(bundle, tmp_path / "case_alpha")
+
+    view = CasePickerView(800, 600, library_dir=str(tmp_path))
+    assert len(view.cases) == 1
+    surface = pygame.Surface((800, 600))
+    view.update()
+    view.draw(surface)
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)) == {
+        "action": "play_case",
+        "path": str(target),
+    }
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)) == (
+        "go_new_game"
+    )
+
+
+def test_case_picker_empty_library_offers_the_sample(tmp_path) -> None:
+    view = CasePickerView(800, 600, library_dir=str(tmp_path / "missing"))
+    surface = pygame.Surface((800, 600))
+    view.update()
+    view.draw(surface)
+    assert view.cases == []
+    assert view._sample_button is not None
+    assert view._sample_button.callback() == "start_dummy"
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)) == (
+        "go_new_game"
+    )
+
+
+def test_generation_screen_follows_and_returns_a_job_result(tmp_path) -> None:
+    from fabula.generation.jobs import JobUpdate
+
+    class FakeJob:
+        label = "KAGGLE"
+        estimate = "about 6–8 minutes"
+        error = None
+        result_path = None
+
+        def __init__(self) -> None:
+            self.pending = [JobUpdate("Uploading the request…", elapsed=1.0)]
+            self.done = False
+            self.cancelled = False
+
+        def drain(self):
+            updates, self.pending = self.pending, []
+            return updates
+
+        @property
+        def is_done(self) -> bool:
+            return self.done
+
+        @property
+        def elapsed(self) -> float:
+            return 1.0
+
+        def cancel(self) -> None:
+            self.cancelled = True
+
+    job = FakeJob()
+    screen = GenerationScreen(800, 600, job, title="GENERATING ON KAGGLE")
+    surface = pygame.Surface((800, 600))
+    screen.update()
+    screen.draw(surface)
+    assert screen.status_message == "Uploading the request…"
+
+    job.done = True
+    job.result_path = tmp_path / "finished_case"
+    screen.update()
+    screen.draw(surface)
+    assert screen.is_ready
+    assert screen.take_action() == {
+        "action": "session_ready",
+        "path": str(tmp_path / "finished_case"),
+    }
+    assert screen.take_action() is None
+
+    other = FakeJob()
+    cancelling = GenerationScreen(800, 600, other)
+    assert cancelling.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)) == (
+        "back_to_menu"
+    )
+    assert other.cancelled
+
+
+def test_app_can_play_a_case_from_the_library(tmp_path) -> None:
+    from fabula.generation.bundle_io import publish_bundle
+    from fabula.training_data import generate_skeleton
+
+    bundle = generate_skeleton("theft", 9, tone="neutral", difficulty="normal")
+    target = publish_bundle(bundle, tmp_path / "case_ready")
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(conversation_service=service, width=800, height=600)
+
+    app._handle_view_action({"action": "play_case", "path": str(target)})
+    assert app.state == "map"
+    assert app.session is not None
+    assert app.session.loaded.root == target
+
+
+def test_app_reports_a_broken_case_instead_of_crashing(tmp_path) -> None:
+    broken = tmp_path / "broken_case"
+    broken.mkdir()
+    (broken / "world.json").write_text("{}", encoding="utf-8")
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(conversation_service=service, width=800, height=600)
+
+    app._handle_view_action({"action": "play_case", "path": str(broken)})
+    assert app.state == "case_library"
+    assert isinstance(app.current_view, CasePickerView)
+    assert app.current_view.error
 
 
 def test_map_quit_button_and_escape(loaded) -> None:

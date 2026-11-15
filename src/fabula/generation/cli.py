@@ -5,6 +5,7 @@ from __future__ import annotations
 import argparse
 import random
 import sys
+import time
 from pathlib import Path
 
 from fabula.generation.config import (
@@ -113,6 +114,93 @@ def run_generate(args: argparse.Namespace) -> int:
     print(f"Bundle: {result.bundle_dir}")
     print(f"Elapsed: {result.elapsed_seconds:.1f}s")
     print(f"Stage attempts: {attempts}")
+    return 0
+
+
+def add_kaggle_arguments(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument(
+        "--count",
+        type=int,
+        default=1,
+        help="number of cases to generate in this batch (default: 1)",
+    )
+    parser.add_argument(
+        "--type",
+        dest="mystery_type",
+        choices=("theft", "disappearance", "murder", "random"),
+        default="random",
+        help="mystery type (default: random, resolved deterministically by seed)",
+    )
+    parser.add_argument(
+        "--tone",
+        choices=("cozy", "neutral", "dark"),
+        default="cozy",
+        help="tone (default: cozy)",
+    )
+    parser.add_argument(
+        "--difficulty",
+        choices=("easy", "normal", "hard"),
+        default="normal",
+        help="difficulty (default: normal)",
+    )
+    parser.add_argument(
+        "--seed",
+        type=int,
+        default=None,
+        help="first seed; later cases use seed+1, seed+2, ... (default: random per case)",
+    )
+    parser.add_argument(
+        "--stop-on-error",
+        action="store_true",
+        help="stop the batch after the first failed case",
+    )
+
+
+def run_kaggle_batch(args: argparse.Namespace) -> int:
+    from fabula.case_library import library_root, unique_case_id
+    from fabula.generation.kaggle_runner import kaggle_settings_from_env, run_kaggle_case
+
+    if args.count < 1:
+        raise ValueError("--count must be at least 1")
+    settings = kaggle_settings_from_env()
+    generation = GenerationSettings(
+        mystery_type=args.mystery_type,
+        tone=args.tone,
+        difficulty=args.difficulty,
+    )
+    failures = 0
+    for index in range(args.count):
+        if args.seed is not None:
+            seed = args.seed + index
+        else:
+            seed = random.SystemRandom().randrange(2**31)
+        destination = library_root() / unique_case_id(f"kaggle_{time.strftime('%Y%m%d_%H%M%S')}")
+        print(
+            f"[{index + 1}/{args.count}] seed={seed} target={destination}",
+            flush=True,
+        )
+        try:
+            run_kaggle_case(
+                settings,
+                generation,
+                seed=seed,
+                destination=destination,
+                emit=lambda message: print(f"    {message}", flush=True),
+            )
+        except Exception as exc:  # noqa: BLE001 - one bad case must not stop the batch
+            failures += 1
+            print(f"[{index + 1}/{args.count}] failed: {exc}", file=sys.stderr, flush=True)
+            if args.stop_on_error:
+                break
+        else:
+            print(f"[{index + 1}/{args.count}] ready: {destination}", flush=True)
+
+    if failures:
+        print(
+            f"{failures} of {args.count} case(s) failed. Finished cases stay in {library_root()}.",
+            file=sys.stderr,
+        )
+        return 3
     return 0
 
 

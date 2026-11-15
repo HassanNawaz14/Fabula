@@ -7,16 +7,19 @@ from typing import Any
 import pygame
 
 from fabula.conversation import ConversationConfig, create_conversation_service
-from fabula.schemas import DiscoveryMethod
+from fabula.generation.jobs import KaggleCaseJob, LocalCaseJob
+from fabula.schemas import DiscoveryMethod, GenerationSettings
 from fabula.simulation import Session
-from fabula.simulation.loader import LoadedBundle
+from fabula.simulation.loader import BundleLoadError, LoadedBundle, load_bundle
 from fabula.training_data import generate_skeleton
 from fabula.ui.accusation import AccusationView
+from fabula.ui.case_picker import CasePickerView
 from fabula.ui.dialogue import DialogueView
 from fabula.ui.generation_screen import GenerationScreen
 from fabula.ui.how_to_play import HowToPlayView
 from fabula.ui.journal import JournalView
 from fabula.ui.map_view import MapView
+from fabula.ui.new_game import NewGameView
 from fabula.ui.settings import SettingsView
 from fabula.ui.start_menu import StartMenuView
 
@@ -111,6 +114,11 @@ class FabulaApp:
             if not self.running:
                 break
             self.current_view.update()
+            take_action = getattr(self.current_view, "take_action", None)
+            if take_action is not None:
+                action = take_action()
+                if action:
+                    self._handle_view_action(action)
             self.current_view.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(30)
@@ -132,13 +140,39 @@ class FabulaApp:
         )
         self.set_session(Session(loaded))
 
+    def _generation_settings(self) -> GenerationSettings:
+        return GenerationSettings(mystery_type="random", tone="cozy", difficulty="normal")
+
+    def _begin_job(self, job: Any, title: str) -> None:
+        self.state = "generation"
+        self.current_view = GenerationScreen(
+            self.width, self.height, job, title=title, estimate=job.estimate
+        )
+        job.start()
+
+    def _play_case(self, path: str) -> None:
+        try:
+            loaded = load_bundle(path)
+        except BundleLoadError as exc:
+            self.state = "case_library"
+            self.current_view = CasePickerView(self.width, self.height, self, error=str(exc))
+            return
+        self.set_session(Session(loaded))
+
     def _handle_view_action(self, result: Any) -> None:
         if isinstance(result, str):
             if result in ("start_dummy", "start_game"):
                 self._start_session()
-            elif result == "go_generation":
-                self.state = "generation"
-                self.current_view = GenerationScreen(self.width, self.height)
+            elif result == "go_new_game":
+                self.state = "new_game"
+                self.current_view = NewGameView(self.width, self.height, self)
+            elif result == "open_case_library":
+                self.state = "case_library"
+                self.current_view = CasePickerView(self.width, self.height, self)
+            elif result == "start_kaggle_generation":
+                self._begin_job(KaggleCaseJob(self._generation_settings()), "GENERATING ON KAGGLE")
+            elif result == "start_local_generation":
+                self._begin_job(LocalCaseJob(self._generation_settings()), "GENERATING LOCALLY")
             elif result == "go_how_to_play":
                 self.state = "how_to_play"
                 self.current_view = HowToPlayView(self.width, self.height, self)
@@ -161,7 +195,11 @@ class FabulaApp:
                 self.running = False
         elif isinstance(result, dict):
             action = result.get("action")
-            if action == "move" and self.session:
+            if action in ("play_case", "session_ready"):
+                path = result.get("path")
+                if path:
+                    self._play_case(str(path))
+            elif action == "move" and self.session:
                 self.session.move_player(result.get("location_id"))
             elif action == "talk_menu" and self.session:
                 npc_id = result.get("npc_id")

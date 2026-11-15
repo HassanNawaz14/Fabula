@@ -52,6 +52,7 @@ Environment overrides:
 | `FABULA_MODEL_PATH` | GGUF path |
 | `FABULA_MODEL_CTX` | context size, default `4096` |
 | `FABULA_MODEL_THREADS` | CPU threads, default `cpu_count - 1` |
+| `FABULA_MODEL_GPU_LAYERS` | GPU layers offloaded to llama.cpp; `0` (default) is CPU-only, `-1` moves all layers to the GPU |
 | `FABULA_GENERATION_OUT` | default output directory |
 | `FABULA_GENERATION_RETRIES` | default per-stage attempts |
 

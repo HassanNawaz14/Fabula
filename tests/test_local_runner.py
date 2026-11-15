@@ -65,6 +65,13 @@ class FakeBackend:
                 "stop": stop,
             }
         )
+        if "GENERATE_CASE:" in prompt:
+            return (
+                "[CASE:theft|cozy|seed_42]\n"
+                "PREMISE: test\n"
+                "CAST: vict:v | culp:npc_01 | susp:npc_02\n"
+                "CRIME: mot:m | meth:m | scene:loc_lib | time:3"
+            )
         user_json = prompt.split("<|im_start|>user\n", 1)[1].split("<|im_end|>", 1)[0]
         payload = json.loads(user_json)
         if "mystery_type" in payload:
@@ -347,3 +354,24 @@ def test_simplify_json_schema_strips_only_constraints() -> None:
             },
         },
     }
+
+
+def test_local_runner_generate_blueprint(fake_model_path: Path, skeleton_bundle) -> None:
+    backend_instance: FakeBackend | None = None
+
+    def factory(path: Path, config: GenerationConfig):
+        nonlocal backend_instance
+        backend_instance = FakeBackend(skeleton_bundle)
+        return backend_instance
+
+    runner = LocalModelRunner(fake_model_path, GenerationConfig(), backend_factory=factory)
+    dsl = runner.generate_blueprint("theft", "cozy", "easy", 42)
+    assert "[CASE:theft|cozy|seed_42]" in dsl
+    assert backend_instance is not None
+    assert len(backend_instance.calls) == 1
+    call = backend_instance.calls[0]
+    assert call["grammar"] is None
+    assert call["stop"] == ("<|eot_id|>", "<|end_of_text|>", "\n\n\n")
+    assert "<|start_header_id|>assistant<|end_header_id|>" in call["prompt"]
+    runner.close()
+    assert backend_instance.closed is True

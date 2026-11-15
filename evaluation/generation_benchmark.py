@@ -224,9 +224,7 @@ def run_benchmark(
 
         stages = _aggregate_stages(result.stage_attempts, timed.calls)
         failures = [call for call in timed.calls if call.get("error")]
-        published = (
-            publish_bundle(result.bundle, bundle_out) if bundle_out is not None else None
-        )
+        published = publish_bundle(result.bundle, bundle_out) if bundle_out is not None else None
         report: dict[str, object] = {
             "mode": mode,
             "generated_at": datetime.now(UTC).isoformat(timespec="seconds"),

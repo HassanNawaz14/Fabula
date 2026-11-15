@@ -29,15 +29,25 @@ class AccusationView:
         self.selected_motive_idx = 0
         self.message = ""
         self.game_over_status: str | None = None
-        
+
         self.font_title = pygame.font.Font(None, 36)
         self.font_section = pygame.font.Font(None, 24)
         self.font_body = pygame.font.Font(None, 20)
 
         # UI Components
         self.panel = Panel(pygame.Rect(20, 80, width - 40, height - 200))
-        self.submit_button = Button(pygame.Rect(width // 2 - 100, height - 100, 200, 40), "Submit Accusation", self._submit_accusation, self.font_section)
-        self.exit_button = Button(pygame.Rect(width - 200, height - 60, 180, 40), "Back [ESC]", lambda: "back_to_map", self.font_section)
+        self.submit_button = Button(
+            pygame.Rect(width // 2 - 100, height - 100, 200, 40),
+            "Submit Accusation",
+            self._submit_accusation,
+            self.font_section,
+        )
+        self.exit_button = Button(
+            pygame.Rect(width - 200, height - 60, 180, 40),
+            "Back [ESC]",
+            lambda: "back_to_map",
+            self.font_section,
+        )
 
     def handle_event(self, event: pygame.event.Event) -> str | None:
         if self.game_over_status:
@@ -103,14 +113,14 @@ class AccusationView:
         y += 60
         self._draw_field(surface, "3. Motive", self.motives[self.selected_motive_idx].text, y)
         y += 60
-        
+
         if self.message:
             msg_surf = self.font_body.render(self.message, True, (255, 100, 100))
             surface.blit(msg_surf, (40, y))
 
         self.submit_button.draw(surface)
         self.exit_button.draw(surface)
-        
+
         ctrl_text = "[1] Suspect [2] Method [3] Motive [ESC] Back"
         ctrl_surf = self.font_body.render(ctrl_text, True, (150, 150, 170))
         surface.blit(ctrl_surf, (30, self.height - 40))
@@ -120,4 +130,3 @@ class AccusationView:
         surface.blit(l_surf, (40, y))
         v_surf = self.font_body.render(f"> {value}", True, (255, 220, 100))
         surface.blit(v_surf, (60, y + 25))
-

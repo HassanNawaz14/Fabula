@@ -125,6 +125,34 @@ Design decisions behind this pipeline:
 - **Solvability, concretely [ADOPTED]**: a chain of clues/facts exists from which the player can derive who/how/why; exactly one culprit set; no timeline contradictions; all cross-references resolve; location graph connected; 4–6 clues.
 - **Loading screen [ADOPTED]**: local CPU generation of a few thousand JSON tokens may take minutes on low-end machines (estimate — **benchmark early**, HA-03).
 
+### 3.1.1 Neurosymbolic Mystery Synthesis (NMS) [DECIDED 2026-11-15]
+
+To overcome the 35–40+ minute generation bottleneck caused by emitting 8,000 raw JSON tokens under single-threaded GBNF grammar constraints, Fabula introduces **Neurosymbolic Mystery Synthesis (`--fast`)**:
+
+```
+Player settings: mystery_type, tone, difficulty, seed
+     │
+     ▼
+[System 1: Neural Story Planning (Edge SLM)]
+Fine-tuned Llama-3.2-1B-Instruct (Q4_K_M GGUF, ~770 MB)
+Emits Compact Blueprint DSL (~140 tokens in ~11s, zero grammar masking stalls)
+     │
+     ▼
+[System 2: Symbolic Compilation & Solvability]
+Python BlueprintCompiler (compiler.py, 2.09 ms)
+   ├─► Spatial topology generation (2D walkable graph, 4 locations)
+   ├─► Schedule alignment to timeline crime events
+   ├─► Epistemic memory slicing (who saw what, alibis, culprit secret DID fact + cover story)
+   └─► Solvability proof: Epistemic candidate elimination guarantees |C| = 1
+     │
+     ▼
+Atomic Publication: complete 9-file Pydantic bundle in bundles/<name> (0 errors)
+```
+
+**Benchmark Comparison:**
+- *Legacy 9-Stage JSON (Qwen2.5-3B)*: ~7,500 tokens, 9 GBNF grammars, 35–40 minutes on CPU.
+- *Neurosymbolic NMS (Llama-3.2-1B)*: ~140 tokens, 0 grammar stalls, **24.2s cold / ~11s warm** on CPU (~150× speedup).
+
 ### 3.2 The Game Bundle (output of Phase 1)
 
 ```

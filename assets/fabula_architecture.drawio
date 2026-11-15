@@ -1,0 +1,193 @@
+<mxfile host="app.diagrams.net" modified="2026-11-15T15:35:00.000Z" agent="Antigravity" version="24.0.0" type="device">
+  <diagram id="fabula-system-architecture" name="Fabula System Architecture">
+    <mxGraphModel dx="1420" dy="880" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1360" pageHeight="1020" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ==================== HEADER CANVAS ==================== -->
+        <mxCell id="canvas_header" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#0F172A;strokeColor=none;arcSize=4;" vertex="1" parent="1">
+          <mxGeometry x="40" y="24" width="1280" height="64" as="geometry" />
+        </mxCell>
+        <mxCell id="title" value="&lt;div style=&quot;font-family:'Inter',system-ui,-apple-system,sans-serif; text-align:center;&quot;&gt;&lt;div style=&quot;font-size:20px; font-weight:800; color:#FFFFFF; letter-spacing:0.5px;&quot;&gt;FABULA — SYSTEM ARCHITECTURE SPECIFICATION&lt;/div&gt;&lt;div style=&quot;font-size:11.5px; color:#94A3B8; font-weight:400; margin-top:3px;&quot;&gt;Two-Phase Autonomous Mystery Engine &amp;bull; Local Pre-Play Generation (Qwen 3B) + Headless Simulation Core (Body &amp;amp; Voice Hybrid)&lt;/div&gt;&lt;/div&gt;" style="text;html=1;align=center;verticalAlign=middle;whiteSpace=wrap;rounded=0;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+          <mxGeometry x="50" y="26" width="1260" height="60" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== PHASE 1: GENERATION ==================== -->
+        <mxCell id="group_phase1" value="&lt;span style=&quot;font-family:'Inter',system-ui,sans-serif;&quot;&gt;&lt;span style=&quot;background:#DBEAFE; color:#1E40AF; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:800; letter-spacing:0.5px;&quot;&gt;PHASE 1&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;b style=&quot;font-size:13px; color:#0F172A; letter-spacing:0.3px;&quot;&gt;LOCAL GENERATION PIPELINE (Offline Pre-Play &amp;bull; CPU-Class Runtime)&lt;/b&gt;&lt;/span&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;rounded=1;arcSize=3;collapsible=0;startSize=34;" vertex="1" parent="1">
+          <mxGeometry x="40" y="104" width="1280" height="216" as="geometry" />
+        </mxCell>
+
+        <!-- Step 1: Player Settings -->
+        <mxCell id="node_settings" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#2563EB; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;INPUT SPECIFICATION&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Player Settings&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Initialization parameters&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:6px; font-size:10.5px; line-height:1.5; color:#334155;&quot;&gt;&lt;div&gt;&lt;b&gt;Mystery Type:&lt;/b&gt; Theft &amp;bull; Murder &amp;bull; Disappearance&lt;/div&gt;&lt;div&gt;&lt;b&gt;Tone Dial:&lt;/b&gt; Cozy &amp;harr; Dark (prose flavor)&lt;/div&gt;&lt;div&gt;&lt;b&gt;Difficulty:&lt;/b&gt; Standard / Random seed&lt;/div&gt;&lt;div&gt;&lt;b&gt;Target Shape:&lt;/b&gt; &lt;i&gt;Who &amp;bull; How &amp;bull; Why&lt;/i&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#3B82F6;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase1">
+          <mxGeometry x="25" y="44" width="260" height="142" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 1: Settings -> Generator -->
+        <mxCell id="edge1" value="Initialization Parameters" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=10;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#CBD5E1;labelPadding=3;" edge="1" parent="group_phase1" source="node_settings" target="node_llm">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 2: Fine-Tuned LLM -->
+        <mxCell id="node_llm" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#B45309; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;LOCAL GENERATOR&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Fine-Tuned LLM (~3–4B)&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Qwen2.5-3B-Instruct &amp;bull; Q4_K_M&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:6px; font-size:10.5px; line-height:1.5; color:#334155;&quot;&gt;&lt;div&gt;&lt;b&gt;Runtime:&lt;/b&gt; llama-cpp-python (CPU wheel)&lt;/div&gt;&lt;div&gt;&lt;b&gt;Grammar:&lt;/b&gt; GBNF JSON constrained decoding&lt;/div&gt;&lt;div&gt;&lt;b&gt;Staged:&lt;/b&gt; world &amp;rarr; cast &amp;rarr; truth &amp;rarr; npcs&lt;/div&gt;&lt;div&gt;&lt;b&gt;Compute:&lt;/b&gt; Zero GPU needed (local CPU)&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#D97706;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase1">
+          <mxGeometry x="345" y="44" width="270" height="142" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow 2: Generator -> Validator -->
+        <mxCell id="edge2" value="Stage JSON DTO" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#475569;strokeWidth=1.5;fontSize=10;fontColor=#334155;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#CBD5E1;labelPadding=3;" edge="1" parent="group_phase1" source="node_llm" target="node_validator">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 3: Validator & Repair -->
+        <mxCell id="node_validator" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#C2410C; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;PIPELINE VERIFICATION&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Stage Validator &amp;amp; Repair&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Deterministic structural gates&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:6px; font-size:10.5px; line-height:1.5; color:#334155;&quot;&gt;&lt;div&gt;&lt;b&gt;Integrity:&lt;/b&gt; Strict schema &amp;amp; cross-ID checks&lt;/div&gt;&lt;div&gt;&lt;b&gt;Spatial:&lt;/b&gt; Town graph G=(V,E) connected&lt;/div&gt;&lt;div&gt;&lt;b&gt;Timeline:&lt;/b&gt; Alibi &amp;amp; movement consistency&lt;/div&gt;&lt;div&gt;&lt;b&gt;Solvability:&lt;/b&gt; 1 culprit + fair clue chain&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#EA580C;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase1">
+          <mxGeometry x="675" y="44" width="270" height="142" as="geometry" />
+        </mxCell>
+
+        <!-- Retry Loop (Routed cleanly underneath nodes) -->
+        <mxCell id="edge_retry" value="Fail: Retry stage (max 3)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#FECACA;labelPadding=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="group_phase1" source="node_validator" target="node_llm">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="810" y="198" />
+              <mxPoint x="480" y="198" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- Arrow 3: Validator -> Bundle -->
+        <mxCell id="edge3" value="Pass (Schema Valid)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontSize=10;fontColor=#16A34A;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#BBF7D0;labelPadding=3;" edge="1" parent="group_phase1" source="node_validator" target="node_bundle">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Step 4: Validated Bundle -->
+        <mxCell id="node_bundle" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#15803D; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;PERSISTENT ARTIFACT&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Validated Game Bundle&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Atomic JSON files on disk&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:6px; font-size:10.5px; line-height:1.5; color:#334155;&quot;&gt;&lt;div&gt;&lt;b&gt;world.json:&lt;/b&gt; Locations &amp;amp; NPC schedules&lt;/div&gt;&lt;div&gt;&lt;b&gt;truth.json:&lt;/b&gt; &lt;span style=&quot;color:#DC2626; font-weight:700;&quot;&gt;[ENGINE-ONLY]&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;b&gt;clues.json:&lt;/b&gt; 4–6 clues (fair chain)&lt;/div&gt;&lt;div&gt;&lt;b&gt;npcs/&amp;lt;id&amp;gt;/:&lt;/b&gt; identity &amp;amp; memory JSON&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#16A34A;strokeWidth=2;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase1">
+          <mxGeometry x="1005" y="44" width="250" height="142" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== PHASE 2: PLAY LOOP ==================== -->
+        <mxCell id="group_phase2" value="&lt;span style=&quot;font-family:'Inter',system-ui,sans-serif;&quot;&gt;&lt;span style=&quot;background:#F3E8FF; color:#6B21A8; padding:3px 8px; border-radius:4px; font-size:10px; font-weight:800; letter-spacing:0.5px;&quot;&gt;PHASE 2&lt;/span&gt;&amp;nbsp;&amp;nbsp;&lt;b style=&quot;font-size:13px; color:#0F172A; letter-spacing:0.3px;&quot;&gt;PLAY LOOP RUNTIME (~10-Minute Headless Engine &amp;bull; Body &amp;amp; Voice Hybrid Architecture)&lt;/b&gt;&lt;/span&gt;" style="swimlane;whiteSpace=wrap;html=1;fillColor=#F8FAFC;strokeColor=#CBD5E1;strokeWidth=1.5;rounded=1;arcSize=3;collapsible=0;startSize=34;" vertex="1" parent="1">
+          <mxGeometry x="40" y="340" width="1280" height="640" as="geometry" />
+        </mxCell>
+
+        <!-- Bundle Load Connector (Inter-Phase) -->
+        <mxCell id="edge_load_bundle" value="Atomic Publish &amp;amp; Read-Only Load at Startup" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#16A34A;strokeWidth=2;fontSize=10;fontColor=#16A34A;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#BBF7D0;labelPadding=3;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.65;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="1" source="node_bundle" target="node_engine">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1170" y="328" />
+              <mxPoint x="509" y="328" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== PHASE 2: COLUMN 1 (CLIENT & ACCUSATION) ==================== -->
+        <!-- Player UI Client -->
+        <mxCell id="node_ui" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#1D4ED8; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;DESKTOP FRONTEND&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Player UI Client&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Pygame / Arcade 2D presentation&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:6px; font-size:10.5px; line-height:1.55; color:#334155;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Map View:&lt;/b&gt; 2D tile grid &amp;amp; NPC sprites&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Interaction:&lt;/b&gt; E-key proximity dialogue&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Journal:&lt;/b&gt; Discovered clues &amp;amp; alibis&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;HUD:&lt;/b&gt; 10-minute session countdown&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Decoupled:&lt;/b&gt; Thin presentation layer&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#2563EB;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="25" y="50" width="245" height="190" as="geometry" />
+        </mxCell>
+
+        <!-- Accusation Evaluator -->
+        <mxCell id="node_accuse" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#B91C1C; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;CASE RESOLUTION&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:700; color:#0F172A;&quot;&gt;Accusation Evaluator&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Endgame solution verification&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #FECACA; padding-top:6px; font-size:10.5px; line-height:1.55; color:#334155;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Submission:&lt;/b&gt; Player files &lt;i&gt;Who &amp;bull; How &amp;bull; Why&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Verification:&lt;/b&gt; Exact check vs &lt;b&gt;truth.json&lt;/b&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Timer Trigger:&lt;/b&gt; Auto-fires at 10:00 limit&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Outcome:&lt;/b&gt; Decisive Victory / Defeat&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#DC2626;strokeWidth=1.8;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="25" y="400" width="245" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: UI -> Accusation -->
+        <mxCell id="edge_ui_accuse" value="Player Submits Accusation" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=1.5;fontSize=10;fontColor=#DC2626;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#FECACA;labelPadding=3;" edge="1" parent="group_phase2" source="node_ui" target="node_accuse">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== PHASE 2: COLUMN 2 (ENGINE & FIREWALL) ==================== -->
+        <!-- Headless Simulation Engine Core -->
+        <mxCell id="node_engine" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:800; color:#0F172A; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;AUTHORITATIVE RUNTIME&lt;/div&gt;&lt;div style=&quot;font-size:14px; font-weight:800; color:#0F172A;&quot;&gt;Headless Simulation Engine&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:6px;&quot;&gt;Pure-Python Core &amp;bull; Zero UI Imports&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #CBD5E1; padding-top:6px; font-size:10.5px; line-height:1.55; color:#1E293B;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Decoupled:&lt;/b&gt; 100% headless (zero UI dependencies)&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Session Clock:&lt;/b&gt; 1-minute real-time simulation ticks&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Perception Filter:&lt;/b&gt; Tile proximity vision radius&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;World State:&lt;/b&gt; Authoritative player &amp;amp; NPC positions&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Event Bus:&lt;/b&gt; Coordinates motion, talk &amp;amp; clue reveals&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Truth Custodian:&lt;/b&gt; Sole holder of &lt;b&gt;truth.json&lt;/b&gt;&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0F172A;strokeWidth=2.2;align=left;spacingLeft=12;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="320" y="50" width="290" height="250" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: UI -> Engine (Player input) -->
+        <mxCell id="edge_ui_engine" value="User Input &amp;amp; Actions" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#2563EB;strokeWidth=2;fontSize=10;fontColor=#1E40AF;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#BFDBFE;labelPadding=3;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.23;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="node_ui" target="node_engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Engine -> UI (State render) -->
+        <mxCell id="edge_engine_ui" value="World State &amp;amp; Frames" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#E2E8F0;labelPadding=3;exitX=0;exitY=0.65;exitDx=0;exitDy=0;entryX=1;entryY=0.85;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="node_engine" target="node_ui">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Accusation -> Engine (Verdict check) -->
+        <mxCell id="edge_accuse_engine" value="Verify vs truth.json" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#DC2626;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#DC2626;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#FECACA;labelPadding=3;exitX=1;exitY=0.4;exitDx=0;exitDy=0;entryX=0;entryY=0.9;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="node_accuse" target="node_engine">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="295" y="470" />
+              <mxPoint x="295" y="275" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- The Spoiler Firewall (Security Boundary) -->
+        <mxCell id="node_firewall" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:800; color:#991B1B; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;SECURITY BOUNDARY&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:800; color:#B91C1C;&quot;&gt;The Spoiler Firewall&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#991B1B; margin-bottom:6px;&quot;&gt;Machine-Enforced Isolation Gateway&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #FECACA; padding-top:6px; font-size:10.5px; line-height:1.55; color:#7F1D1D;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Strict Barrier:&lt;/b&gt; &lt;b&gt;truth.json&lt;/b&gt; is strictly engine-only&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Zero Injection:&lt;/b&gt; Never sent in prompts or API calls&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Per-NPC Memory:&lt;/b&gt; NPC prompts read only own facts&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Test-Verified:&lt;/b&gt; Enforced by tests, not prompt wording&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FEF2F2;strokeColor=#EF4444;strokeWidth=1.8;align=left;spacingLeft=12;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="320" y="400" width="290" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Engine -> Firewall -->
+        <mxCell id="edge_engine_firewall" value="NPC Dialogue Trigger" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#EF4444;strokeWidth=1.5;fontSize=10;fontColor=#B91C1C;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#FECACA;labelPadding=3;exitX=0.4;exitY=1;exitDx=0;exitDy=0;entryX=0.4;entryY=0;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="node_engine" target="node_firewall">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ==================== PHASE 2: COLUMN 3 (THE BODY & THE VOICE) ==================== -->
+        <!-- The Body (Classical AI) -->
+        <mxCell id="group_body" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:800; color:#065F46; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;DETERMINISTIC AI&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:800; color:#065F46;&quot;&gt;The Body (Classical AI)&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#047857; margin-bottom:6px;&quot;&gt;Autonomous Navigation &amp;amp; Physical Rules&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #A7F3D0; padding-top:6px; font-size:10.5px; line-height:1.55; color:#064E3B;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Authored Schedules:&lt;/b&gt; Waypoint table (&lt;i&gt;at_minute &amp;rarr; loc&lt;/i&gt;)&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;A* Shortest Path:&lt;/b&gt; Town graph G=(V,E) search&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Zero LLM Drift:&lt;/b&gt; 100% deterministic spatial moves&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Collision Rules:&lt;/b&gt; Tile occupancy &amp;amp; door keys&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Background Sim:&lt;/b&gt; NPCs navigate off-screen&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ECFDF5;strokeColor=#059669;strokeWidth=1.8;align=left;spacingLeft=12;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="670" y="50" width="280" height="250" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Engine -> Body -->
+        <mxCell id="edge_engine_body" value="Schedule Waypoints (at_minute)" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=2;fontSize=10;fontColor=#065F46;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#A7F3D0;labelPadding=3;exitX=1;exitY=0.28;exitDx=0;exitDy=0;entryX=0;entryY=0.28;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="node_engine" target="group_body">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Body -> Engine -->
+        <mxCell id="edge_body_engine" value="A* Tile Coordinates" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#059669;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#065F46;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#A7F3D0;labelPadding=3;exitX=0;exitY=0.72;exitDx=0;exitDy=0;entryX=1;entryY=0.72;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="group_body" target="node_engine">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- The Voice (Prompt Assembler) -->
+        <mxCell id="group_voice" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:800; color:#5B21B6; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;SPEECH RUNTIME&lt;/div&gt;&lt;div style=&quot;font-size:13px; font-weight:800; color:#5B21B6;&quot;&gt;The Voice (Prompt Engine)&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#6D28D9; margin-bottom:6px;&quot;&gt;Per-NPC Dialogue Orchestration&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #DDD6FE; padding-top:6px; font-size:10.5px; line-height:1.55; color:#4C1D95;&quot;&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Isolated Assembly:&lt;/b&gt; Own identity &amp;amp; memory JSON&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Disclosure Rules:&lt;/b&gt; &lt;i&gt;volunteer &amp;bull; if_asked &amp;bull; hide &amp;bull; lie&lt;/i&gt;&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Cover Stories:&lt;/b&gt; Authored lies for culprit NPCs&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Dispatcher:&lt;/b&gt; Live API &amp;harr; Scripted fallback&lt;/div&gt;&lt;div&gt;&amp;bull; &lt;b&gt;Parser:&lt;/b&gt; Strict {&quot;reply&quot;: str, &quot;mood&quot;: str}&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#F5F3FF;strokeColor=#7C3AED;strokeWidth=1.8;align=left;spacingLeft=12;spacingRight=10;verticalAlign=top;spacingTop=8;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="670" y="400" width="280" height="175" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Firewall -> Voice -->
+        <mxCell id="edge_firewall_voice" value="Sanitized Memory DTO" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;strokeWidth=2;fontSize=10;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#DDD6FE;labelPadding=3;" edge="1" parent="group_phase2" source="node_firewall" target="group_voice">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Voice -> Engine (Dialogue speech event returning through open corridor) -->
+        <mxCell id="edge_speech_engine" value="Speech Event DTO {reply, mood}" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#7C3AED;strokeWidth=1.5;dashed=1;fontSize=10;fontColor=#5B21B6;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#DDD6FE;labelPadding=3;exitX=0.25;exitY=0;exitDx=0;exitDy=0;entryX=0.85;entryY=1;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="group_voice" target="node_engine">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="740" y="350" />
+              <mxPoint x="566" y="350" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- ==================== PHASE 2: COLUMN 4 (SPEECH PROVIDERS) ==================== -->
+        <!-- Live Cloud LLMs -->
+        <mxCell id="node_live_api" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#0369A1; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;EXTERNAL PROVIDER&lt;/div&gt;&lt;div style=&quot;font-size:12.5px; font-weight:700; color:#0F172A;&quot;&gt;Live LLM Providers&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:5px;&quot;&gt;Gemini 2.5 &amp;bull; xAI Grok&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:5px; font-size:10px; line-height:1.45; color:#334155;&quot;&gt;&lt;div&gt;&amp;bull; Target SLA: &amp;asymp; 2–3s latency cap&lt;/div&gt;&lt;div&gt;&amp;bull; Budget: Per-session token caps&lt;/div&gt;&lt;div&gt;&amp;bull; Grounded roleplay within memory&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#0284C7;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=6;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="1010" y="400" width="245" height="105" as="geometry" />
+        </mxCell>
+
+        <!-- Scripted Fallback -->
+        <mxCell id="node_fallback" value="&lt;div style=&quot;font-family:'Inter',system-ui,sans-serif; padding:2px;&quot;&gt;&lt;div style=&quot;font-size:9px; font-weight:700; color:#475569; letter-spacing:0.5px; text-transform:uppercase; margin-bottom:2px;&quot;&gt;DETERMINISTIC FALLBACK&lt;/div&gt;&lt;div style=&quot;font-size:12.5px; font-weight:700; color:#0F172A;&quot;&gt;Scripted Dialogue Fallback&lt;/div&gt;&lt;div style=&quot;font-size:10px; color:#64748B; margin-bottom:5px;&quot;&gt;Authored Persona Templates&lt;/div&gt;&lt;div style=&quot;border-top:1px solid #E2E8F0; padding-top:5px; font-size:10px; line-height:1.45; color:#334155;&quot;&gt;&lt;div&gt;&amp;bull; Zero API key needed (offline / timeout)&lt;/div&gt;&lt;div&gt;&amp;bull; Deterministic reveal of eligible clues&lt;/div&gt;&lt;div&gt;&amp;bull; Excluded from live provider evals&lt;/div&gt;&lt;/div&gt;&lt;/div&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#FFFFFF;strokeColor=#64748B;strokeWidth=1.5;align=left;spacingLeft=10;spacingRight=10;verticalAlign=top;spacingTop=6;arcSize=5;" vertex="1" parent="group_phase2">
+          <mxGeometry x="1010" y="525" width="245" height="105" as="geometry" />
+        </mxCell>
+
+        <!-- Arrows: Voice -> Providers -->
+        <mxCell id="edge_voice_live" value="API Key Present" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#0284C7;strokeWidth=1.8;fontSize=10;fontColor=#0369A1;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#BAE6FD;labelPadding=3;exitX=1;exitY=0.3;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="group_voice" target="node_live_api">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Arrow: Voice -> Fallback -->
+        <mxCell id="edge_voice_fb" value="No Key / Offline / Timeout" style="edgeStyle=orthogonalEdgeStyle;rounded=1;orthogonalLoop=1;jettySize=auto;html=1;strokeColor=#64748B;strokeWidth=1.8;fontSize=10;fontColor=#475569;fontFamily=Inter,system-ui,sans-serif;labelBackgroundColor=#FFFFFF;labelBorderColor=#E2E8F0;labelPadding=3;exitX=1;exitY=0.8;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;" edge="1" parent="group_phase2" source="group_voice" target="node_fallback">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

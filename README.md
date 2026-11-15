@@ -87,18 +87,31 @@ Use `live` to require a key and fail clearly if it is missing, or `scripted` as 
 
 ---
 
-## 🧩 Generate a Mystery
+## 🧩 Generate & Play a Mystery
 
-The fine-tuned GGUF is not committed. Place `Qwen2.5-3B-Instruct.Q4_K_M.gguf` in `models/`, install the CPU runtime, verify the checksum, then generate:
+### Fast Neurosymbolic Generation (< 30s)
+Using the fine-tuned edge model (`Llama-3.2-1B-Instruct.Q4_K_M.gguf`), pre-game generation runs in **~12–24 seconds** with mathematical candidate-elimination solvability ($|C| = 1$):
 
 ```powershell
 python -m pip install -e .
 python -m pip install llama-cpp-python --prefer-binary --extra-index-url https://abetlen.github.io/llama-cpp-python/whl/cpu
+
+# Generate a validated, solvable mystery case
+python -m fabula generate --fast --model models/Llama-3.2-1B-Instruct.Q4_K_M.gguf --type theft --out bundles/my-case
+
+# Play the investigation in the UI
+python -m fabula play --bundle bundles/my-case
+```
+
+### Legacy Staged Generation (Qwen2.5-3B)
+For baseline ablation and multi-stage JSON generation:
+
+```powershell
 python -m fabula model check
 python -m fabula generate --type theft --seed 1 --out bundles/my-case
 ```
 
-Generation runs before play and writes `world.json`, `truth.json`, `clues.json`, and per-NPC `identity.json`/`memory.json`. The engine validates every stage, retries failed stages, atomically publishes only a complete bundle, and repairs a missing culprit account/evidence link when needed. See **[docs/local-generation.md](docs/local-generation.md)** for artifact hashes, environment overrides, grammar safeguards, benchmarks and troubleshooting.
+Generation runs before play and writes `world.json`, `truth.json`, `clues.json`, and per-NPC `identity.json`/`memory.json`. The engine validates every stage, atomically publishes only a complete bundle, and proves solvability. See **[docs/neurosymbolic_generation_architecture.md](docs/neurosymbolic_generation_architecture.md)** and **[docs/local-generation.md](docs/local-generation.md)** for detailed benchmarks and architecture.
 
 ---
 

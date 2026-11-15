@@ -1,5 +1,6 @@
 """Pre-play staged generation with validation, retries and atomic publication."""
 
+from fabula.generation.compiler import BlueprintCompiler
 from fabula.generation.config import (
     DEFAULT_MODEL_FILENAME,
     DEFAULT_MODEL_PATH,
@@ -12,6 +13,7 @@ from fabula.generation.config import (
     sha256_file,
     verify_model_artifact,
 )
+from fabula.generation.dsl import Blueprint, format_dsl, parse_dsl
 from fabula.generation.errors import (
     BundlePublishError,
     FinalBundleError,
@@ -29,6 +31,7 @@ from fabula.generation.orchestrator import (
     GenerationResult,
     StageAttemptRecord,
     generate_bundle,
+    generate_neurosymbolic_bundle,
     resolve_mystery_type,
 )
 from fabula.generation.prompts import (
@@ -54,6 +57,8 @@ __all__ = [
     "CHATML_TEMPLATE",
     "DEFAULT_MODEL_FILENAME",
     "DEFAULT_MODEL_PATH",
+    "Blueprint",
+    "BlueprintCompiler",
     "NPC_STAGE",
     "STAGES",
     "STAGE_MAX_TOKENS",
@@ -85,9 +90,12 @@ __all__ = [
     "build_stage_prompt",
     "cast_from_bundle",
     "config_from_env",
+    "format_dsl",
     "generate_bundle",
+    "generate_neurosymbolic_bundle",
     "load_model_manifest",
     "manifest_sha256",
+    "parse_dsl",
     "resolve_mystery_type",
     "resolve_model_path",
     "sha256_file",

@@ -13,6 +13,8 @@ from fabula.generation.errors import GenerationSetupError
 
 DEFAULT_MODEL_FILENAME = "Qwen2.5-3B-Instruct.Q4_K_M.gguf"
 DEFAULT_MODEL_PATH = Path("models") / DEFAULT_MODEL_FILENAME
+DEFAULT_FAST_MODEL_FILENAME = "Llama-3.2-1B-Instruct.Q4_K_M.gguf"
+DEFAULT_FAST_MODEL_PATH = Path("models") / DEFAULT_FAST_MODEL_FILENAME
 DEFAULT_MANIFEST_PATH = Path("models") / "model_manifest.json"
 DEFAULT_N_CTX = 4096
 DEFAULT_TEMPERATURE = 0.6
@@ -26,6 +28,7 @@ STAGE_MAX_TOKENS: dict[str, int] = {
     "world->cast": 900,
     "world+cast->truth+clues": 1600,
     "world+cast+truth+clues+npc_id->identity+memory": 900,
+    "blueprint": 350,
 }
 
 
@@ -84,6 +87,25 @@ def resolve_model_path(
     if from_env:
         return Path(from_env).expanduser()
     return DEFAULT_MODEL_PATH
+
+
+def resolve_fast_model_path(
+    explicit: str | Path | None = None,
+    *,
+    environ: Mapping[str, str] | None = None,
+) -> Path:
+    env = os.environ if environ is None else environ
+    if explicit is not None:
+        return Path(explicit).expanduser()
+    from_fast_env = env.get("FABULA_FAST_MODEL_PATH")
+    if from_fast_env:
+        return Path(from_fast_env).expanduser()
+    if DEFAULT_FAST_MODEL_PATH.is_file():
+        return DEFAULT_FAST_MODEL_PATH
+    from_env = env.get("FABULA_MODEL_PATH")
+    if from_env:
+        return Path(from_env).expanduser()
+    return DEFAULT_FAST_MODEL_PATH
 
 
 def config_from_env(

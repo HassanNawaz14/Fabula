@@ -28,12 +28,17 @@ class DialogueView:
         self.history: list[dict[str, str]] = []
         self.current_mood = "neutral"
         self.loading = False
-        
+
         self.font_title = pygame.font.Font(None, 28)
         self.font_body = pygame.font.Font(None, 20)
-        
+
         self.panel = Panel(pygame.Rect(10, 80, width - 20, height - 160))
-        self.exit_button = Button(pygame.Rect(width - 150, 15, 120, 30), "Return [ESC]", lambda: "back_to_map", self.font_body)
+        self.exit_button = Button(
+            pygame.Rect(width - 150, 15, 120, 30),
+            "Return [ESC]",
+            lambda: "back_to_map",
+            self.font_body,
+        )
 
         # Load initial greeting or recent messages if any
         existing_statements = session.statements_for(npc_id)
@@ -93,7 +98,7 @@ class DialogueView:
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((25, 30, 40))
-        
+
         # Header
         pygame.draw.rect(surface, (40, 45, 60), (0, 0, self.width, 60))
         title_text = f"Conversation with {self.npc.display_name} — Mood: {self.current_mood}"
@@ -123,4 +128,3 @@ class DialogueView:
             prompt_str = "Thinking..."
         input_surf = self.font_body.render(prompt_str, True, (240, 240, 255))
         surface.blit(input_surf, (20, self.height - 47))
-

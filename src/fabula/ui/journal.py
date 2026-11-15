@@ -14,13 +14,18 @@ class JournalView:
         self.width = width
         self.height = height
         self.session = session
-        
+
         self.font_title = pygame.font.Font(None, 36)
         self.font_section = pygame.font.Font(None, 24)
         self.font_body = pygame.font.Font(None, 20)
-        
+
         self.panel = Panel(pygame.Rect(20, 80, width - 40, height - 140))
-        self.exit_button = Button(pygame.Rect(width - 200, height - 60, 180, 40), "Return [ESC/J]", lambda: "back_to_map", self.font_section)
+        self.exit_button = Button(
+            pygame.Rect(width - 200, height - 60, 180, 40),
+            "Return [ESC/J]",
+            lambda: "back_to_map",
+            self.font_section,
+        )
 
     def handle_event(self, event: pygame.event.Event) -> str | None:
         if self.exit_button.handle_event(event):
@@ -35,7 +40,7 @@ class JournalView:
 
     def draw(self, surface: pygame.Surface) -> None:
         surface.fill((20, 25, 35))
-        
+
         t_surf = self.font_title.render("Detective Journal & Notes", True, (240, 240, 255))
         surface.blit(t_surf, (30, 30))
 
@@ -72,7 +77,7 @@ class JournalView:
         for npc in self.session.loaded.world.npcs:
             for st in self.session.statements_for(npc.id):
                 notes.append(f"• [{npc.display_name}]: {st}")
-        
+
         if not notes:
             no_note_text = "No notes recorded from NPC conversations yet."
             surface.blit(self.font_body.render(no_note_text, True, (180, 180, 180)), (50, y))
@@ -83,4 +88,3 @@ class JournalView:
                 y += 22
 
         self.exit_button.draw(surface)
-

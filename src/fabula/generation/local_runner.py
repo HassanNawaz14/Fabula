@@ -245,6 +245,49 @@ class LocalModelRunner:
         }
         return text
 
+    def generate_blueprint(
+        self,
+        mystery_type: str,
+        tone: str,
+        difficulty: str,
+        seed: int,
+    ) -> str:
+        """Generate a Compact Blueprint DSL using the fine-tuned edge model (< 10s)."""
+        backend = self._ensure_backend()
+        prompt = (
+            "<|start_header_id|>system<|end_header_id|>\n\n"
+            "You are Fabula's Master Mystery Architect. "
+            "Generate a valid Compact Blueprint DSL.<|eot_id|>"
+            "<|start_header_id|>user<|end_header_id|>\n\n"
+            f"GENERATE_CASE: type={mystery_type} tone={tone} "
+            f"difficulty={difficulty} seed={seed}<|eot_id|>"
+            "<|start_header_id|>assistant<|end_header_id|>\n\n"
+        )
+        max_tokens = self.config.max_tokens.get("blueprint", 350)
+        text = backend.generate(
+            prompt,
+            grammar=None,
+            max_tokens=max_tokens,
+            temperature=self.config.temperature,
+            top_p=self.config.top_p,
+            repeat_penalty=self.config.repeat_penalty,
+            seed=seed & 0x7FFFFFFF,
+            stop=("<|eot_id|>", "<|end_of_text|>", "\n\n\n"),
+        )
+        self.last_stats = {
+            "prompt_tokens": getattr(backend, "last_prompt_tokens", None),
+            "output_tokens": getattr(backend, "last_output_tokens", None),
+        }
+        cleaned = text.strip()
+        if cleaned.startswith("```"):
+            lines = cleaned.splitlines()
+            if lines[0].startswith("```"):
+                lines = lines[1:]
+            if lines and lines[-1].startswith("```"):
+                lines = lines[:-1]
+            cleaned = "\n".join(lines).strip()
+        return cleaned
+
     def close(self) -> None:
         if self._backend is not None:
             self._backend.close()

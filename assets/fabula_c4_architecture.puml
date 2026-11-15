@@ -1,0 +1,166 @@
+@startuml fabula_c4_architecture
+!theme plain
+hide stereotype
+skinparam Shadowing false
+skinparam RoundCorner 6
+skinparam DefaultFontName "Segoe UI, -apple-system, Roboto, sans-serif"
+skinparam DefaultFontSize 10
+skinparam DefaultFontColor #0F172A
+
+skinparam PackageStyle rectangle
+skinparam TitleFontSize 15
+skinparam TitleFontColor #0F172A
+
+skinparam ArrowColor #475569
+skinparam ArrowThickness 1.5
+skinparam ArrowFontSize 9
+skinparam ArrowFontColor #334155
+
+' ================= STEREOTYPE PALETTES =================
+skinparam rectangle {
+    BorderThickness 1.5
+    BorderColor #334155
+    BackgroundColor #FFFFFF
+}
+
+skinparam rectangle<<PhaseBox>> {
+    BackgroundColor #F8FAFC
+    BorderColor #CBD5E1
+    BorderStyle solid
+    BorderThickness 1.5
+    FontColor #0F172A
+    FontStyle bold
+    FontSize 12
+}
+
+skinparam rectangle<<Input>> {
+    BackgroundColor #FFFFFF
+    BorderColor #3B82F6
+    FontColor #0F172A
+}
+
+skinparam rectangle<<GenCore>> {
+    BackgroundColor #FFFFFF
+    BorderColor #D97706
+    FontColor #0F172A
+}
+
+skinparam rectangle<<Validator>> {
+    BackgroundColor #FFFFFF
+    BorderColor #EA580C
+    FontColor #0F172A
+}
+
+skinparam rectangle<<Bundle>> {
+    BackgroundColor #FFFFFF
+    BorderColor #16A34A
+    BorderThickness 2
+    FontColor #0F172A
+}
+
+skinparam rectangle<<EngineCore>> {
+    BackgroundColor #FFFFFF
+    BorderColor #0F172A
+    BorderThickness 2.2
+    FontColor #0F172A
+}
+
+skinparam rectangle<<TheBody>> {
+    BackgroundColor #ECFDF5
+    BorderColor #059669
+    FontColor #064E3B
+}
+
+skinparam rectangle<<TheVoice>> {
+    BackgroundColor #F5F3FF
+    BorderColor #7C3AED
+    FontColor #4C1D95
+}
+
+skinparam rectangle<<Firewall>> {
+    BackgroundColor #FEF2F2
+    BorderColor #EF4444
+    FontColor #7F1D1D
+}
+
+skinparam rectangle<<ExternalAPI>> {
+    BackgroundColor #FFFFFF
+    BorderColor #0284C7
+    FontColor #0F172A
+}
+
+skinparam rectangle<<ScriptedFallback>> {
+    BackgroundColor #FFFFFF
+    BorderColor #64748B
+    FontColor #0F172A
+}
+
+skinparam rectangle<<Accusation>> {
+    BackgroundColor #FFFFFF
+    BorderColor #DC2626
+    BorderThickness 1.8
+    FontColor #0F172A
+}
+
+title **FABULA — SYSTEM ARCHITECTURE SPECIFICATION**\n<size:11><color:#64748B>Two-Phase Autonomous Mystery Engine · Local Pre-Play Generation (Qwen 3B) + Headless Simulation Core (Body & Voice Hybrid)</color></size>
+
+top to bottom direction
+
+' ================= PHASE 1: GENERATION =================
+rectangle "PHASE 1: LOCAL GENERATION PIPELINE (Offline Pre-Play · CPU-Class Runtime)" <<PhaseBox>> as Phase1 {
+    rectangle "<b><size:8.5><color:#2563EB>INPUT SPECIFICATION</color></size></b>\n<b><size:11.5>Player Settings</size></b>\n<size:8.5><color:#64748B>Initialization parameters</color></size>\n----\n<b>Mystery:</b> Theft · Murder · Disappearance\n<b>Tone Dial:</b> Cozy ↔ Dark\n<b>Difficulty:</b> Standard / Random\n<b>Target:</b> <i>Who · How · Why</i>" <<Input>> as P_Settings
+
+    rectangle "<b><size:8.5><color:#B45309>LOCAL GENERATOR</color></size></b>\n<b><size:11.5>Fine-Tuned LLM (~3-4B)</size></b>\n<size:8.5><color:#64748B>Qwen2.5-3B-Instruct · Q4_K_M</color></size>\n----\n<b>Runtime:</b> llama-cpp-python (CPU)\n<b>Grammar:</b> GBNF JSON constrained\n<b>Staged:</b> world → cast → truth → npcs\n<b>Compute:</b> Zero GPU (local CPU wheel)" <<GenCore>> as P_LLM
+
+    rectangle "<b><size:8.5><color:#C2410C>PIPELINE VERIFICATION</color></size></b>\n<b><size:11.5>Stage Validator & Repair</size></b>\n<size:8.5><color:#64748B>Deterministic structural gates</color></size>\n----\n<b>Integrity:</b> Schema & cross-ID checks\n<b>Spatial:</b> Graph G=(V,E) connected\n<b>Timeline:</b> Alibi & movement checks\n<b>Solvability:</b> 1 culprit + clue chain" <<Validator>> as P_Val
+
+    rectangle "<b><size:8.5><color:#15803D>PERSISTENT ARTIFACT</color></size></b>\n<b><size:11.5>Validated Game Bundle</size></b>\n<size:8.5><color:#64748B>Atomic JSON files on disk</color></size>\n----\n<b>world.json:</b> Locations & schedules\n<b>truth.json:</b> <color:#DC2626><b>[ENGINE-ONLY]</b></color>\n<b>clues.json:</b> 4–6 clues (fair chain)\n<b>npcs/<id>/:</b> identity & memory JSON" <<Bundle>> as P_Bundle
+
+    P_Settings -right-> P_LLM : "Config"
+    P_LLM -right-> P_Val : "Stage JSON"
+    P_Val -right-> P_Bundle : "Pass (Schema valid)"
+    P_Val .[#DC2626]left.> P_LLM : "Fail (Retry <= 3)"
+}
+
+' ================= PHASE 2: PLAY LOOP =================
+rectangle "PHASE 2: PLAY LOOP RUNTIME (~10-Minute Headless Engine · Body & Voice Hybrid Architecture)" <<PhaseBox>> as Phase2 {
+    
+    ' Top Row
+    rectangle "<b><size:8.5><color:#1D4ED8>DESKTOP FRONTEND</color></size></b>\n<b><size:11.5>Player UI Client</size></b>\n<size:8.5><color:#64748B>Pygame / Arcade presentation</color></size>\n----\n• 2D tile grid & NPC sprites\n• E-key proximity dialogue\n• Discovered clues journal\n• 10-minute session countdown" <<Input>> as P_UI
+
+    rectangle "<b><size:8.5><color:#0F172A>AUTHORITATIVE RUNTIME</color></size></b>\n<b><size:11.5>Headless Engine Core</size></b>\n<size:8.5><color:#64748B>Pure Python · Zero UI Imports</color></size>\n----\n• Pure headless state simulation\n• 1-minute real-time clock ticks\n• Tile proximity perception radius\n• Physical collision & event bus\n• Sole holder of <b>truth.json</b>" <<EngineCore>> as P_Engine
+
+    rectangle "<b><size:8.5><color:#065F46>DETERMINISTIC SIMULATION</color></size></b>\n<b><size:11.5>The Body (Classical AI)</size></b>\n<size:8.5><color:#047857>Predictable Spatial Simulation</color></size>\n----\n• Waypoints (at_minute → loc)\n• A* search on town graph G=(V,E)\n• 100% deterministic navigation\n• Zero spatial LLM drift\n• Tile occupancy & collision rules" <<TheBody>> as P_Body
+
+    rectangle "<b><size:8.5><color:#0369A1>EXTERNAL PROVIDER</color></size></b>\n<b><size:11>Live LLM Providers</size></b>\n<size:8.5><color:#64748B>Gemini 2.5 · xAI Grok</color></size>\n----\n• ≈ 2–3s SLA turnaround\n• Per-session token caps\n• In-character speech" <<ExternalAPI>> as P_LiveLLM
+
+    ' Bottom Row
+    rectangle "<b><size:8.5><color:#B91C1C>CASE RESOLUTION</color></size></b>\n<b><size:11.5>Accusation Evaluator</size></b>\n<size:8.5><color:#64748B>Endgame solution verification</color></size>\n----\n• Player files <i>Who · How · Why</i>\n• Exact check vs <b>truth.json</b>\n• Auto-fires at 10:00 limit\n• Decisive Victory / Defeat" <<Accusation>> as P_Accuse
+
+    rectangle "<b><size:8.5><color:#991B1B>SECURITY BOUNDARY</color></size></b>\n<b><size:11.5>The Spoiler Firewall</size></b>\n<size:8.5><color:#B91C1C>Machine-Enforced Isolation Gateway</color></size>\n----\n• <b>truth.json is engine-only</b>\n• Never sent in prompts or API calls\n• Per-NPC memory strictly isolated\n• Verified by automated test suites" <<Firewall>> as P_Firewall
+
+    rectangle "<b><size:8.5><color:#5B21B6>SPEECH RUNTIME</color></size></b>\n<b><size:11.5>The Voice (Prompt Engine)</size></b>\n<size:8.5><color:#6D28D9>Per-NPC Dialogue Orchestration</color></size>\n----\n• Own identity & memory JSON only\n• Rules: volunteer, if_asked, hide, lie\n• Authored culprit cover stories\n• Schema: {reply: str, mood: str}" <<TheVoice>> as P_Voice
+
+    rectangle "<b><size:8.5><color:#475569>DETERMINISTIC FALLBACK</color></size></b>\n<b><size:11>Scripted Fallback</size></b>\n<size:8.5><color:#64748B>Authored Persona Templates</color></size>\n----\n• Zero API key needed\n• Reveals eligible clues\n• Offline / safety safety net" <<ScriptedFallback>> as P_Scripted
+
+    ' Layout & Flow Connections
+    P_UI -right-> P_Engine : "Actions & input"
+    P_UI -down-> P_Accuse : "Player accuses"
+    P_Accuse -right-> P_Engine : "Verify vs truth.json"
+
+    P_Engine -right-> P_Body : "Schedule dispatch"
+    P_Engine -down-> P_Firewall : "Dialogue trigger"
+
+    P_Firewall -right-> P_Voice : "Sanitized Memory DTO"
+    P_Voice -up-> P_Engine : "Speech event DTO"
+
+    P_Voice -right-> P_LiveLLM : "API Key Present"
+    P_Voice -down-> P_Scripted : "No Key / Fallback"
+}
+
+' Phase Connection & Layout Hierarchy
+Phase1 -[hidden]down-> Phase2
+P_Settings -[hidden]down-> P_UI
+P_Bundle -down-> P_Engine : "Atomic Publish & Startup Load"
+
+@enduml

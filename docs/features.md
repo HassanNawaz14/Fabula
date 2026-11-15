@@ -90,10 +90,12 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 
 - The fine-tuned model generates **everything**: mystery, town, NPC roster, NPC identities, NPC memories/secrets, clue placement.
 - Player-facing generation settings **[ADOPTED]**: `mystery_type` (theft / disappearance / murder / random), `tone` (cozy ↔ dark), `difficulty`.
-- **Staged generation [ADOPTED]**: world → cast → truth → per-NPC files, instead of one giant output. Reasons: small models stay more consistent, each stage is validated separately, retries are cheap.
-- **Constrained decoding [ADOPTED]**: grammar- or JSON-schema-constrained output to avoid malformed JSON.
-- **Validator + retry loop [ADOPTED]**: runs after each stage (schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability and unique-culprit checks). Failure → retry the stage up to N times → clear error screen if still failing. This is a **runtime safety guard**, not the project's headline evaluation.
-- **Loading screen [ADOPTED]**: local CPU generation of a few thousand JSON tokens may take minutes on low-end machines (estimate; **benchmark early**).
+- **Neurosymbolic Mystery Synthesis (`--fast`) [DECIDED/ADOPTED 2026-11-15]**: The primary high-performance generation pipeline. Instead of forcing the local CPU to emit 8,000 tokens of raw JSON boilerplate with single-threaded GBNF grammar masks (which took 35–40+ minutes), generation uses a dual-axis architecture:
+  1. **Neural Story Planning (Edge SLM)**: A fine-tuned `Llama-3.2-1B-Instruct` model outputs a token-dense Compact Blueprint DSL (~140 tokens in ~11 seconds), defining the crime, motive, method, culprit, suspect alibis, clue linkages, and timeline beats.
+  2. **Symbolic Compilation & Verification**: A deterministic Python `BlueprintCompiler` maps the DSL into the complete, frozen Pydantic game bundle in 2.09 ms, generates walkable 2D grid coordinates, aligns NPC schedules to crime timeline beats, and mathematically proves candidate-elimination solvability ($|C| = 1$). Total cold pre-game latency drops to <25 seconds with 0 validation errors.
+- **Legacy Staged Generation [MAINTAINED]**: Multi-stage JSON pipeline (`world → cast → truth → per-NPC files`) with GBNF grammar-constrained decoding and per-stage retries, retained for legacy evaluation and ablations.
+- **Validator + retry loop [ADOPTED]**: runs after generation (schema validity, cross-reference integrity, graph connectivity, timeline consistency, solvability and unique-culprit checks). Failure → retry stage or fallback to verified symbolic synthesis.
+- **Loading screen [ADOPTED]**: shows progress during the 10–20 second pre-game generation.
 - Output is a **game bundle** (section 8).
 
 ### 4.2 World & Engine

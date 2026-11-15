@@ -5,7 +5,7 @@ from typing import Any
 import pygame
 
 from fabula.simulation import location_graph
-from fabula.ui.components import Button, Panel
+from fabula.ui.components import Button
 
 
 class MapView:
@@ -20,13 +20,30 @@ class MapView:
         self.status_message: str | None = None
         self.status_timer = 0
         self._init_layout()
-        
+
         self.font = pygame.font.Font(None, 20)
         self.buttons = [
-            Button(pygame.Rect(20, self.height - 60, 80, 30), "Examine [E]", lambda: {"action": "examine_location"}, self.font),
-            Button(pygame.Rect(110, self.height - 60, 80, 30), "Talk [T]", self._talk_action, self.font),
-            Button(pygame.Rect(200, self.height - 60, 80, 30), "Journal [J]", lambda: {"action": "open_journal"}, self.font),
-            Button(pygame.Rect(290, self.height - 60, 80, 30), "Accuse [A]", lambda: {"action": "open_accusation"}, self.font),
+            Button(
+                pygame.Rect(20, self.height - 60, 80, 30),
+                "Examine [E]",
+                lambda: {"action": "examine_location"},
+                self.font,
+            ),
+            Button(
+                pygame.Rect(110, self.height - 60, 80, 30), "Talk [T]", self._talk_action, self.font
+            ),
+            Button(
+                pygame.Rect(200, self.height - 60, 80, 30),
+                "Journal [J]",
+                lambda: {"action": "open_journal"},
+                self.font,
+            ),
+            Button(
+                pygame.Rect(290, self.height - 60, 80, 30),
+                "Accuse [A]",
+                lambda: {"action": "open_accusation"},
+                self.font,
+            ),
         ]
 
     def _talk_action(self) -> dict[str, Any] | None:
@@ -183,4 +200,3 @@ class MapView:
             hud_text = f"Location: {loc_name} | {time_str}"
             info_surf = font_body.render(hud_text, True, (220, 220, 240))
             surface.blit(info_surf, (20, self.height - 45))
-

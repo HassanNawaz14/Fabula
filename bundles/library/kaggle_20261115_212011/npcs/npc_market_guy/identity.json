@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_market_guy",
+  "name": "Gus",
+  "age": 30,
+  "role": "market guy",
+  "traits": [
+    "kind",
+    "impatient"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

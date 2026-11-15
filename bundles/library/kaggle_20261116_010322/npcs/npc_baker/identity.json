@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_baker",
+  "name": "Ivy Baker",
+  "age": 53,
+  "role": "baker",
+  "traits": [
+    "chatty",
+    "jolly"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Willow Green for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

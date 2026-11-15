@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "disappearance",
+    "target": "npc_park_warden",
+    "time_window": {
+      "start": 3,
+      "end": 10
+    },
+    "location_id": "loc_residence"
+  },
+  "timeline": [
+    {
+      "t": 3,
+      "who": "npc_market_vendor",
+      "what": "walked past and noticed something wrong at the loc_residence.",
+      "where": "loc_residence"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_baker",
+    "correct_method_id": "method_2",
+    "correct_motive_id": "motive_1",
+    "how": "Elsie lured them behind the sheds with a fake errand and never came back at the loc_residence at minute 3, and the npc_park_warden was never seen that day.",
+    "why": "They did it to keep an old secret buried."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_market_vendor_2",
+      "secret": "I pretends to work when the coach is late and hope no one finds out."
+    },
+    {
+      "npc": "npc_grocer",
+      "secret": "I spreads a rumour about the herbalist and hope no one asks questions."
+    }
+  ]
+}

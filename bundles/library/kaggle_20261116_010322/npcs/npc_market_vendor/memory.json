@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_vendor",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_market_vendor",
+      "what": "I was at the loc_cafe around that time, I can swear to it.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_vendor",
+      "what": "Someone told me the the_sheriff was involved in old town business.",
+      "where": "loc_cafe",
+      "when": "minute 9",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_vendor",
+      "what": "I has been avoiding the loc_park like a plague.",
+      "where": "loc_park",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

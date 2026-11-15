@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "theft",
+    "target": "silver saffron teapot",
+    "time_window": {
+      "start": 3,
+      "end": 9
+    },
+    "location_id": "loc_residence"
+  },
+  "timeline": [
+    {
+      "t": 3,
+      "who": "npc_library_gentleman",
+      "what": "was seen near the loc_residence",
+      "where": "loc_residence"
+    },
+    {
+      "t": 6,
+      "who": "npc_cafe_guy",
+      "what": "left the loc_cafe",
+      "where": "loc_parking"
+    },
+    {
+      "t": 9,
+      "who": "npc_library_gentleman",
+      "what": "was seen near the loc_cafe",
+      "where": "loc_cafe"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_library_gentleman",
+    "correct_method_id": "method_4",
+    "correct_motive_id": "motive_2",
+    "how": "The silver saffron teapot was wrapped in a scarf and walked out calmly, hoping no one noticed at the loc_residence at minute 9.",
+    "why": "They did it for the thrill of it, no matter the cost."
+  },
+  "red_herrings": []
+}

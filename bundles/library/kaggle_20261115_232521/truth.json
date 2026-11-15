@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "murder",
+    "target": "npc_2",
+    "time_window": {
+      "start": 4,
+      "end": 8
+    },
+    "location_id": "l_3"
+  },
+  "timeline": [
+    {
+      "t": 5,
+      "who": "npc_1",
+      "what": "saw something wrong around the Old Cottage and reported it to the town clerk.",
+      "where": "l_1"
+    },
+    {
+      "t": 7,
+      "who": "npc_6",
+      "what": "argued with someone near the l_2 and left in a hurry.",
+      "where": "l_2"
+    },
+    {
+      "t": 8,
+      "who": "npc_5",
+      "what": "was seen arguing with someone near the l_3.",
+      "where": "l_3"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_1",
+    "correct_method_id": "m_4",
+    "correct_motive_id": "m_8",
+    "how": "Omar sent them a forged note that pulled them away at night and the target died for it.",
+    "why": "They did it to stop an old letter from being read aloud."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_3",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    },
+    {
+      "npc": "npc_4",
+      "secret": "I spreads a rumour about the herbalist and hope no one finds out."
+    }
+  ]
+}

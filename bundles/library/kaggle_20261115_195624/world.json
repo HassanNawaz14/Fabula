@@ -1,0 +1,177 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "sct_123",
+  "mystery_type": "theft",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Stolen Saffron from the Old Cafe",
+  "intro_text": "A crate of rare saffron has gone missing from the Old Cafe in Willowbrook this morning. Someone here knows more than they are saying.",
+  "town_name": "Willowbrook",
+  "locations": [
+    {
+      "id": "loc_cafe",
+      "name": "Old Cafe",
+      "type": "cafe",
+      "description": "Cozy nooks filled with warm, golden light, where the air is thickly scented with the earthy aroma of strong tea.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_residence",
+      "name": "Quiet Residence",
+      "type": "residence",
+      "description": "A quaint little cottage nestled on a peaceful lane, its windows whispering secrets from within.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_park",
+      "name": "Elder Park",
+      "type": "park",
+      "description": "A verdant oasis where the ancient trees stand sentinel over paths worn smooth by countless footsteps.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_policeman",
+      "display_name": "Piotr",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 1,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 9,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_vendor",
+      "display_name": "Sana",
+      "start_location": "loc_park",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "loc_park"
+        },
+        {
+          "at_minute": 4,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 8,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_broker",
+      "display_name": "Hana",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_park"
+        },
+        {
+          "at_minute": 7,
+          "location": "loc_park"
+        }
+      ]
+    },
+    {
+      "id": "npc_shepherd",
+      "display_name": "Bess",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 4,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 8,
+          "location": "loc_park"
+        }
+      ]
+    },
+    {
+      "id": "npc_baker",
+      "display_name": "Elsie",
+      "start_location": "loc_park",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 5,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_residence"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "method_1",
+        "text": "Method 1: traded it for a cheap spice from the market stall."
+      },
+      {
+        "id": "method_2",
+        "text": "Method 2: wrapped it in a scarf and walked out calmly."
+      },
+      {
+        "id": "method_3",
+        "text": "Method 3: knocked over a display of spices and took it in the confusion."
+      },
+      {
+        "id": "method_4",
+        "text": "Method 4: hid it under a fruit crate and came back for it."
+      }
+    ],
+    "motives": [
+      {
+        "id": "motive_1",
+        "text": "Wanted to prove they were smarter than the market folk."
+      },
+      {
+        "id": "motive_2",
+        "text": "Helped a friend in secret."
+      },
+      {
+        "id": "motive_3",
+        "text": "Covered a loss from another theft."
+      },
+      {
+        "id": "motive_4",
+        "text": "Stole it for the thrill of it."
+      }
+    ]
+  }
+}

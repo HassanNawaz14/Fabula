@@ -1,0 +1,165 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "disappearance_43",
+  "mystery_type": "disappearance",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Vanishing of the Old Cottage Librarian",
+  "intro_text": "the Old Cottage librarian has vanished from Brindlebay overnight. Someone must have known more than they let on.",
+  "town_name": "Brindlebay",
+  "locations": [
+    {
+      "id": "loc_parking",
+      "name": "Town Parking Lot",
+      "type": "parking",
+      "description": "An open lot where the only sounds are the distant caw of a crow and the occasional rustle of leaves in the breeze.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_cafe",
+      "name": "Copper Kettle Cafe",
+      "type": "cafe",
+      "description": "Inside, the air is thick with the smell of strong tea and freshly baked bread, mingling with the warmth of cozy conversations and the gentle clink of ceramic cups.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "loc_parking"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_residence",
+      "name": "Lane House",
+      "type": "residence",
+      "description": "A small, weathered cottage nestled along a serene lane, its windows casting an amber glow into the night sky. The soft rustle of leaves outside hints at secrets within.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_park_warden",
+      "display_name": "Piotr",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_cafe"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_vendor",
+      "display_name": "Tomas",
+      "start_location": "loc_parking",
+      "schedule": [
+        {
+          "at_minute": 9,
+          "location": "loc_parking"
+        }
+      ]
+    },
+    {
+      "id": "npc_baker",
+      "display_name": "Elsie",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 10,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 8,
+          "location": "loc_parking"
+        }
+      ]
+    },
+    {
+      "id": "npc_grocer",
+      "display_name": "Mira",
+      "start_location": "loc_parking",
+      "schedule": [
+        {
+          "at_minute": 3,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 9,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_vendor_2",
+      "display_name": "Nadia",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "loc_parking"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_cafe"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "method_1",
+        "text": "Method 1: sent them a forged note that pulled them away at night."
+      },
+      {
+        "id": "method_2",
+        "text": "Method 2: lured them behind the sheds with a fake errand and never came back."
+      },
+      {
+        "id": "method_3",
+        "text": "Method 3: tricked them into leaving town on the wrong coach."
+      },
+      {
+        "id": "method_4",
+        "text": "Method 4: argued with them near the water and they never came back."
+      }
+    ],
+    "motives": [
+      {
+        "id": "motive_1",
+        "text": "Motive 1: keep an old secret buried."
+      },
+      {
+        "id": "motive_2",
+        "text": "Motive 2: inherit a small but useful sum."
+      },
+      {
+        "id": "motive_3",
+        "text": "Motive 3: end a feud that had been simmering for years."
+      },
+      {
+        "id": "motive_4",
+        "text": "Motive 4: clear the way for a new job posting."
+      }
+    ]
+  }
+}

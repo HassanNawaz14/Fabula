@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_baker",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_baker",
+      "what": "I has been spreading rumours about the retired fishmonger.",
+      "where": "loc_cafe",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_baker",
+      "what": "I was seen near the water around that time.",
+      "where": "loc_parking",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_baker",
+      "what": "I was seen near the loc_cafe at that time.",
+      "where": "loc_cafe",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

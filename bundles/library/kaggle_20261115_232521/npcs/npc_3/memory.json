@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_3",
+  "facts": [
+    {
+      "id": "m_3",
+      "who": "npc_3",
+      "what": "I has been spreading a rumour about the herbalist's reputation.",
+      "where": "l_1",
+      "when": "minute 7",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_4",
+      "who": "npc_3",
+      "what": "I has been arguing with the herbalist near the Old Cottage.",
+      "where": "l_1",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_5",
+      "who": "npc_3",
+      "what": "I was seen near the l_2 at minute 6.",
+      "where": "l_2",
+      "when": "minute 6",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

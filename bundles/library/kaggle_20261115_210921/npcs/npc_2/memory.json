@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_2",
+  "facts": [
+    {
+      "id": "npc_2_fact_1",
+      "who": "npc_2",
+      "what": "I has been to the l_1 and will check if anyone saw anything suspicious.",
+      "where": "l_1",
+      "when": "minute 8",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_2_fact_2",
+      "who": "npc_2",
+      "what": "I has been to the l_4 and will spread a rumour about someone in town.",
+      "where": "l_4",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

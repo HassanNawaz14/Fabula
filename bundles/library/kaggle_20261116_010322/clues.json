@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "clue_1",
+      "location_id": "loc_park",
+      "description": "Something is out of place — footprints in the dust near a locked side door.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_baker"
+      ],
+      "requires": []
+    },
+    {
+      "id": "clue_2",
+      "location_id": "loc_park",
+      "description": "A loose rumour that may or may not matter: someone has been spreading stories about the sheriff's reputation.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_3",
+      "location_id": "loc_residence",
+      "description": "A locked side door that hints at hidden secrets within.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_4",
+      "location_id": "loc_park",
+      "description": "Ivy Baker's claimed alibi at the loc_cafe can be checked.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_5",
+      "location_id": "loc_residence",
+      "description": "A loose rumour that may or may not matter: someone saw someone hurry away from the loc_residence.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

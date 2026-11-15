@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "murder_15",
+  "mystery_type": "murder",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Saffron Thief's Death at Willow Green",
+  "intro_text": "the night was thick with the scent of ripe fruit and the soft clink of porcelain cups, while a hush hung over the town square like mist on dewy grass.",
+  "town_name": "Willow Green",
+  "locations": [
+    {
+      "id": "loc_cafe",
+      "name": "Little Cafe",
+      "type": "cafe",
+      "description": "A cozy nook where small tables are set under an awning, and warm golden light bathes the space in a gentle glow.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_residence",
+      "name": "Quiet Residence",
+      "type": "residence",
+      "description": "A quaint little house nestled on a peaceful lane, its windows like sleepy eyes peering into the night.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_park",
+      "name": "Willow Green Park",
+      "type": "park",
+      "description": "A verdant expanse where the air is thick with the scent of wildflowers and the rustle of leaves beneath footsteps.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_sheriff",
+      "display_name": "Sergeant O'Malley",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_park"
+        },
+        {
+          "at_minute": 8,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_baker",
+      "display_name": "Ivy Baker",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 6,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_park"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_vendor",
+      "display_name": "Hana",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 9,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_park_warden",
+      "display_name": "Piotr",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 1,
+          "location": "loc_park"
+        },
+        {
+          "at_minute": 5,
+          "location": "loc_cafe"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_seller",
+      "display_name": "Nadia",
+      "start_location": "loc_park",
+      "schedule": [
+        {
+          "at_minute": 3,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 6,
+          "location": "loc_park"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "method_1",
+        "text": "Method 1: tricked them into a dangerous meeting place at the park at night."
+      },
+      {
+        "id": "method_2",
+        "text": "Method 2: sabotaged their cart so it rolled downhill on Willow Green Lane."
+      },
+      {
+        "id": "method_3",
+        "text": "Method 3: sent them down the wrong road at night, where they slipped and fell into a hidden pond."
+      },
+      {
+        "id": "method_4",
+        "text": "Method 4: poisoned their evening tea with a deadly spice from the herb garden."
+      }
+    ],
+    "motives": [
+      {
+        "id": "motive_1",
+        "text": "Motive 1: inherit a small but useful sum of money."
+      },
+      {
+        "id": "motive_2",
+        "text": "Motive 2: keep a stolen land deed hidden forever."
+      },
+      {
+        "id": "motive_3",
+        "text": "Motive 3: punish them for spreading a rumour around town."
+      },
+      {
+        "id": "motive_4",
+        "text": "Motive 4: end a feud that had been simmering for years."
+      }
+    ]
+  }
+}

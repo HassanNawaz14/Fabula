@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_library_gentleman",
+  "facts": [
+    {
+      "id": "account_npc_library_gentleman",
+      "who": "npc_library_gentleman",
+      "what": "I committed the theft of silver saffron teapot at the loc_residence. The silver saffron teapot was wrapped in a scarf and walked out calmly, hoping no one noticed at the loc_residence at minute 9.",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_library_gentleman",
+      "what": "was seen near the loc_residence",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_library_gentleman",
+      "what": "left the loc_cafe",
+      "where": "loc_parking",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_library_gentleman",
+      "what": "was seen near the loc_cafe",
+      "where": "loc_cafe",
+      "when": "minute 9",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story_1",
+    "claim": "I was at home the whole time, never near any location mentioned.",
+    "supporting_facts": [
+      "fact_3"
+    ]
+  }
+}

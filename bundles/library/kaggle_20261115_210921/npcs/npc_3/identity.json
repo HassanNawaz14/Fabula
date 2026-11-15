@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_3",
+  "name": "Tomas",
+  "age": 56,
+  "role": "market vendor",
+  "traits": [
+    "nervous",
+    "sly"
+  ],
+  "speech_style": "short, direct sentences",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

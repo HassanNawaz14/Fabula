@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_2",
+  "name": "Kofi",
+  "age": 37,
+  "role": "librarian",
+  "traits": [
+    "jolly",
+    "nervous"
+  ],
+  "speech_style": "quick and peppered with questions",
+  "backstory": "Grew up in Willowbrook and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "tired and a little short-tempered"
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_senior",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_market_senior",
+      "what": "I has been known around town for always being early.",
+      "where": "loc_residence",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_senior",
+      "what": "I has been seen near the loc_cafe at that time.",
+      "where": "loc_cafe",
+      "when": "minute 8",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_senior",
+      "what": "I was seen near the loc_parking around that time.",
+      "where": "loc_parking",
+      "when": "minute 6",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

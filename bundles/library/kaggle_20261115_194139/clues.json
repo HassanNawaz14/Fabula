@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "c_id_1",
+      "location_id": "l_3",
+      "description": "Something hidden beneath a pile of rumpled coats.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_id_2",
+      "location_id": "l_1",
+      "description": "A loose rummage of papers and notes nearby.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_id_3",
+      "location_id": "l_2",
+      "description": "A locked side door that has been prodded with a stick.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_4"
+      ],
+      "requires": []
+    },
+    {
+      "id": "c_id_4",
+      "location_id": "l_1",
+      "description": "A loose rummage of papers and notes nearby.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

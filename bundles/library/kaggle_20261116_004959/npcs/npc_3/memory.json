@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_3",
+  "facts": [
+    {
+      "id": "m_1",
+      "who": "npc_3",
+      "what": "I has been spreading rumours about the herbalist's private business.",
+      "where": "l_2",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_2",
+      "who": "npc_3",
+      "what": "I was seen near the l_1 at night, acting nervous and avoiding eye contact.",
+      "where": "l_1",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

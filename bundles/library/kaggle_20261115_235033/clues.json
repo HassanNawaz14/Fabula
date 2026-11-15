@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "clue_1",
+      "location_id": "loc_residence",
+      "description": "Something is out of place — dust under a counter suggests someone was in a hurry to leave.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_2",
+      "location_id": "loc_park",
+      "description": "A loose rumour that the npc_baker has been skipping their night watch rounds at the loc_residence.",
+      "discovery": "npc_reveal",
+      "revealed_by_npc": null,
+      "implies": [
+        "fact_4"
+      ],
+      "requires": []
+    },
+    {
+      "id": "clue_3",
+      "location_id": "loc_park",
+      "description": "A loose rumour that someone in town has been spreading secrets around the loc_park.",
+      "discovery": "npc_reveal",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_4",
+      "location_id": "loc_residence",
+      "description": "A locked side door suggests something was left behind in a hurry.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_5",
+      "location_id": "loc_park",
+      "description": "A loose rumour that the npc_library_resident had been discussed at every stall that morning.",
+      "discovery": "npc_reveal",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

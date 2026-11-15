@@ -1,0 +1,52 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "c_1",
+      "location_id": "l_1",
+      "description": "Something is out of place — a loose rumour that hints at hidden knowledge.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_2",
+      "location_id": "l_3",
+      "description": "A loose rumour that may or may not matter — someone was seen arguing near this location.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_1"
+      ],
+      "requires": []
+    },
+    {
+      "id": "c_3",
+      "location_id": "l_2",
+      "description": "A loose rumour that may or may not matter — something seems out of place here.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_4",
+      "location_id": "l_3",
+      "description": "Something hidden nearby suggests someone in town is keeping a secret of their own.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_5",
+      "location_id": "l_2",
+      "description": "A loose rumour that may or may not matter — something seems out of place here.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

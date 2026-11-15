@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_baker",
+  "name": "Ravi",
+  "age": 48,
+  "role": "baker",
+  "traits": [
+    "stubborn",
+    "kind"
+  ],
+  "speech_style": "quiet, rarely finishes thoughts",
+  "backstory": "Known in Oakenford for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "polite but guarded"
+}

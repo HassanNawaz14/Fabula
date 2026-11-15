@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "disappearance",
+    "target": "the retired fishmonger",
+    "time_window": {
+      "start": 3,
+      "end": 9
+    },
+    "location_id": "loc_parking"
+  },
+  "timeline": [
+    {
+      "t": 3,
+      "who": "npc_doctor",
+      "what": "walked past the loc_parking and noticed something wrong.",
+      "where": "loc_parking"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_market_guy",
+    "correct_method_id": "method_4",
+    "correct_motive_id": "motive_1",
+    "how": "Gus argued with them near the water and they never came back at the loc_parking at minute 3, and the retired fishmonger was never seen that day.",
+    "why": "They did it to keep an old secret buried."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_market_vendor",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    },
+    {
+      "npc": "npc_parking_mechanic",
+      "secret": "I pretends to work when the coach is late so I can stay hidden."
+    }
+  ]
+}

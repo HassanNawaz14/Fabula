@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_baker",
+  "facts": [
+    {
+      "id": "account_npc_baker",
+      "who": "npc_baker",
+      "what": "I committed the disappearance of npc_park_warden at the loc_residence. Elsie lured them behind the sheds with a fake errand and never came back at the loc_residence at minute 3, and the npc_park_warden was never seen that day.",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_baker",
+      "what": "I was seen near the loc_residence at night.",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_baker",
+      "what": "I lured them behind the sheds with a fake errand and never came back at the loc_residence at minute 3.",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cs_baker",
+    "claim": "I was at the loc_parking the whole time, never near the loc_residence.",
+    "supporting_facts": [
+      "fact_1"
+    ]
+  }
+}

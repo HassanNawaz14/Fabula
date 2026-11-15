@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_6",
+  "name": "Bess",
+  "age": 43,
+  "role": "coach driver",
+  "traits": [
+    "guarded",
+    "kind"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Grew up in Merridale and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

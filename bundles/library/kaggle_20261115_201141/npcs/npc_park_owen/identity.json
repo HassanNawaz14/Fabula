@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_park_owen",
+  "name": "Owen",
+  "age": 32,
+  "role": "fishmonger",
+  "traits": [
+    "nervous",
+    "kind"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Oakenford for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

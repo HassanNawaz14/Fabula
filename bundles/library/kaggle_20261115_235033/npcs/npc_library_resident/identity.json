@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_library_resident",
+  "name": "Omar",
+  "age": 38,
+  "role": "night watchman",
+  "traits": [
+    "jolly",
+    "methodical"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

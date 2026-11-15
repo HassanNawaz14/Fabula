@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "c_1",
+      "location_id": "l_3",
+      "description": "Something is out of place — signs of a rushed exit from the l_3.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_5"
+      ],
+      "requires": []
+    },
+    {
+      "id": "c_2",
+      "location_id": "l_2",
+      "description": "A loose rumour that may or may not matter: someone has been spreading tales of a stolen land deed around town.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_3",
+      "location_id": "l_1",
+      "description": "A locked side door that hints at hidden business nearby.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "c_4",
+      "location_id": "l_2",
+      "description": "A loose rumour that may or may not matter: someone has been seen near the l_2 at night, acting nervous and avoiding eye contact.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

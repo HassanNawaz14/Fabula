@@ -1,0 +1,189 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "s_6",
+  "mystery_type": "murder",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Stolen Saffron Teapot",
+  "intro_text": "A rare and valuable saffron teapot has gone missing from the Old Cottage Inn in Brindlebay this morning. Someone here knows more than they are saying.",
+  "town_name": "Brindlebay",
+  "locations": [
+    {
+      "id": "l_1",
+      "name": "Cafe of Secrets",
+      "type": "cafe",
+      "description": "A cozy corner where patrons sip strong tea and share whispered secrets in hushed tones.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_2",
+      "name": "Parkside Cafe",
+      "type": "cafe",
+      "description": "A quaint little cafe nestled along the town square, where the air is thick with the scent of freshly brewed coffee and gossip.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "l_1",
+        "l_3"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_3",
+      "name": "Town Library",
+      "type": "library",
+      "description": "A labyrinthine hall of knowledge where the shelves stretch from floor to ceiling, filled with tales of adventure and intrigue.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "l_2",
+        "l_4"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_4",
+      "name": "Coach Yard",
+      "type": "parking",
+      "description": "An open expanse where the ground is marked by faded lines and the occasional abandoned cart, hinting at days long gone.",
+      "position": {
+        "x": 3,
+        "y": 0
+      },
+      "connections": [
+        "l_3"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_1",
+      "display_name": "Elsie",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 5,
+          "location": "l_4"
+        },
+        {
+          "at_minute": 6,
+          "location": "l_3"
+        }
+      ]
+    },
+    {
+      "id": "npc_2",
+      "display_name": "Bess",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 4,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 8,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_3",
+      "display_name": "Tomas",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_4"
+        },
+        {
+          "at_minute": 7,
+          "location": "l_4"
+        }
+      ]
+    },
+    {
+      "id": "npc_4",
+      "display_name": "Gus",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 1,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 5,
+          "location": "l_1"
+        }
+      ]
+    },
+    {
+      "id": "npc_5",
+      "display_name": "Mira",
+      "start_location": "l_4",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 3,
+          "location": "l_4"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "m_1",
+        "text": "Method: tricked them into a dangerous meeting place at the Town Library."
+      },
+      {
+        "id": "m_2",
+        "text": "Method: loosened a beam during hours of calm at the Cafe of Secrets."
+      },
+      {
+        "id": "m_3",
+        "text": "Method: sabotaged their cart so it rolled in front of them at the Coach Yard."
+      },
+      {
+        "id": "m_4",
+        "text": "Method: sent them down the wrong road at the Town Library."
+      }
+    ],
+    "motives": [
+      {
+        "id": "m_5",
+        "text": "Motive: keep a secret job hiding and stop it from being exposed."
+      },
+      {
+        "id": "m_6",
+        "text": "Motive: punish them for a public humiliation."
+      },
+      {
+        "id": "m_7",
+        "text": "Motive: end a feud that has been simmering for years."
+      },
+      {
+        "id": "m_8",
+        "text": "Motive: inherit a small but useful sum."
+      }
+    ]
+  }
+}

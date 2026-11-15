@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_doctor",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_doctor",
+      "what": "I has been avoiding the coach yard that morning, hoping to clear a spot for important papers.",
+      "where": "loc_parking",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_doctor",
+      "what": "I heard rumours of a hidden side door in the loc_cafe and decided to investigate.",
+      "where": "loc_cafe",
+      "when": "minute 6",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_doctor",
+      "what": "I passed by the loc_parking and noticed something felt wrong about a loose step.",
+      "where": "loc_parking",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

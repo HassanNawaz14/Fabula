@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "clue_1",
+      "location_id": "loc_parking",
+      "description": "Something is out of place — a loose step that whispers of hidden footsteps.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_market_guy"
+      ],
+      "requires": []
+    },
+    {
+      "id": "clue_2",
+      "location_id": "loc_parking",
+      "description": "A loose rumour suggests the retired fishmonger was involved in town business.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_3",
+      "location_id": "loc_cafe",
+      "description": "A locked side door hinting at a secret meeting place.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_4",
+      "location_id": "loc_parking",
+      "description": "A loose rumour that the retired fishmonger was seen arguing near the water.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

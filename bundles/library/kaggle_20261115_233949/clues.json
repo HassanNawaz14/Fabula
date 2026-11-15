@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "clues": [
+    {
+      "id": "clue_1",
+      "location_id": "loc_residence",
+      "description": "Something is out of place — signs of a rushed exit from the loc_residence.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [
+        "account_npc_baker"
+      ],
+      "requires": []
+    },
+    {
+      "id": "clue_2",
+      "location_id": "loc_parking",
+      "description": "A loose rumour that may or may not matter: someone has been spreading stories about the npc_market_vendor around town.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_3",
+      "location_id": "loc_cafe",
+      "description": "Elsie's claimed alibi at the loc_parking can be checked — they were there, but was they honest?",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    },
+    {
+      "id": "clue_4",
+      "location_id": "loc_residence",
+      "description": "A loose rumour that may or may not matter: someone has been seen near the loc_residence at night.",
+      "discovery": "examine",
+      "revealed_by_npc": null,
+      "implies": [],
+      "requires": []
+    }
+  ]
+}

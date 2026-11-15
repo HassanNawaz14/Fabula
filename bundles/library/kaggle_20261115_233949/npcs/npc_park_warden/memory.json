@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_park_warden",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_park_warden",
+      "what": "I was seen near the loc_residence at night.",
+      "where": "loc_residence",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_park_warden",
+      "what": "I has been spreading stories about the npc_market_vendor around town.",
+      "where": "loc_residence",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_park_warden",
+      "what": "I has been avoiding the npc_grocer since that argument in the loc_cafe.",
+      "where": "loc_residence",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

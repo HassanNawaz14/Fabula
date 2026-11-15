@@ -1,0 +1,28 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "murder",
+    "target": "npc_5",
+    "time_window": {
+      "start": 3,
+      "end": 8
+    },
+    "location_id": "l_4"
+  },
+  "timeline": [
+    {
+      "t": 6,
+      "who": "npc_2",
+      "what": "stole a handkerchief from the Town Library.",
+      "where": "l_1"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_5",
+    "correct_method_id": "m_3",
+    "correct_motive_id": "m_8",
+    "how": "npc_5 sabotaged their cart so it rolled in front of them at the Coach Yard at minute 6, and the saffron teapot was found under the cart that morning.",
+    "why": "they did it to inherit a small but useful sum."
+  },
+  "red_herrings": []
+}

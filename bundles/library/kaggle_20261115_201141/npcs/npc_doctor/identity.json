@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_doctor",
+  "name": "Mira",
+  "age": 67,
+  "role": "herbalist",
+  "traits": [
+    "methodical",
+    "nervous"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Oakenford for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

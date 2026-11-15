@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_5",
+  "facts": [
+    {
+      "id": "account_npc_5",
+      "who": "npc_5",
+      "what": "I committed the murder of npc_5 at the l_3. NPC 5 poisoned their evening tea at the Saffron Market at the l_3 at minute 6, and the victim died that night.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_5",
+      "what": "I poisoned their evening tea at the Saffron Market at the l_3 at minute 6.",
+      "where": "l_3",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_5",
+      "what": "I was seen near the l_2 at night, acting nervous and avoiding eye contact.",
+      "where": "l_2",
+      "when": "minute 9",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story",
+    "claim": "I was at the l_1 the whole time, never near the l_3 or l_2.",
+    "supporting_facts": [
+      "fact_2"
+    ]
+  }
+}

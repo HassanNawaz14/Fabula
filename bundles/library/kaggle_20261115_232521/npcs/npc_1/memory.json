@@ -1,0 +1,55 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_1",
+  "facts": [
+    {
+      "id": "account_npc_1",
+      "who": "npc_1",
+      "what": "I committed the murder of npc_2 at the l_3. Omar sent them a forged note that pulled them away at night and the target died for it.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_1",
+      "what": "I saw something wrong around the Old Cottage and reported it to the town clerk.",
+      "where": "l_1",
+      "when": "minute 5",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_1",
+      "what": "I was seen arguing with someone near the l_2 and left in a hurry.",
+      "where": "l_2",
+      "when": "minute 8",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_1",
+      "what": "I was seen arguing with someone near the l_3.",
+      "where": "l_3",
+      "when": "minute 8",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

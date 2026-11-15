@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_3",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_3",
+      "what": "I has been known around the town for always being early.",
+      "where": "l_2",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_3",
+      "what": "I hid a stack of overdue library books in my room at home.",
+      "where": "l_2",
+      "when": "minute 1",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_3",
+      "what": "I has been arguing with the herbalist and won't talk to them around people.",
+      "where": "l_2",
+      "when": "minute 10",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

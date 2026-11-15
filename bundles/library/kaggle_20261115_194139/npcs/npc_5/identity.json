@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_5",
+  "name": "Dario",
+  "age": 62,
+  "role": "tea-house keeper",
+  "traits": [
+    "impatient",
+    "sly"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

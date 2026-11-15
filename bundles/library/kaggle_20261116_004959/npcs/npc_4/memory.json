@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_4",
+  "facts": [
+    {
+      "id": "npc_4_fact_1",
+      "who": "npc_4",
+      "what": "I has been spreading rumours of a stolen land deed around town.",
+      "where": "l_2",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_4_fact_2",
+      "who": "npc_4",
+      "what": "I has been seen near the l_2 at night, acting nervous and avoiding eye contact.",
+      "where": "l_2",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

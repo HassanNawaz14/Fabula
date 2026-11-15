@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_5",
+  "name": "Mira",
+  "age": 20,
+  "role": "tea-house keeper",
+  "traits": [
+    "nervous",
+    "kind"
+  ],
+  "speech_style": "quiet and formal",
+  "backstory": "Inherited their small business from a relative in Brindlebay.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

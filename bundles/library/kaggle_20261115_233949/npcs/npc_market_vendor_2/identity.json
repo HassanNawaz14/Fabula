@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_market_vendor_2",
+  "name": "Nadia",
+  "age": 54,
+  "role": "market_vendor",
+  "traits": [
+    "nervous",
+    "kind"
+  ],
+  "speech_style": "quick and peppered with questions",
+  "backstory": "Known in Brindlebay for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

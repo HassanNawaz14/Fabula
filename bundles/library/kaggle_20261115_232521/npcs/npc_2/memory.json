@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_2",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_2",
+      "what": "I has been spreading a rumour that the herbalist's remedies are dangerous.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_2",
+      "what": "I has been arguing with the herbalist near the locative.",
+      "where": "l_3",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,34 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "disappearance",
+    "target": "the Argent Pudding",
+    "time_window": {
+      "start": 4,
+      "end": 9
+    },
+    "location_id": "loc_parking"
+  },
+  "timeline": [
+    {
+      "t": 7,
+      "who": "npc_doctor",
+      "what": "saw something wrong with the Argent Pudding at the loc_parking and reported it to the sheriff.",
+      "where": "loc_parking"
+    },
+    {
+      "t": 10,
+      "who": "npc_sheriff",
+      "what": "inquired of the npc_doctor about the Argent Pudding.",
+      "where": "loc_parking"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_market_guy",
+    "correct_method_id": "method_2",
+    "correct_motive_id": "motive_3",
+    "how": "the npc_market_guy argued with them near the water and they never came back at the loc_parking at minute 7, and the Argent Pudding is now gone.",
+    "why": "they did it to stop them from reporting a theft."
+  },
+  "red_herrings": []
+}

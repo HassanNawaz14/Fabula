@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_baker",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_baker",
+      "what": "I was seen near the crime scene at the loc_residence at minute 7.",
+      "where": "loc_residence",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_baker",
+      "what": "I loosened their leg brace during a public display at the loc_park at minute 7.",
+      "where": "loc_park",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_baker",
+      "what": "Someone told me the npc_library_resident was involved in old town business.",
+      "where": "loc_park",
+      "when": "minute 10",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_4",
+      "who": "npc_baker",
+      "what": "I spreads a rumour about the npc_market_broker and hope no one finds out.",
+      "where": "loc_park",
+      "when": "minute 9",
+      "source": "did",
+      "secret": true,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story",
+    "claim": "I was at the loc_park the whole time, never near the crime scene.",
+    "supporting_facts": [
+      "fact_2",
+      "fact_4"
+    ]
+  }
+}

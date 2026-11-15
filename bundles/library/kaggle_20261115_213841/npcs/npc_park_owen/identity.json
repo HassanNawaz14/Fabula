@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_park_owen",
+  "name": "Owen",
+  "age": 36,
+  "role": "night watchman",
+  "traits": [
+    "earnest",
+    "gloomy"
+  ],
+  "speech_style": "short, direct sentences",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_baker",
+  "facts": [
+    {
+      "id": "account_npc_baker",
+      "who": "npc_baker",
+      "what": "I committed the murder of npc_sheriff at the loc_park. Ivy Baker sabotaged their cart so it rolled downhill on Willow Green Lane at the loc_park at minute 3, and the sheriff never saw it coming.",
+      "where": "loc_park",
+      "when": "minute 2",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_baker",
+      "what": "I has been spreading stories about the sheriff's reputation.",
+      "where": "loc_park",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_baker",
+      "what": "I was seen near the loc_park acting nervous.",
+      "where": "loc_park",
+      "when": "minute 6",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_baker",
+      "what": "I left the loc_residence in a hurry.",
+      "where": "loc_residence",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story_1",
+    "claim": "I was at the loc_cafe the whole time, never near the loc_park.",
+    "supporting_facts": [
+      "fact_3"
+    ]
+  }
+}

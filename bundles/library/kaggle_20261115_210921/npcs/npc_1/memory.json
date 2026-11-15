@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_1",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_1",
+      "what": "I has been spreading rumours around town about the herbalist's secrets.",
+      "where": "l_2",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_1",
+      "what": "I has been arguing with the schoolteacher near the l_1 and hope no one saw that.",
+      "where": "l_1",
+      "when": "minute 8",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_1",
+      "what": "I passed by the l_4 and noticed something felt wrong, though I cannot say what.",
+      "where": "l_4",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

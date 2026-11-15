@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_1",
+  "facts": [
+    {
+      "id": "m_fact_1",
+      "who": "npc_1",
+      "what": "I has been skipping their night watch rounds near the Old Library.",
+      "where": "l_3",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_fact_2",
+      "who": "npc_1",
+      "what": "I has been arguing with a friend near the coach yard and felt guilty about it.",
+      "where": "l_3",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_guy",
+  "facts": [
+    {
+      "id": "account_npc_market_guy",
+      "who": "npc_market_guy",
+      "what": "I committed the disappearance of the retired fishmonger at the loc_parking. Gus argued with them near the water and they never came back at the loc_parking at minute 3, and the retired fishmonger was never seen that day.",
+      "where": "loc_parking",
+      "when": "minute 3",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_market_guy",
+      "what": "I argued with them near the water and they never came back at the loc_parking at minute 3.",
+      "where": "loc_parking",
+      "when": "minute 3",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_guy",
+      "what": "People have been talking about the retired fishmonger lately.",
+      "where": "loc_parking",
+      "when": "minute 6",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_guy",
+      "what": "I spreads a rumour about the retired fishmonger being involved in town business.",
+      "where": "loc_parking",
+      "when": "minute 10",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story",
+    "claim": "I was at the loc_cafe the whole time, never near the loc_parking.",
+    "supporting_facts": [
+      "fact_2"
+    ]
+  }
+}

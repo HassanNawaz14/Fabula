@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_2",
+  "facts": [
+    {
+      "id": "m_fact_1",
+      "who": "npc_2",
+      "what": "I was near the l_1 at minute 6, acting nervous.",
+      "where": "l_1",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_fact_2",
+      "who": "npc_2",
+      "what": "I was seen near the l_3 at minute 4.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

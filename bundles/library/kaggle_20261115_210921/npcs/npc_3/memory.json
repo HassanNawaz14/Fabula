@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_3",
+  "facts": [
+    {
+      "id": "npc_3_f1",
+      "who": "npc_3",
+      "what": "I has been arguing with the herbalist near the l_4 and hope no one saw.",
+      "where": "l_4",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_3_f2",
+      "who": "npc_3",
+      "what": "I has been spreading rumours about the herbalist's reputation.",
+      "where": "l_4",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_3_f3",
+      "who": "npc_3",
+      "what": "I has been arguing with the herbalist near the l_4 and hope no one saw.",
+      "where": "l_4",
+      "when": "minute 6",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

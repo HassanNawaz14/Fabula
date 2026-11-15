@@ -1,0 +1,169 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "s_5",
+  "mystery_type": "murder",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "Death at the Old Cottage",
+  "intro_text": "The Old Cottage in Willowbrook has been quiet for days. A note left on a side table hints at hidden secrets, and now it is believed someone within knows more than they are saying.",
+  "town_name": "Willowbrook",
+  "locations": [
+    {
+      "id": "loc_cafe",
+      "name": "Copper Kettle Cafe",
+      "type": "cafe",
+      "description": "Cozy nooks where the steam from cups clatters softly against saucers, and the air is filled with the comforting aroma of strong tea.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_residence",
+      "name": "Quiet Residence",
+      "type": "residence",
+      "description": "A small, weathered cottage nestled on a peaceful lane, its windows casting gentle shadows through the trees.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_park",
+      "name": "Elder Park",
+      "type": "park",
+      "description": "A verdant haven where paths wind between ancient trees and benches provide spots for quiet contemplation under the canopy of leaves.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "loc_residence"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_grocer",
+      "display_name": "Ivy",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "loc_park"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_broker",
+      "display_name": "Hana",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 6,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 9,
+          "location": "loc_park"
+        }
+      ]
+    },
+    {
+      "id": "npc_library_resident",
+      "display_name": "Omar",
+      "start_location": "loc_park",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 7,
+          "location": "loc_park"
+        }
+      ]
+    },
+    {
+      "id": "npc_baker",
+      "display_name": "Lena",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 1,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 4,
+          "location": "loc_cafe"
+        }
+      ]
+    },
+    {
+      "id": "npc_park_ownder",
+      "display_name": "Mira",
+      "start_location": "loc_park",
+      "schedule": [
+        {
+          "at_minute": 2,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 6,
+          "location": "loc_residence"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "method_1",
+        "text": "Method 1: loosened a beam they knew was dangerous in the night."
+      },
+      {
+        "id": "method_2",
+        "text": "Method 2: tricked them into a dangerous meeting place at the park."
+      },
+      {
+        "id": "method_3",
+        "text": "Method 3: sent them down the wrong road at dusk."
+      },
+      {
+        "id": "method_4",
+        "text": "Method 4: loosened their leg brace during a public display."
+      }
+    ],
+    "motives": [
+      {
+        "id": "motive_1",
+        "text": "Motive 1: end a feud that had been simmering for years."
+      },
+      {
+        "id": "motive_2",
+        "text": "Motive 2: keep a stolen land deed hidden."
+      },
+      {
+        "id": "motive_3",
+        "text": "Motive 3: punish them for a public humiliation."
+      },
+      {
+        "id": "motive_4",
+        "text": "Motive 4: stop an old letter from being read aloud."
+      }
+    ]
+  }
+}

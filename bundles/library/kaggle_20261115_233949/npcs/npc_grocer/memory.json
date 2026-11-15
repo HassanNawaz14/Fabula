@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_grocer",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_grocer",
+      "what": "I was at the loc_parking around that time, I can swear to it.",
+      "where": "loc_parking",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_grocer",
+      "what": "People say I spreads rumours about the npc_market_vendor.",
+      "where": "loc_parking",
+      "when": "minute 6",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_grocer",
+      "what": "I passed by the loc_residence and noticed something felt wrong.",
+      "where": "loc_residence",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

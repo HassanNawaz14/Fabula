@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_parking_mechanic",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_parking_mechanic",
+      "what": "I has been known in Dunmore for always being early.",
+      "where": "loc_parking",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_parking_mechanic",
+      "what": "I has been seen near the water around that time.",
+      "where": "loc_parking",
+      "when": "minute 5",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_parking_mechanic",
+      "what": "I was late to the loc_cafe and left in a hurry.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,41 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "theft",
+    "target": "silver locket",
+    "time_window": {
+      "start": 1,
+      "end": 9
+    },
+    "location_id": "l_2"
+  },
+  "timeline": [
+    {
+      "t": 5,
+      "who": "npc_3",
+      "what": "hid a stack of overdue library books under their coat near the copper kettle cafe.",
+      "where": "l_3"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_4",
+    "correct_method_id": "m_method_1",
+    "correct_motive_id": "m_motive_2",
+    "how": "Ravi hid it under a fruit crate near the coach yard and came back for it when no one was looking.",
+    "why": "They did it to prove they were smarter than the library keeper."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_1",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    },
+    {
+      "npc": "npc_2",
+      "secret": "I secretly sells tea from the side of the road and hopes no one finds out."
+    },
+    {
+      "npc": "npc_5",
+      "secret": "I hid a stack of important letters under my bed at home."
+    }
+  ]
+}

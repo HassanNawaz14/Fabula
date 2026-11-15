@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_baker",
+  "name": "Elsie",
+  "age": 67,
+  "role": "baker",
+  "traits": [
+    "kind",
+    "gloomy"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Grew up in Brindlebay and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

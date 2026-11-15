@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_4",
+  "facts": [
+    {
+      "id": "account_npc_4",
+      "who": "npc_4",
+      "what": "I committed the theft of silver locket at the l_2. Ravi hid it under a fruit crate near the coach yard and came back for it when no one was looking.",
+      "where": "l_2",
+      "when": "minute 1",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_4",
+      "what": "I hid a stack of overdue library books under their coat near the copper kettle cafe.",
+      "where": "l_3",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_4",
+      "what": "I was seen near the Old Library at minute 4.",
+      "where": "l_1",
+      "when": "minute 4",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cs_npc_4",
+    "claim": "I was at the copper kettle cafe the whole time, never near the Old Library.",
+    "supporting_facts": [
+      "fact_2"
+    ]
+  }
+}

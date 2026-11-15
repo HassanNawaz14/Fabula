@@ -89,9 +89,11 @@ _SECTIONS: tuple[tuple[str, str], ...] = (
     ),
     (
         "body",
-        "How to use it: choose Generate New Game on the menu. The game writes and checks "
-        "a fresh case before you arrive. This takes longer than opening the ready-made "
-        "case, so Play Mystery is the quick option.",
+        "How to use it: choose New Game on the menu, then pick one of three routes. "
+        "Play a Ready Case opens a mystery that is already written and starts instantly, "
+        "even with no internet. Generate on Kaggle sends the job to a free Kaggle GPU "
+        "and usually returns in six to eight minutes. Generate Locally runs the AI "
+        "writer on this PC; it needs no internet, but it can take half an hour or more.",
     ),
     (
         "callout",

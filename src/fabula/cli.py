@@ -9,7 +9,9 @@ from pathlib import Path
 
 from fabula.generation.cli import (
     add_generation_arguments,
+    add_kaggle_arguments,
     run_generate,
+    run_kaggle_batch,
     run_model_check,
 )
 from fabula.generation.errors import GenerationError, GenerationSetupError
@@ -24,6 +26,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     generate = subparsers.add_parser("generate", help="generate a validated game bundle")
     add_generation_arguments(generate)
+
+    kaggle = subparsers.add_parser("kaggle", help="generate one or more cases on your Kaggle GPU")
+    add_kaggle_arguments(kaggle)
 
     model = subparsers.add_parser("model", help="model artifact utilities")
     model_subparsers = model.add_subparsers(dest="model_command", required=True)
@@ -57,6 +62,8 @@ def main(argv: Sequence[str] | None = None) -> int:
     try:
         if args.command == "generate":
             return run_generate(args)
+        if args.command == "kaggle":
+            return run_kaggle_batch(args)
         if args.command == "model" and args.model_command == "check":
             return run_model_check(args)
         if args.command == "play":

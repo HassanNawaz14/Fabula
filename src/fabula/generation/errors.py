@@ -56,6 +56,14 @@ class BundlePublishError(GenerationError):
     """The validated bundle could not be written to disk atomically."""
 
 
+class KaggleSetupError(GenerationSetupError):
+    """Kaggle credentials, client, or dataset configuration is missing."""
+
+
+class KaggleRunError(GenerationError):
+    """The remote Kaggle run failed or produced an unusable bundle."""
+
+
 class FinalBundleError(GenerationError):
     """Stage outputs parsed individually but do not form a valid bundle."""
 

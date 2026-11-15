@@ -263,8 +263,7 @@ def test_grammar_schema_drops_deeply_nested_constraints(
 
     grammar = created[0].calls[0]["grammar"]
     assert isinstance(grammar, str)
-    assert '"maxLength": 300' in grammar
-    assert '"maxLength": 4000' not in grammar
+    assert "maxLength" not in grammar
     assert "maxItems" in grammar
     assert "minItems" in grammar
     assert "required" in grammar
@@ -341,10 +340,9 @@ def test_simplify_json_schema_strips_only_constraints() -> None:
         "properties": {
             "name": {
                 "type": "string",
-                "maxLength": 300,
                 "enum": ["a", "b"],
             },
-            "title": {"type": "string", "maxLength": 80},
+            "title": {"type": "string"},
             "description": {"type": "string"},
             "tags": {
                 "type": "array",

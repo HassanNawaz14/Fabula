@@ -250,22 +250,21 @@ class StartMenuView:
                 button_h,
             )
 
-        play_label = "Play Mystery" if app_has_session(self.app) else "Play Demo Mystery"
+        play_label = "New Game"
         self.play_button = MenuButton(
-            slot(0), play_label, lambda: "start_dummy", self.font_button, primary=True
+            slot(0), play_label, lambda: "go_new_game", self.font_button, primary=True
         )
         self.mode_button = MenuButton(
-            slot(3), self._mode_label(), self._toggle_mode, self.font_button
+            slot(2), self._mode_label(), self._toggle_mode, self.font_button
         )
         self.buttons = [
             self.play_button,
-            MenuButton(slot(1), "Generate New Game", lambda: "go_generation", self.font_button),
-            MenuButton(slot(2), "How to Play", lambda: "go_how_to_play", self.font_button),
+            MenuButton(slot(1), "How to Play", lambda: "go_how_to_play", self.font_button),
             self.mode_button,
-            MenuButton(slot(4), "Settings", lambda: "go_settings", self.font_button),
-            MenuButton(slot(5), "Quit [Esc]", lambda: "quit_game", self.font_button),
+            MenuButton(slot(3), "Settings", lambda: "go_settings", self.font_button),
+            MenuButton(slot(4), "Quit [Esc]", lambda: "quit_game", self.font_button),
         ]
-        caption_y = y + 6 * button_h + 5 * button_gap + round(14 * scale)
+        caption_y = y + 5 * button_h + 4 * button_gap + round(14 * scale)
         caption_text = (
             "Auto uses a live AI when an API key is available. Offline always uses written replies."
         )
@@ -366,7 +365,3 @@ class StartMenuView:
             surface.blit(line, (self.margin_x, y))
             y += line.get_height()
         surface.blit(self.footer, self.footer_pos)
-
-
-def app_has_session(app: Any) -> bool:
-    return getattr(app, "session", None) is not None

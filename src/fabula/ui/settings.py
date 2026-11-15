@@ -5,6 +5,7 @@ from typing import Any
 import pygame
 
 from fabula.ui.components import Button, Panel
+from fabula.ui.menu_theme import ui_font
 
 
 class SettingsView:
@@ -12,11 +13,14 @@ class SettingsView:
         self.width = width
         self.height = height
         self.app = app
-        self.font = pygame.font.Font(None, 30)
+        self.scale = max(0.9, min(width / 1600, height / 900))
+        self.font = ui_font(30 * self.scale)
+        self.title_font = ui_font(42 * self.scale, bold=True)
+        self.row_h = max(44, round(54 * self.scale))
 
-        self.panel = Panel(pygame.Rect(width // 4, 100, width // 2, height - 200))
+        self.panel = Panel(pygame.Rect(width // 4, 90, width // 2, height - 180))
         self.back_button = Button(
-            pygame.Rect(width // 2 - 100, height - 150, 200, 40),
+            pygame.Rect(width // 2 - 130, height - 130, 260, 54),
             "Back to Menu",
             lambda: "back_to_menu",
             self.font,
@@ -34,14 +38,14 @@ class SettingsView:
         surface.fill((20, 20, 30))
         self.panel.draw(surface)
 
-        title = self.font.render("Settings", True, (255, 255, 255))
-        surface.blit(title, (self.width // 2 - title.get_width() // 2, 120))
+        title = self.title_font.render("Settings", True, (255, 255, 255))
+        surface.blit(title, (self.width // 2 - title.get_width() // 2, 110))
 
-        y = 180
+        y = 190
         for key, value in self.app.settings.items():
             text = f"{key.replace('_', ' ').capitalize()}: {value}"
             surf = self.font.render(text, True, (200, 200, 200))
             surface.blit(surf, (self.width // 4 + 40, y))
-            y += 40
+            y += self.row_h
 
         self.back_button.draw(surface)

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_6",
+  "facts": [
+    {
+      "id": "npc_6_f1",
+      "who": "npc_6",
+      "what": "I has been arguing with the coach and will pretend it was nothing if asked.",
+      "where": "l_1",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_6_f2",
+      "who": "npc_6",
+      "what": "I has been skulking around the l_2 and hope no one finds out.",
+      "where": "l_2",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_6_f3",
+      "who": "npc_6",
+      "what": "I was seen near the l_1 at night, acting nervous and avoiding eye contact.",
+      "where": "l_1",
+      "when": "minute 9",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

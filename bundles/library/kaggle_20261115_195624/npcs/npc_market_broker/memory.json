@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_broker",
+  "facts": [
+    {
+      "id": "npc_market_broker_gossip",
+      "who": "npc_market_broker",
+      "what": "I heard the the crate of saffron was discussed at every stall that morning.",
+      "where": "loc_cafe",
+      "when": "minute 2",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_market_broker_trace",
+      "who": "npc_market_broker",
+      "what": "I left the loc_cafe in a hurry, hoping no one saw.",
+      "where": "loc_cafe",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

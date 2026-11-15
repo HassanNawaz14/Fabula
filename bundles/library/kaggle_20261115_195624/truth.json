@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "theft",
+    "target": "crate of rare saffron",
+    "time_window": {
+      "start": 0,
+      "end": 6
+    },
+    "location_id": "loc_cafe"
+  },
+  "timeline": [
+    {
+      "t": 0,
+      "who": "npc_market_vendor",
+      "what": "walked past the crate and lifted a corner to check if anything was out of place.",
+      "where": "loc_cafe"
+    },
+    {
+      "t": 5,
+      "who": "npc_policeman",
+      "what": "walked past and noticed something wrong with the crate of saffron.",
+      "where": "loc_cafe"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_market_vendor",
+    "correct_method_id": "method_4",
+    "correct_motive_id": "motive_1",
+    "how": "the npc_market_vendor hid it under a fruit crate and came back for it at the loc_cafe at minute 5.",
+    "why": "they did it to prove they were smarter than the market folk."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_policeman",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    },
+    {
+      "npc": "npc_baker",
+      "secret": "I spreads a rumour about the herbalist and hope no one finds out."
+    }
+  ]
+}

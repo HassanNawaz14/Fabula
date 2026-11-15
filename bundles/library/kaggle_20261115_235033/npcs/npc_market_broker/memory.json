@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_broker",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_market_broker",
+      "what": "I has been spreading secrets around the loc_park.",
+      "where": "loc_park",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_broker",
+      "what": "I was seen near the loc_residence at that time.",
+      "where": "loc_residence",
+      "when": "minute 10",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_broker",
+      "what": "Someone told me the npc_library_resident was involved in old town business.",
+      "where": "loc_park",
+      "when": "minute 10",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

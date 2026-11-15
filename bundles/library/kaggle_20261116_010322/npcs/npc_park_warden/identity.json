@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_park_warden",
+  "name": "Piotr",
+  "age": 48,
+  "role": "park warden",
+  "traits": [
+    "gloomy",
+    "kind"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Willow Green for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

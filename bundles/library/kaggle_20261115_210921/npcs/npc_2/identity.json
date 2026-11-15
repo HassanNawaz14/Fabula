@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_2",
+  "name": "Bess",
+  "age": 48,
+  "role": "schoolteacher",
+  "traits": [
+    "stubborn",
+    "kind"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "tired and a little short-tempered"
+}

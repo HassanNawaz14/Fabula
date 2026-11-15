@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_baker",
+  "name": "Elsie",
+  "age": 41,
+  "role": "baker",
+  "traits": [
+    "guarded",
+    "observant"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Inherited their trade from a relative in Willowbrook.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "polite but guarded"
+}

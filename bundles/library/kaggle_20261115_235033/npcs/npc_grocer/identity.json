@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_grocer",
+  "name": "Ivy",
+  "age": 62,
+  "role": "baker",
+  "traits": [
+    "sly",
+    "kind"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Grew up in Willowbrook and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

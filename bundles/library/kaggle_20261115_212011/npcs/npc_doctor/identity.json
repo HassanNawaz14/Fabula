@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_doctor",
+  "name": "Omar",
+  "age": 42,
+  "role": "doctor",
+  "traits": [
+    "methodical",
+    "gloomy"
+  ],
+  "speech_style": "quiet and formal",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

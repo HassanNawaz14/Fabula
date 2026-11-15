@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_6",
+  "name": "Gus",
+  "age": 47,
+  "role": "herbalist",
+  "traits": [
+    "observant",
+    "gloomy"
+  ],
+  "speech_style": "quiet, rarely finishes thoughts",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_6",
+  "facts": [
+    {
+      "id": "m_npc_6_f1",
+      "who": "npc_6",
+      "what": "I has been avoiding the Copper Kettle Cafe lately, even though I usually stop by for a cup of tea.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_npc_6_f2",
+      "who": "npc_6",
+      "what": "I was seen near the Old Cottage around that time, though I insist it was by accident.",
+      "where": "l_3",
+      "when": "minute 8",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_npc_6_f3",
+      "who": "npc_6",
+      "what": "I secretly spreads a rumour about the herbalist and hope no one finds out.",
+      "where": "l_3",
+      "when": "minute 5",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

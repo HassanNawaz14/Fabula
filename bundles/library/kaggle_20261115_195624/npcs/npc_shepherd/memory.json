@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_shepherd",
+  "facts": [
+    {
+      "id": "npc_shepherd_gossip",
+      "who": "npc_shepherd",
+      "what": "I heard the npc_market_vendor had been arguing with a neighbour that morning.",
+      "where": "loc_residence",
+      "when": "minute 7",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_shepherd_parking_ticket",
+      "who": "npc_shepherd",
+      "what": "I parked my cart in the wrong place and was warned by a passerby.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_vendor",
+  "facts": [
+    {
+      "id": "account_npc_market_vendor",
+      "who": "npc_market_vendor",
+      "what": "I committed the theft of crate of rare saffron at the loc_cafe. the npc_market_vendor hid it under a fruit crate and came back for it at the loc_cafe at minute 5.",
+      "where": "loc_cafe",
+      "when": "minute 0",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_market_vendor_gossip",
+      "who": "npc_market_vendor",
+      "what": "I heard the the crate of saffron had been discussed at every stall that morning.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_market_vendor_trace",
+      "who": "npc_market_vendor",
+      "what": "I left the loc_cafe with a rumpled pocket and a heavy heart.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_policeman_reveal",
+      "who": "npc_market_vendor",
+      "what": "I was seen near the loc_cafe at that time, but I did not steal anything.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "npc_market_vendor_cover",
+    "claim": "I was at the loc_park the whole time, never near the loc_cafe.",
+    "supporting_facts": [
+      "npc_market_vendor_trace"
+    ]
+  }
+}

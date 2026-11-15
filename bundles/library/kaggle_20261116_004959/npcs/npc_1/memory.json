@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_1",
+  "facts": [
+    {
+      "id": "m_1",
+      "who": "npc_1",
+      "what": "I has been skipping their night watch rounds in the town, hoping no one finds out.",
+      "where": "l_3",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "m_2",
+      "who": "npc_1",
+      "what": "I has been spreading rumours about the herbalist's private business.",
+      "where": "l_3",
+      "when": "minute 8",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,40 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "murder",
+    "target": "npc_sheriff",
+    "time_window": {
+      "start": 2,
+      "end": 8
+    },
+    "location_id": "loc_park"
+  },
+  "timeline": [
+    {
+      "t": 6,
+      "who": "npc_market_vendor",
+      "what": "was seen near the loc_park acting nervous.",
+      "where": "loc_park"
+    },
+    {
+      "t": 4,
+      "who": "npc_sheriff",
+      "what": "met the player and spoke in hushed tones.",
+      "where": "loc_cafe"
+    },
+    {
+      "t": 3,
+      "who": "npc_market_seller",
+      "what": "left the loc_residence in a hurry.",
+      "where": "loc_residence"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_baker",
+    "correct_method_id": "method_2",
+    "correct_motive_id": "motive_4",
+    "how": "Ivy Baker sabotaged their cart so it rolled downhill on Willow Green Lane at the loc_park at minute 3, and the sheriff never saw it coming.",
+    "why": "They did it to end a feud that had been simmering for years."
+  },
+  "red_herrings": []
+}

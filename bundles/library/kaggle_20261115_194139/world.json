@@ -1,0 +1,166 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "s_5_g_4",
+  "mystery_type": "theft",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "A stolen silver locket from the Old Library",
+  "intro_text": "A silver locket has gone missing from the Old Library in Willowbrook this morning. Someone here knows more than they are saying.",
+  "town_name": "Willowbrook",
+  "locations": [
+    {
+      "id": "l_1",
+      "name": "Coach Yard",
+      "type": "parking",
+      "description": "Empty spaces under a canvas awning, where the only sounds are the distant hoots of a nearby owl and the occasional creak of wooden planks.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_2",
+      "name": "Old Library",
+      "type": "library",
+      "description": "A hushed sanctuary where towering shelves reach from floor to ceiling, whispering tales of yesteryears within their pages. A lone oak table stands in the center, its surface marred by countless marks of time and use.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "l_1",
+        "l_3"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_3",
+      "name": "Copper Kettle Cafe",
+      "type": "cafe",
+      "description": "A cozy nook where the aroma of freshly brewed tea mingles with the soft clink of porcelain cups, inviting patrons to linger over steaming mugs and small talk.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_1",
+      "display_name": "Mira",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 6,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 9,
+          "location": "l_3"
+        }
+      ]
+    },
+    {
+      "id": "npc_2",
+      "display_name": "Kofi",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 6,
+          "location": "l_1"
+        }
+      ]
+    },
+    {
+      "id": "npc_3",
+      "display_name": "Elsie",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 4,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 5,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_4",
+      "display_name": "Ravi",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 9,
+          "location": "l_1"
+        }
+      ]
+    },
+    {
+      "id": "npc_5",
+      "display_name": "Dario",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 8,
+          "location": "l_3"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "m_method_1",
+        "text": "I hid it under a fruit crate near the coach yard and came back for it when no one was looking."
+      },
+      {
+        "id": "m_method_2",
+        "text": "I swapped it with a lookalike during the rush hour at the Old Library."
+      },
+      {
+        "id": "m_method_3",
+        "text": "I knocked over a display of small jars and took it in the confusion."
+      },
+      {
+        "id": "m_method_4",
+        "text": "I slipped it into my pocket while the owner was busy near the copper kettle cafe."
+      }
+    ],
+    "motives": [
+      {
+        "id": "m_motive_1",
+        "text": "I needed money for a fresh start in another town."
+      },
+      {
+        "id": "m_motive_2",
+        "text": "I wanted to prove I was smarter than the library keeper."
+      },
+      {
+        "id": "m_motive_3",
+        "text": "I hoped it would help me pay off a growing debt."
+      },
+      {
+        "id": "m_motive_4",
+        "text": "I did it for the thrill of it, no matter the cost."
+      }
+    ]
+  }
+}

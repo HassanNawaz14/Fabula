@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_park_ownder",
+  "name": "Mira",
+  "age": 28,
+  "role": "night watchman",
+  "traits": [
+    "impatient",
+    "guarded"
+  ],
+  "speech_style": "short, direct sentences",
+  "backstory": "Inherited their small business from a relative in Willowbrook.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

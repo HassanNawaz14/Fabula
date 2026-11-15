@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_vendor",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_market_vendor",
+      "what": "I has been avoiding the coach yard that morning, hoping to avoid certain people.",
+      "where": "loc_parking",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_vendor",
+      "what": "I heard someone mention the retired fishmonger's disappearance in the coach yard.",
+      "where": "loc_parking",
+      "when": "minute 7",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_vendor",
+      "what": "I has been spreading rumours about the retired fishmonger around town.",
+      "where": "loc_parking",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

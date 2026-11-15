@@ -1,0 +1,170 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "sct_123",
+  "mystery_type": "theft",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Stolen Saffron Teapot",
+  "intro_text": "A silver saffron teapot has gone missing from the Old Cottage in Willowbrook this morning. Someone here knows more than they are saying.",
+  "town_name": "Willowbrook",
+  "locations": [
+    {
+      "id": "loc_parking",
+      "name": "Town Parking Lot",
+      "type": "parking",
+      "description": "A dimly lit square where old cars sit like forgotten memories, their paint dulled by time and the occasional spray of oil stains on the cracked asphalt.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_cafe",
+      "name": "The Steaming Cup Cafe",
+      "type": "cafe",
+      "description": "Inside, the air is thick with the scent of strong tea and freshly baked bread. The counters are lined with steaming cups, while patrons sip their brews in whispers that hint at secrets just waiting to be uncovered.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "loc_parking",
+        "loc_residence"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "loc_residence",
+      "name": "Lane House",
+      "type": "residence",
+      "description": "A quaint little house nestled along a winding lane, its windows casting gentle shadows on the cobblestone path. Inside, the cozy warmth of a crackling fireplace and a freshly brewed cup of tea create an atmosphere where even the most guarded secrets seem to spill out into the open.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "loc_cafe"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_park_owen",
+      "display_name": "Owen",
+      "start_location": "loc_parking",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 9,
+          "location": "loc_parking"
+        }
+      ]
+    },
+    {
+      "id": "npc_cafe_guy",
+      "display_name": "Gus",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 6,
+          "location": "loc_parking"
+        },
+        {
+          "at_minute": 7,
+          "location": "loc_cafe"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_baker",
+      "display_name": "Bess",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 10,
+          "location": "loc_residence"
+        },
+        {
+          "at_minute": 4,
+          "location": "loc_parking"
+        }
+      ]
+    },
+    {
+      "id": "npc_library_gentleman",
+      "display_name": "Elsie",
+      "start_location": "loc_cafe",
+      "schedule": [
+        {
+          "at_minute": 3,
+          "location": "loc_parking"
+        },
+        {
+          "at_minute": 6,
+          "location": "loc_residence"
+        }
+      ]
+    },
+    {
+      "id": "npc_market_senior",
+      "display_name": "Hana",
+      "start_location": "loc_residence",
+      "schedule": [
+        {
+          "at_minute": 4,
+          "location": "loc_cafe"
+        },
+        {
+          "at_minute": 10,
+          "location": "loc_parking"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "method_1",
+        "text": "I hid it under a fruit crate near the parking lot and came back for it at half past three."
+      },
+      {
+        "id": "method_2",
+        "text": "I knocked over a display of teapots and took the saffron one in the confusion."
+      },
+      {
+        "id": "method_3",
+        "text": "I slipped it into my bag while the lane house was quiet and empty."
+      },
+      {
+        "id": "method_4",
+        "text": "I wrapped it in a scarf and walked out calmly, hoping no one noticed."
+      }
+    ],
+    "motives": [
+      {
+        "id": "motive_1",
+        "text": "I wanted to prove I could pull off a small theft."
+      },
+      {
+        "id": "motive_2",
+        "text": "I needed money for a fresh start in town."
+      },
+      {
+        "id": "motive_3",
+        "text": "I hoped it would keep me out of trouble for a little while."
+      },
+      {
+        "id": "motive_4",
+        "text": "I did it for the thrill of it, no matter the cost."
+      }
+    ]
+  }
+}

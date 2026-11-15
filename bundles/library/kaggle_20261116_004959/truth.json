@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "murder",
+    "target": "npc_5",
+    "time_window": {
+      "start": 4,
+      "end": 9
+    },
+    "location_id": "l_3"
+  },
+  "timeline": [
+    {
+      "t": 6,
+      "who": "npc_6",
+      "what": "sent them down the wrong road at night.",
+      "where": "l_2"
+    },
+    {
+      "t": 7,
+      "who": "npc_4",
+      "what": "saw someone hurry away from the l_3 and report it to the town clerk.",
+      "where": "l_3"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_5",
+    "correct_method_id": "m_1",
+    "correct_motive_id": "m_8",
+    "how": "NPC 5 poisoned their evening tea at the Saffron Market at the l_3 at minute 6, and the victim died that night.",
+    "why": "They did it to stop an old letter from being read aloud."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_1",
+      "secret": "I spreads a rumour about the herbalist and hope no one finds out."
+    },
+    {
+      "npc": "npc_2",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    },
+    {
+      "npc": "npc_3",
+      "secret": "I pretends to work when really I is loitering around the town in secret."
+    },
+    {
+      "npc": "npc_4",
+      "secret": "I hid a stack of overdue library books at home."
+    }
+  ]
+}

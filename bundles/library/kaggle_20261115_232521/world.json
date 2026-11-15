@@ -1,0 +1,185 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "s_3",
+  "mystery_type": "murder",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "Death at the Old Cottage",
+  "intro_text": "The Old Cottage has been a quiet spot in Willowbrook for years, known for its lush greenery and occasional whisper of gossip. Tonight, it is shrouded in mystery as someone's secrets have come to light.",
+  "town_name": "Willowbrook",
+  "locations": [
+    {
+      "id": "l_1",
+      "name": "Copper Kettle Cafe",
+      "type": "cafe",
+      "description": "A quaint little café where the air is thick and the aroma of freshly brewed coffee fills every corner, mingling with the warm chatter of patrons.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_2",
+      "name": "Coach Yard",
+      "type": "parking",
+      "description": "Underneath the watchful gaze of a weathered old tree, this open space is a haven for late-night wanderers and the occasional lost soul. The cobblestones are etched with the paths of countless footsteps, each one carrying a story.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "l_3",
+        "l_1"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_3",
+      "name": "Old Cottage",
+      "type": "residence",
+      "description": "A small, weathered cottage stands as a silent sentinel on the outskirts of town. Its windows are sealed tight, and even the most eager passerby is reluctant to knock.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_1",
+      "display_name": "Omar",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 5,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 6,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_2",
+      "display_name": "Elsie",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 1,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_3",
+      "display_name": "Mira",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 9,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_4",
+      "display_name": "Lena",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 8,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 10,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_5",
+      "display_name": "Ivy",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 9,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 10,
+          "location": "l_3"
+        }
+      ]
+    },
+    {
+      "id": "npc_6",
+      "display_name": "Gus",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 5,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 8,
+          "location": "l_2"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "m_1",
+        "text": "Method 1: tricked them into a dangerous meeting place at the Old Cottage at night."
+      },
+      {
+        "id": "m_2",
+        "text": "Method 2: poisoned their evening tea at the Copper Kettle Cafe."
+      },
+      {
+        "id": "m_3",
+        "text": "Method 3: sabotaged their cart on the main road, and they never came back."
+      },
+      {
+        "id": "m_4",
+        "text": "Method 4: sent them a forged note that pulled them away at night."
+      }
+    ],
+    "motives": [
+      {
+        "id": "m_5",
+        "text": "Motive 1: keep a stolen land deed hidden from the town."
+      },
+      {
+        "id": "m_6",
+        "text": "Motive 2: punish them for a public humiliation."
+      },
+      {
+        "id": "m_7",
+        "text": "Motive 3: end a feud that had been simmering for years."
+      },
+      {
+        "id": "m_8",
+        "text": "Motive 4: stop an old letter from being read aloud."
+      }
+    ]
+  }
+}

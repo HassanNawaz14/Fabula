@@ -1,0 +1,49 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_baker",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_market_baker",
+      "what": "I has been spreading rumours about people in town.",
+      "where": "loc_residence",
+      "when": "minute 4",
+      "source": "did",
+      "secret": false,
+      "disclosure": "lie",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_baker",
+      "what": "I was seen near the loc_parking at that time.",
+      "where": "loc_parking",
+      "when": "minute 5",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_baker",
+      "what": "I was seen near the loc_residence at that time.",
+      "where": "loc_residence",
+      "when": "minute 10",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cs_market_baker",
+    "claim": "I was at home the whole time, never near any of those locations.",
+    "supporting_facts": [
+      "fact_1"
+    ]
+  }
+}

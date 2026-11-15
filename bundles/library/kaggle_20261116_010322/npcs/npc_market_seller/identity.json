@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_market_seller",
+  "name": "Nadia",
+  "age": 29,
+  "role": "market seller",
+  "traits": [
+    "earnest",
+    "impatient"
+  ],
+  "speech_style": "short, direct sentences",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "tired and a little short-tempered"
+}

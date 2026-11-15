@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "crime": {
+    "type": "murder",
+    "target": "npc_library_resident",
+    "time_window": {
+      "start": 5,
+      "end": 10
+    },
+    "location_id": "loc_park"
+  },
+  "timeline": [
+    {
+      "t": 7,
+      "who": "npc_baker",
+      "what": "walked past the crime scene and left in a hurry.",
+      "where": "loc_residence"
+    }
+  ],
+  "solution": {
+    "correct_culprit_id": "npc_baker",
+    "correct_method_id": "method_4",
+    "correct_motive_id": "motive_3",
+    "how": "The npc_baker loosened their leg brace during a public display at the loc_park at minute 7, and the npc_library_resident died as a result.",
+    "why": "They did it to punish them for a public humiliation."
+  },
+  "red_herrings": [
+    {
+      "npc": "npc_grocer",
+      "secret": "I secretly sells extra bread from the bakery and hope no one finds out."
+    },
+    {
+      "npc": "npc_park_ownder",
+      "secret": "I has been skipping their night watch rounds and hope no one finds out."
+    }
+  ]
+}

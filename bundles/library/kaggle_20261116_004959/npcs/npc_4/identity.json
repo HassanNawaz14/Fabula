@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_4",
+  "name": "Ravi",
+  "age": 67,
+  "role": "baker",
+  "traits": [
+    "observant",
+    "kind"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Merridale for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

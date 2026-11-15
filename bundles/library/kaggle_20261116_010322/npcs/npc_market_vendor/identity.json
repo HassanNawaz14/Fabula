@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_market_vendor",
+  "name": "Hana",
+  "age": 50,
+  "role": "market vendor",
+  "traits": [
+    "sly",
+    "impatient"
+  ],
+  "speech_style": "quick and peppered with questions",
+  "backstory": "Known in Willow Green for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "tired and a little short-tempered"
+}

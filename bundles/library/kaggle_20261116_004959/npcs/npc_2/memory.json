@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_2",
+  "facts": [
+    {
+      "id": "npc_2_gossip_1",
+      "who": "npc_2",
+      "what": "People say the the Saffron Market is hiding more than meets the eye.",
+      "where": "l_1",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_2_gossip_2",
+      "who": "npc_2",
+      "what": "I heard the the Saffron Market was closed for a reason.",
+      "where": "l_1",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_2_gossip_3",
+      "who": "npc_2",
+      "what": "Someone told me the the Saffron Market was involved in old town business.",
+      "where": "l_1",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_1",
+  "name": "Mira",
+  "age": 47,
+  "role": "tea-house keeper",
+  "traits": [
+    "methodical",
+    "guarded"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Grew up in Willowbrook and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

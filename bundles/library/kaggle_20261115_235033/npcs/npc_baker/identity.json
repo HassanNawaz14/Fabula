@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_baker",
+  "name": "Lena",
+  "age": 56,
+  "role": "baker",
+  "traits": [
+    "nervous",
+    "stubborn"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Grew up in Willowbrook and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_5",
+  "facts": [
+    {
+      "id": "account_npc_5",
+      "who": "npc_5",
+      "what": "I committed the murder of npc_5 at the l_4. npc_5 sabotaged their cart so it rolled in front of them at the Coach Yard at minute 6, and the saffron teapot was found under the cart that morning.",
+      "where": "l_4",
+      "when": "minute 3",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_5",
+      "what": "I has been avoiding the l_4 like a fevered dream.",
+      "where": "l_4",
+      "when": "minute 6",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_5",
+      "what": "I has been keeping an old diary hidden under the counter at the l_4.",
+      "where": "l_4",
+      "when": "minute 1",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_5",
+      "what": "Someone told me the saffron teapot was involved in old town business.",
+      "where": "l_4",
+      "when": "minute 8",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cs",
+    "claim": "I has been staying away from the l_4 like a fevered dream.",
+    "supporting_facts": [
+      "fact_1"
+    ]
+  }
+}

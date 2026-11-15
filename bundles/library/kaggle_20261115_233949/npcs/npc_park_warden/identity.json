@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_park_warden",
+  "name": "Piotr",
+  "age": 46,
+  "role": "park_warden",
+  "traits": [
+    "gloomy",
+    "methodical"
+  ],
+  "speech_style": "quiet, rarely finishes thoughts",
+  "backstory": "Known in Brindlebay for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

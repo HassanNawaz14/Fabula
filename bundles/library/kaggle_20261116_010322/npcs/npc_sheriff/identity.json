@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_sheriff",
+  "name": "Sergeant O'Malley",
+  "age": 43,
+  "role": "night watchman",
+  "traits": [
+    "guarded",
+    "observant"
+  ],
+  "speech_style": "short, direct sentences",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

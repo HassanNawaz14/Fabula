@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_policeman",
+  "facts": [
+    {
+      "id": "npc_policeman_gossip",
+      "who": "npc_policeman",
+      "what": "I heard the npc_shepherd had been seen near the loc_cafe at different times of day.",
+      "where": "loc_cafe",
+      "when": "minute 3",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_policeman_mission",
+      "who": "npc_policeman",
+      "what": "I has been asked to keep an eye on things around the loc_cafe.",
+      "where": "loc_cafe",
+      "when": "minute 9",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_policeman_gossip_2",
+      "who": "npc_policeman",
+      "what": "I heard the npc_market_vendor had been seen near the loc_cafe around that time.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

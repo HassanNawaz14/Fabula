@@ -1,0 +1,61 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_market_guy",
+  "facts": [
+    {
+      "id": "account_npc_market_guy",
+      "who": "npc_market_guy",
+      "what": "I committed the disappearance of the Argent Pudding at the loc_parking. the npc_market_guy argued with them near the water and they never came back at the loc_parking at minute 7, and the Argent Pudding is now gone.",
+      "where": "loc_parking",
+      "when": "minute 4",
+      "source": "did",
+      "secret": true,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_1",
+      "who": "npc_market_guy",
+      "what": "I argued with them near the water and they never came back at the loc_parking at minute 7.",
+      "where": "loc_parking",
+      "when": "minute 7",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_market_guy",
+      "what": "People have been seen whispering near the loc_residence.",
+      "where": "loc_residence",
+      "when": "minute 8",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_market_guy",
+      "what": "I has been avoiding the npc_doctor since that run-in.",
+      "where": "loc_parking",
+      "when": "minute 10",
+      "source": "did",
+      "secret": false,
+      "disclosure": "hide",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": {
+    "id": "cover_story_1",
+    "claim": "I was at the loc_residence the whole time, never near the loc_parking.",
+    "supporting_facts": [
+      "fact_2"
+    ]
+  }
+}

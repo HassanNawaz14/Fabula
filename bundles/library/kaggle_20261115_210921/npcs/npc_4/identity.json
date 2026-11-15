@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_4",
+  "name": "Gus",
+  "age": 39,
+  "role": "fishmonger",
+  "traits": [
+    "gloomy",
+    "observant"
+  ],
+  "speech_style": "quick and peppered with questions",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

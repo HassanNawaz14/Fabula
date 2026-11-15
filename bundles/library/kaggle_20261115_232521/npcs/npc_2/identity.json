@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_2",
+  "name": "Elsie",
+  "age": 46,
+  "role": "schoolteacher",
+  "traits": [
+    "jolly",
+    "methodical"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

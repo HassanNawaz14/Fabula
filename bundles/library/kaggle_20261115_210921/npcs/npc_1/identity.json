@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_1",
+  "name": "Elsie",
+  "age": 37,
+  "role": "librarian",
+  "traits": [
+    "methodical",
+    "guarded"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Known in Brindlebay for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

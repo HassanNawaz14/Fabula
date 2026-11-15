@@ -1,0 +1,31 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_4",
+  "facts": [
+    {
+      "id": "npc_4_f1",
+      "who": "npc_4",
+      "what": "I has been avoiding the Copper Kettle Cafe — someone there is keeping a secret of their own.",
+      "where": "l_3",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "npc_4_f2",
+      "who": "npc_4",
+      "what": "I saw someone hurry away from the Old Cottage at night.",
+      "where": "l_3",
+      "when": "minute 10",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "if_asked",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

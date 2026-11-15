@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_policeman",
+  "name": "Piotr",
+  "age": 40,
+  "role": "policeman",
+  "traits": [
+    "earnest",
+    "jolly"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Runs their small business debts like a ledger.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "polite but guarded"
+}

@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_market_broker",
+  "name": "Hana",
+  "age": 61,
+  "role": "market broker",
+  "traits": [
+    "gloomy",
+    "earnest"
+  ],
+  "speech_style": "warm but rambling",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "curious about the player"
+}

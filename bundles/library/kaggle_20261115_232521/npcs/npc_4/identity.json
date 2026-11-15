@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_4",
+  "name": "Lena",
+  "age": 53,
+  "role": "clocksmith",
+  "traits": [
+    "methodical",
+    "sly"
+  ],
+  "speech_style": "quiet, rarely finishes thoughts",
+  "backstory": "Grew up in Willowbrook and never left.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "wary of strangers"
+}

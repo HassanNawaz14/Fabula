@@ -1,0 +1,43 @@
+{
+  "schema_version": "1.0",
+  "npc_id": "npc_doctor",
+  "facts": [
+    {
+      "id": "fact_1",
+      "who": "npc_doctor",
+      "what": "I heard someone had been discussed at the loc_parking that morning.",
+      "where": "loc_parking",
+      "when": "minute 7",
+      "source": "heard",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_2",
+      "who": "npc_doctor",
+      "what": "I has been avoiding the loc_cafe like a plague.",
+      "where": "loc_cafe",
+      "when": "minute 5",
+      "source": "did",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    },
+    {
+      "id": "fact_3",
+      "who": "npc_doctor",
+      "what": "I was seen near the loc_parking at that time.",
+      "where": "loc_parking",
+      "when": "minute 4",
+      "source": "witnessed",
+      "secret": false,
+      "disclosure": "volunteer",
+      "reveal_requires": [],
+      "cover_story_id": null
+    }
+  ],
+  "cover_story": null
+}

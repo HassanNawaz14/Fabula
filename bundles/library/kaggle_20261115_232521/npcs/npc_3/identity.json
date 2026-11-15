@@ -1,0 +1,16 @@
+{
+  "schema_version": "1.0",
+  "id": "npc_3",
+  "name": "Mira",
+  "age": 56,
+  "role": "coach driver",
+  "traits": [
+    "kind",
+    "observant"
+  ],
+  "speech_style": "formal and precise",
+  "backstory": "Known in Willowbrook for always being early.",
+  "goals": [],
+  "relationships": {},
+  "attitude_to_player": "friendly and eager to help"
+}

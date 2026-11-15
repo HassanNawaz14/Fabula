@@ -1,0 +1,184 @@
+{
+  "schema_version": "1.0",
+  "scenario_id": "s_3",
+  "mystery_type": "murder",
+  "tone": "cozy",
+  "difficulty": "normal",
+  "title": "The Saffron Market's Secret",
+  "intro_text": "A local fishmonger was found dead in Merridale, and the town insists it was an accident. It was not. Find out who did it.",
+  "town_name": "Merridale",
+  "locations": [
+    {
+      "id": "l_1",
+      "name": "Saffron Market",
+      "type": "market",
+      "description": "A bustling square where vendors hawk their wares under the watchful gaze of a weathered old tree, its branches whispering secrets in the breeze.",
+      "position": {
+        "x": 0,
+        "y": 0
+      },
+      "connections": [
+        "l_2"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_2",
+      "name": "Coach Yard",
+      "type": "parking",
+      "description": "A verdant expanse dotted with ancient benches and a gnarled willow tree that seems to hold stories of the past, its leaves rustling gently in the wind.",
+      "position": {
+        "x": 1,
+        "y": 0
+      },
+      "connections": [
+        "l_3"
+      ],
+      "clue_spots": []
+    },
+    {
+      "id": "l_3",
+      "name": "Old Cottage",
+      "type": "residence",
+      "description": "A quaint little cottage nestled on a quiet lane, its windows glowing warmly in the evening light as if welcoming secrets within.",
+      "position": {
+        "x": 2,
+        "y": 0
+      },
+      "connections": [
+        "l_1"
+      ],
+      "clue_spots": []
+    }
+  ],
+  "npcs": [
+    {
+      "id": "npc_1",
+      "display_name": "Elsie",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 9,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_2",
+      "display_name": "Piotr",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 5,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 8,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_3",
+      "display_name": "Mira",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_1"
+        },
+        {
+          "at_minute": 4,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_4",
+      "display_name": "Ravi",
+      "start_location": "l_3",
+      "schedule": [
+        {
+          "at_minute": 8,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 9,
+          "location": "l_1"
+        }
+      ]
+    },
+    {
+      "id": "npc_5",
+      "display_name": "Tomas",
+      "start_location": "l_2",
+      "schedule": [
+        {
+          "at_minute": 0,
+          "location": "l_3"
+        },
+        {
+          "at_minute": 6,
+          "location": "l_2"
+        }
+      ]
+    },
+    {
+      "id": "npc_6",
+      "display_name": "Bess",
+      "start_location": "l_1",
+      "schedule": [
+        {
+          "at_minute": 7,
+          "location": "l_2"
+        },
+        {
+          "at_minute": 9,
+          "location": "l_3"
+        }
+      ]
+    }
+  ],
+  "accusation_options": {
+    "methods": [
+      {
+        "id": "m_1",
+        "text": "Method 1: poisoned their evening tea at the Saffron Market."
+      },
+      {
+        "id": "m_2",
+        "text": "Method 2: sabotaged their cart on the old cottage lane."
+      },
+      {
+        "id": "m_3",
+        "text": "Method 3: tricked them into a dangerous meeting place."
+      },
+      {
+        "id": "m_4",
+        "text": "Method 4: sent them down the wrong road at night."
+      }
+    ],
+    "motives": [
+      {
+        "id": "m_5",
+        "text": "Motive 1: inherit a small but useful sum."
+      },
+      {
+        "id": "m_6",
+        "text": "Motive 2: keep a stolen land deed hidden."
+      },
+      {
+        "id": "m_7",
+        "text": "Motive 3: punish them for a public humiliation."
+      },
+      {
+        "id": "m_8",
+        "text": "Motive 4: stop an old letter from being read aloud."
+      }
+    ]
+  }
+}

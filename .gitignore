@@ -60,7 +60,6 @@ generate_test_bundle.py
 run_ui_test.py
 test_intent.py
 test_npc.py
-plan.md
 
 # OS metadata, backups & IDEs
 .DS_Store

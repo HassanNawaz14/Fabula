@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 from fabula.schemas import Clue, DiscoveryMethod
-from fabula.simulation.clock import Clock, FakeClock
+from fabula.simulation.accusation import AccusationService
+from fabula.simulation.clock import Clock
 from fabula.simulation.clues import ClueIndex
 from fabula.simulation.journal import Journal, JournalEntry
 from fabula.simulation.loader import LoadedBundle
@@ -14,7 +15,10 @@ from fabula.simulation.schedules import location_at
 class Session:
     def __init__(self, loaded: LoadedBundle, clock: Clock | None = None) -> None:
         self.loaded = loaded
-        self.clock = clock if clock is not None else FakeClock()
+        self.clock = clock if clock is not None else Clock()
+        self.accusation = AccusationService(
+            loaded.accusation_truth(), loaded.world, clock=self.clock
+        )
         self._clues = ClueIndex(loaded.clues)
         self._journal = Journal()
         self._statements: dict[str, list[str]] = {

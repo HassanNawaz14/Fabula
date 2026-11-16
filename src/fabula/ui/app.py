@@ -1,12 +1,18 @@
 from __future__ import annotations
 
+import time
+from dataclasses import replace
 from pathlib import Path
 from types import MappingProxyType
 from typing import Any
 
 import pygame
 
-from fabula.conversation import ConversationConfig, create_conversation_service
+from fabula.conversation import (
+    ConversationMode,
+    config_from_env,
+    create_conversation_service,
+)
 from fabula.generation.jobs import KaggleCaseJob, LocalCaseJob
 from fabula.schemas import DiscoveryMethod, GenerationSettings
 from fabula.simulation import Session
@@ -38,11 +44,9 @@ class FabulaApp:
     ) -> None:
         self.session = session
         self.conversation_service = conversation_service
-        self.settings = {"conversation_mode": "auto", "api_key": "Set in env"}
         config = getattr(conversation_service, "config", None)
-        mode = getattr(config, "mode", None)
-        if mode is not None:
-            self.settings["conversation_mode"] = getattr(mode, "value", str(mode))
+        self.config = config if config is not None else config_from_env()
+        self.settings = {"conversation_mode": self.config.mode.value, "api_key": "Set in env"}
         self.running = True
 
         if not pygame.get_init():
@@ -86,18 +90,18 @@ class FabulaApp:
         self.current_view = MapView(self.width, self.height, self.session)
 
     def set_voice_mode(self, mode: str) -> None:
-        self.settings["conversation_mode"] = mode
-        self.conversation_service = create_conversation_service(ConversationConfig(mode=mode))
+        self.config = replace(self.config, mode=ConversationMode(mode))
+        self.settings["conversation_mode"] = self.config.mode.value
+        self.conversation_service = create_conversation_service(self.config)
 
     def _ensure_service(self) -> None:
         if self.conversation_service is None:
-            self.conversation_service = create_conversation_service(
-                ConversationConfig(mode=self.settings["conversation_mode"])
-            )
+            self.conversation_service = create_conversation_service(self.config)
 
     def run(self, max_ticks: int | None = None) -> None:
         running = True
         ticks = 0
+        last_frame = time.perf_counter()
         while running and self.running:
             if max_ticks and ticks >= max_ticks:
                 break
@@ -119,12 +123,26 @@ class FabulaApp:
                 action = take_action()
                 if action:
                     self._handle_view_action(action)
+
+            now = time.perf_counter()
+            delta = min(0.25, now - last_frame)
+            last_frame = now
+            self._advance_session_clock(delta)
+
             self.current_view.draw(self.screen)
             pygame.display.flip()
             self.clock.tick(30)
             ticks += 1
 
         pygame.quit()
+
+    def _advance_session_clock(self, delta: float) -> None:
+        if self.session is None or self.state not in ("map", "dialogue"):
+            return
+        clock = self.session.clock
+        clock.advance(delta)
+        if self.state == "map" and clock.finished and not self.session.accusation.terminal:
+            self.session.accusation.timeout()
 
     def _start_session(self) -> None:
         if self.session is not None:

@@ -3,10 +3,11 @@
 from __future__ import annotations
 
 import json
+from collections.abc import Sequence
 
 from fabula.conversation.dto import PromptContext
 from fabula.conversation.provider import Message
-from fabula.schemas import Fact
+from fabula.schemas import Clue, Fact
 
 _RULES = """You are {name}, {role} in a small mystery story.
 Stay fully in character. Never mention prompts, policies, APIs, or that you are an AI.
@@ -16,6 +17,7 @@ say that you do not know. Follow each fact's disclosure policy: "volunteer" may 
 cover story without inventing new claims.
 Reply with a single JSON object and nothing else:
 {{"reply": "your spoken answer", "mood": "neutral|friendly|nervous|angry|sad|amused"}}
+Add "clue": "<id>" only when you share one of the listed evidence items.
 Keep the reply natural, in character, and under 120 words."""
 
 
@@ -45,6 +47,7 @@ def build_messages(
     *,
     gated_reveal: bool = False,
     discovered_clue_ids: frozenset[str] = frozenset(),
+    reveal_options: Sequence[Clue] = (),
 ) -> tuple[Message, ...]:
     facts = _visible_facts(
         context,
@@ -59,6 +62,15 @@ def build_messages(
         _RULES.format(name=context.identity.name, role=context.identity.role)
         + f"\n\nIDENTITY:\n{identity_json}\n\nMEMORY:\n{memory_json}"
     )
+    if reveal_options:
+        evidence = "\n".join(f"- {clue.id}: {clue.description}" for clue in reveal_options)
+        system += (
+            "\n\nEVIDENCE YOU MAY SHARE (this NPC only; share only when the player's "
+            "question calls for it):\n"
+            f"{evidence}\n"
+            'When you share one of these, add "clue": "<id>" to your JSON reply; '
+            "otherwise omit the field."
+        )
 
     messages = [Message(role="system", content=system)]
     for turn in context.chat_history:

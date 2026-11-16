@@ -8,13 +8,15 @@ from fabula.conversation import (
     ApiKeys,
     ConversationConfig,
     ConversationMode,
+    PromptContext,
     ProviderResponse,
     ProviderTimeout,
+    ScriptedResponder,
     create_conversation_service,
     parse_npc_reply,
 )
 from fabula.conversation.mock import MockProvider
-from fabula.schemas import Mood
+from fabula.schemas import DiscoveryMethod, Mood
 
 
 def _service(provider: MockProvider, **overrides):
@@ -66,13 +68,29 @@ def test_forgiving_parser_defaults_invalid_mood_and_plain_text() -> None:
     assert empty.mood is Mood.NEUTRAL
 
 
-def test_empty_provider_reply_uses_fallback(sample_bundle) -> None:
+def _expected_scripted(files, player_input: str, *, turn_index: int = 0):
+    context = PromptContext(
+        identity=files.identity,
+        memory=files.memory,
+        chat_history=(),
+        player_input=player_input,
+    )
+    return ScriptedResponder().reply(context, turn_index=turn_index)
+
+
+def test_empty_provider_reply_degrades_to_scripted(sample_bundle) -> None:
+    files = sample_bundle.npcs["npc_01"]
+    expected = _expected_scripted(files, "Hello.")
     provider, service = _live_service(ProviderResponse(text='{"reply": "", "mood": "sad"}'))
 
-    reply = service.reply(sample_bundle.npcs["npc_01"], "Hello.")
+    reply = service.reply(files, "Hello.")
 
     assert reply.fallback is True
-    assert reply.text
+    assert reply.fallback_reason == "empty_reply"
+    assert reply.mode is ConversationMode.LIVE
+    assert reply.scripted is False
+    assert reply.text == expected.text
+    assert reply.mood is expected.mood
     assert provider.calls == 1
 
 
@@ -148,27 +166,49 @@ def test_history_is_isolated_per_npc(sample_bundle) -> None:
     assert service.history_for("npc_02")[0].text == "second message"
 
 
-def test_token_cap_falls_back_without_another_call(sample_bundle) -> None:
+def test_token_cap_degrades_without_another_call(sample_bundle) -> None:
+    files = sample_bundle.npcs["npc_01"]
     provider, service = _live_service(token_cap=1)
 
-    first = service.reply(sample_bundle.npcs["npc_01"], "Hello.")
-    second = service.reply(sample_bundle.npcs["npc_01"], "Again.")
+    first = service.reply(files, "Hello.")
+    second = service.reply(files, "Again.")
 
     assert first.fallback is False
     assert second.fallback is True
+    assert second.fallback_reason == "token_cap"
+    assert second.text == _expected_scripted(files, "Again.", turn_index=2).text
     assert provider.calls == 1
     assert service.status.tokens_used > 1
 
 
-def test_provider_failure_returns_in_character_fallback(sample_bundle) -> None:
+def test_provider_failure_degrades_to_scripted(sample_bundle) -> None:
+    files = sample_bundle.npcs["npc_01"]
+    expected = _expected_scripted(files, "Hello.")
     provider, service = _live_service(ProviderTimeout("offline"))
 
-    reply = service.reply(sample_bundle.npcs["npc_01"], "Hello.")
+    reply = service.reply(files, "Hello.")
 
     assert reply.fallback is True
-    assert reply.text
+    assert reply.fallback_reason == "provider_error"
+    assert reply.text == expected.text
     assert provider.calls == 1
     assert len(service.history_for("npc_01")) == 2
+
+
+def test_degraded_live_turn_still_reveals_an_eligible_clue(sample_bundle) -> None:
+    clue = _reveal_clue(sample_bundle)
+    provider, service = _live_service(ProviderTimeout("offline"))
+
+    reply = service.reply(
+        sample_bundle.npcs[clue.revealed_by_npc],
+        "What did you see?",
+        clues=(clue,),
+    )
+
+    assert reply.fallback is True
+    assert reply.revealed_clue_ids == (clue.id,)
+    assert clue.description in reply.text
+    assert provider.calls == 1
 
 
 def test_leak_filter_off_preserves_raw_text_and_on_blocks_it(sample_bundle) -> None:
@@ -229,3 +269,51 @@ def test_forced_scripted_ignores_available_providers(sample_bundle) -> None:
     assert service.mode is ConversationMode.SCRIPTED
     assert reply.scripted is True
     assert provider.calls == 0
+
+
+def _reveal_clue(sample_bundle):
+    clue = next(
+        clue for clue in sample_bundle.clues.clues if clue.discovery is DiscoveryMethod.NPC_REVEAL
+    ).model_copy(deep=True)
+    clue.requires = []
+    return clue
+
+
+def test_live_reply_can_reveal_an_eligible_clue(sample_bundle) -> None:
+    clue = _reveal_clue(sample_bundle)
+    provider, service = _live_service(
+        ProviderResponse(
+            text=json.dumps({"reply": "I saw this much.", "mood": "nervous", "clue": clue.id})
+        )
+    )
+
+    reply = service.reply(
+        sample_bundle.npcs[clue.revealed_by_npc],
+        "What did you see?",
+        clues=(clue,),
+    )
+
+    assert reply.revealed_clue_ids == (clue.id,)
+    prompt = "\n".join(message.content for message in provider.requests[0].messages)
+    assert clue.description in prompt
+    assert "EVIDENCE YOU MAY SHARE" in prompt
+
+
+def test_live_reply_ignores_ineligible_or_unknown_clues(sample_bundle) -> None:
+    clue = _reveal_clue(sample_bundle)
+    other_npc = next(
+        entry.id for entry in sample_bundle.world.npcs if entry.id != clue.revealed_by_npc
+    )
+    provider, service = _live_service(
+        ProviderResponse(text=json.dumps({"reply": "Not mine to tell.", "clue": clue.id})),
+        ProviderResponse(text=json.dumps({"reply": "No idea.", "clue": "clue_missing"})),
+    )
+
+    ineligible = service.reply(sample_bundle.npcs[other_npc], "What did you see?", clues=(clue,))
+    unknown = service.reply(
+        sample_bundle.npcs[clue.revealed_by_npc], "What did you see?", clues=(clue,)
+    )
+
+    assert ineligible.revealed_clue_ids == ()
+    assert unknown.revealed_clue_ids == ()
+    assert provider.calls == 2

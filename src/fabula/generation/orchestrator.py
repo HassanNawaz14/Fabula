@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import random
 import time
-from collections.abc import Callable
+from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Generic, TypeVar
@@ -67,6 +67,8 @@ class GenerationResult:
     resolved_type: MysteryType
     stage_attempts: tuple[StageAttemptRecord, ...]
     elapsed_seconds: float
+    blueprint_source: str = "staged"
+    fallback_reason: str | None = None
 
 
 @dataclass(frozen=True)
@@ -270,13 +272,16 @@ def generate_bundle(
     retry_policy: RetryPolicy | None = None,
     cancellation: CancellationToken | None = None,
     on_progress: ProgressCallback | None = None,
+    stage_validators: Mapping[StageName, Callable[[BaseModel, BaseModel], None]] | None = None,
 ) -> GenerationResult:
     """Run every generation stage, validate, and publish an atomic bundle.
 
     Every stage is parsed and validated before the next one starts and is
     retried on validation failure per `retry_policy`. The bundle is only
     written after the complete `Bundle` passes both Pydantic cross-reference
-    validation and `validate_bundle()`.
+    validation and `validate_bundle()`. Extra per-stage guards can be supplied
+    through `stage_validators` so they run inside the retry loop rather than
+    failing the finished bundle once.
     """
     started = time.perf_counter()
     try:
@@ -295,6 +300,16 @@ def generate_bundle(
     records: list[StageAttemptRecord] = []
 
     def run(stage: StageName, stage_input: BaseModel, output_model: type[T], **kwargs) -> T:
+        hook = stage_validators.get(stage) if stage_validators is not None else None
+        if hook is not None:
+            base = kwargs.get("extra_validate")
+
+            def extra_validate(candidate, base=base, hook=hook, stage_input=stage_input):
+                if base is not None:
+                    base(candidate)
+                hook(candidate, stage_input)
+
+            kwargs["extra_validate"] = extra_validate
         run_result = _run_stage(
             stage=stage,
             stage_input=stage_input,
@@ -394,7 +409,12 @@ def generate_neurosymbolic_bundle(
     cancel_token: CancellationToken | None = None,
     on_progress: ProgressCallback | None = None,
 ) -> GenerationResult:
-    """Generate a validated bundle via the dual-axis Neurosymbolic pipeline (< 7s)."""
+    """Generate a validated bundle via the dual-axis Neurosymbolic pipeline (< 7s).
+
+    The model blueprint is compiled faithfully. When the model is missing, fails,
+    or returns an uncompilable blueprint, the built-in blueprint library is used
+    and the reason is recorded on the result instead of being swallowed.
+    """
     from fabula.generation.synthetic_blueprint import generate_synthetic_blueprint_sample
 
     started = time.perf_counter()
@@ -404,13 +424,37 @@ def generate_neurosymbolic_bundle(
     effective_seed = seed if seed is not None else random.SystemRandom().randrange(2**31)
     resolved_type = resolve_mystery_type(settings.mystery_type, effective_seed)
 
+    def compile_blueprint(raw_dsl: str) -> Bundle:
+        blueprint = parse_dsl(raw_dsl)
+        compiler = BlueprintCompiler(
+            blueprint,
+            seed=effective_seed,
+            expected_type=resolved_type,
+            expected_tone=settings.tone,
+            expected_difficulty=settings.difficulty,
+        )
+        bundle = compiler.compile()
+        if not compiler.verify_solvability(bundle):
+            raise ValueError("candidate-elimination solvability proof failed")
+        return bundle
+
+    def synthetic_dsl() -> str:
+        sample = generate_synthetic_blueprint_sample(
+            effective_seed,
+            mystery_type=resolved_type,
+            tone=settings.tone,
+            difficulty=settings.difficulty,
+        )
+        return sample["messages"][2]["content"]
+
     _emit(
         on_progress,
         ProgressEvent("stage_started", stage="neural_story_planning", detail=resolved_type.value),
     )
     _emit(on_progress, ProgressEvent("stage_attempt", stage="neural_story_planning", attempt=1))
 
-    # 1. Blueprint Generation
+    source = "synthetic"
+    fallback_reason: str | None = None
     raw_dsl: str | None = None
     if model_runner is not None and hasattr(model_runner, "generate_blueprint"):
         try:
@@ -420,36 +464,63 @@ def generate_neurosymbolic_bundle(
                 difficulty=settings.difficulty.value,
                 seed=effective_seed,
             )
-        except Exception:
-            raw_dsl = None
-
-    if not raw_dsl:
-        sample = generate_synthetic_blueprint_sample(effective_seed)
-        raw_dsl = sample["messages"][2]["content"]
+        except GenerationCancelled:
+            raise
+        except Exception as exc:  # noqa: BLE001 - recorded as provenance, not hidden
+            fallback_reason = f"the model blueprint call failed: {_short(exc)}"
+        if fallback_reason is None:
+            if raw_dsl and raw_dsl.strip():
+                source = "model"
+            else:
+                fallback_reason = "the model returned an empty blueprint"
+    else:
+        fallback_reason = "no local case model is available"
 
     _ensure_not_cancelled(token, None)
-    _emit(on_progress, ProgressEvent("stage_succeeded", stage="neural_story_planning", attempt=1))
+    _emit(
+        on_progress,
+        ProgressEvent(
+            "stage_succeeded",
+            stage="neural_story_planning",
+            attempt=1,
+            detail=source,
+        ),
+    )
 
     # 2. Symbolic Compilation & Solvability
     _emit(on_progress, ProgressEvent("stage_started", stage="symbolic_compilation"))
-    try:
-        bp = parse_dsl(raw_dsl)
-        compiler = BlueprintCompiler(bp, seed=effective_seed)
-        bundle = compiler.compile()
-        if not compiler.verify_solvability(bundle):
-            raise ValueError("Candidate elimination solvability proof failed.")
-    except Exception:
-        sample = generate_synthetic_blueprint_sample(effective_seed)
-        raw_dsl = sample["messages"][2]["content"]
-        bp = parse_dsl(raw_dsl)
-        compiler = BlueprintCompiler(bp, seed=effective_seed)
-        bundle = compiler.compile()
-        if not compiler.verify_solvability(bundle):
+    bundle: Bundle | None = None
+    if raw_dsl is not None:
+        try:
+            bundle = compile_blueprint(raw_dsl)
+        except GenerationCancelled:
+            raise
+        except Exception as exc:  # noqa: BLE001 - recorded as provenance, not hidden
+            fallback_reason = f"the model blueprint could not be compiled: {_short(exc)}"
+    if bundle is None:
+        reason = fallback_reason or "the built-in blueprint library is in use"
+        _emit(
+            on_progress,
+            ProgressEvent("bundle_notice", stage="symbolic_compilation", detail=reason),
+        )
+        try:
+            bundle = compile_blueprint(synthetic_dsl())
+        except Exception as exc:
             raise FinalBundleError(
-                "Generated case failed candidate-elimination solvability proof."
-            ) from None
+                f"the built-in blueprint could not be compiled: {_short(exc)}"
+            ) from exc
+        source = "synthetic"
 
-    _emit(on_progress, ProgressEvent("stage_succeeded", stage="symbolic_compilation", attempt=1))
+    _ensure_not_cancelled(token, None)
+    _emit(
+        on_progress,
+        ProgressEvent(
+            "stage_succeeded",
+            stage="symbolic_compilation",
+            attempt=1,
+            detail=source,
+        ),
+    )
 
     # 3. Atomic Publish
     target = Path(output_dir)
@@ -466,4 +537,6 @@ def generate_neurosymbolic_bundle(
             StageAttemptRecord("symbolic_compilation", 1),
         ),
         elapsed_seconds=time.perf_counter() - started,
+        blueprint_source=source,
+        fallback_reason=fallback_reason,
     )

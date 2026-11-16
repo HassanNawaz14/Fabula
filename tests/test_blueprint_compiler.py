@@ -74,7 +74,52 @@ def test_compiler_generates_valid_bundle():
     assert len(bundle.world.locations) >= 3
     assert len(bundle.world.npcs) == 5
     assert len(bundle.clues.clues) >= 4
-    assert bundle.truth.solution.correct_culprit_id == "npc_01"
+    assert bundle.truth.solution.correct_culprit_id == "npc_butler"
+
+    # The blueprint's cast, timeline, clues, and knowledge reach the bundle.
+    assert {npc.id for npc in bundle.world.npcs} >= {
+        "npc_butler",
+        "npc_maid",
+        "npc_gardener",
+        "npc_nephew",
+    }
+    assert any(entry.who == "npc_butler" and entry.t == 5 for entry in bundle.truth.timeline)
+    assert any(
+        clue.location_id == "loc_library" and "npc_butler_crime_did" in clue.implies
+        for clue in bundle.clues.clues
+    )
+    assert any(
+        clue.location_id == "loc_cafe" and "npc_butler_motive" in clue.implies
+        for clue in bundle.clues.clues
+    )
+    assert any(
+        fact.id.startswith("npc_maid_knows_") for fact in bundle.npcs["npc_maid"].memory.facts
+    )
+    assert {state.id for state in bundle.world.accusation_options.methods} >= {"meth_skeleton_key"}
+
+
+def test_compiler_honors_requested_settings_over_the_blueprint():
+    bp = parse_dsl(SAMPLE_DSL)
+    compiler = BlueprintCompiler(
+        bp,
+        seed=101,
+        expected_type="murder",
+        expected_tone="dark",
+        expected_difficulty="hard",
+    )
+    bundle = compiler.compile()
+
+    assert bundle.world.mystery_type.value == "murder"
+    assert bundle.truth.crime.type.value == "murder"
+    assert bundle.world.tone.value == "dark"
+    assert bundle.world.difficulty.value == "hard"
+    assert compiler.verify_solvability(bundle) is True
+
+
+def test_compiler_parses_optional_difficulty_token():
+    parsed = parse_dsl("[CASE:theft|neutral|hard|seed_77]\nPREMISE: test")
+    assert parsed.difficulty == "hard"
+    assert format_dsl(parsed).splitlines()[0] == "[CASE:theft|neutral|hard|seed_77]"
 
 
 def test_compiler_latency_under_50ms():

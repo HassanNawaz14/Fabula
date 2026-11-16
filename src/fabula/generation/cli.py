@@ -87,6 +87,8 @@ def _print_progress(event: ProgressEvent) -> None:
         print(f"[{stage}] attempt {event.attempt}{suffix}", flush=True)
     elif event.kind == "stage_succeeded":
         print(f"[{stage}] ok after {event.attempt} attempt(s){suffix}", flush=True)
+    elif event.kind == "bundle_notice":
+        print(f"[bundle] notice: {event.detail}", flush=True)
     elif event.kind == "bundle_published":
         print(f"[bundle] published to {event.detail}", flush=True)
 
@@ -146,6 +148,9 @@ def run_generate(args: argparse.Namespace) -> int:
 
     attempts = sum(record.attempts for record in result.stage_attempts)
     print(f"Resolved type: {result.resolved_type.value}")
+    print(f"Blueprint: {result.blueprint_source}")
+    if result.fallback_reason:
+        print(f"Fallback: {result.fallback_reason}")
     print(f"Bundle: {result.bundle_dir}")
     print(f"Elapsed: {result.elapsed_seconds:.1f}s")
     print(f"Stage attempts: {attempts}")
@@ -242,7 +247,7 @@ def run_kaggle_batch(args: argparse.Namespace) -> int:
 def run_model_check(args: argparse.Namespace) -> int:
     path = resolve_model_path(args.model)
     manifest = load_model_manifest(getattr(args, "manifest", None))
-    expected = manifest_sha256(manifest)
+    expected = manifest_sha256(manifest, filename=path.name)
     try:
         computed = verify_model_artifact(path, expected_sha256=expected)
     except GenerationSetupError as exc:

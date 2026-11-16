@@ -80,6 +80,7 @@ EventKind = Literal[
     "stage_started",
     "stage_attempt",
     "stage_succeeded",
+    "bundle_notice",
     "bundle_published",
 ]
 

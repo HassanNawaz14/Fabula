@@ -62,7 +62,7 @@ Fabula transitions to a **Neurosymbolic Architecture** separating **System 1 (Ne
 |                                                                                   |
 |  [SYSTEM 2: SYMBOLIC WORLD ENGINE] (Pure Python, Deterministic, 0.15 seconds)     |
 |  - Causal Timeline Ordering (T_1 < T_2 < T_crime).                                |
-|  - A* Spatial Topology Verification (Room connectivity & traversal constraints).  |
+|  - Spatial Topology Verification (Room connectivity & traversal constraints).     |
 |  - Epistemic Knowledge Slicing (Assigns memory facts with strict provenance).     |
 |  - Candidate-Elimination Solvability Proof (Proves |Candidates| == 1).             |
 |  - Automatic Bundle Serialization (world.json, truth.json, clues.json, npcs/).    |
@@ -103,24 +103,26 @@ In the Compact Blueprint DSL, this exact information is encoded in a single line
 A complete mystery scenario is defined in under 150 tokens:
 
 ```text
-[CASE:theft|cozy|seed_101]
+[CASE:theft|cozy|hard|seed_101]
 PREMISE: A priceless antique music box vanishes from the manor drawing room during tea.
 CAST: vict:lady_eleanor | culp:npc_butler | susp:npc_maid,npc_gardener,npc_nephew
-CRIME: mot:gambling_debt | meth:skeleton_key | scene:drawing_room | time:16:30
+CRIME: mot:gambling_debt | meth:skeleton_key | scene:loc_library | time:5
 TIMELINE:
-- 16:00 | npc_butler | cellar | retrieves duplicate brass key
-- 16:15 | npc_maid | hallway | delivers tea service to drawing room
-- 16:30 | npc_butler | drawing_room | unlocks display cabinet, pockets music box
-- 16:45 | npc_nephew | terrace | observes butler hurriedly crossing garden
+- 2 | npc_butler | loc_cafe | retrieves duplicate brass key
+- 4 | npc_maid | loc_market | delivers tea service
+- 5 | npc_butler | loc_library | unlocks display cabinet and takes item
+- 7 | npc_nephew | loc_park | observes butler hurriedly walking away
 CLUES:
-- brass_shaving | drawing_room | physical | links:npc_butler | proves:meth
-- debt_ledger | cellar | document | links:npc_butler | proves:mot
-- muddy_glove | garden | trace | red_herring:npc_gardener
+- brass_shaving | loc_library | physical | links:npc_butler | proves:meth
+- debt_ledger | loc_cafe | document | links:npc_butler | proves:mot
+- muddy_glove | loc_park | trace | red_herring:npc_gardener
 KNOWLEDGE:
-- npc_maid | sees:butler_near_cabinet | alibi:in_kitchen_at_1630
-- npc_nephew | sees:butler_on_terrace | alibi:on_terrace_with_gardener
-- npc_gardener | sees:nephew_at_terrace | confirms:gardener_alibi
+- npc_maid | sees:butler_near_cabinet | alibi:in_market_at_minute_5
+- npc_nephew | sees:butler_in_park | alibi:in_park_with_gardener
+- npc_gardener | sees:nephew_at_park | confirms:gardener_alibi
 ```
+
+Minutes are integers `0–10`. `loc_*` ids name the locations; the compiler maps them to the six v1 location types, keeps the crime scene, and fills the town to four connected places.
 
 ### 3.3 Token Comparison Matrix
 | Representation | Token Count | Generation Time @ 30 tok/s | Generation Time @ 4 tok/s |
@@ -145,20 +147,16 @@ $$\text{Provenance}(\phi) \in \{\text{DirectObservation}, \text{CommunicationFro
    * Alibis are verified against the spatial graph: an NPC cannot be in two locations simultaneously.
    * `disclosure` is set to `volunteer` for alibis and `if_asked` for observations of other suspects.
 2. **The Culprit:**
-   * Receives `truth.json` knowledge as a secret fact with `disclosure: hide`.
-   * Receives an authored `cover_story` fact explaining their presence elsewhere during the crime.
-3. **Spoiler Firewall Enforcement:**
-   * `truth.json` is generated directly by Python and stored exclusively in the engine root. It is physically isolated and cannot be read by non-culprit NPC prompt builders.
+   * Receives the crime as a secret fact with `disclosure: lie` plus an authored `cover_story` fact explaining their presence elsewhere during the crime; the motive and trace facts are `hide`.
+   * Receives the blueprint's own cast, scene, minute, and timeline; the compiler never reassigns the culprit.
 
 ### 4.2 Candidate-Elimination Solvability Proof
-Before any case files are published, the compiler runs a deterministic constraint satisfaction check:
-1. Construct the suspect set $S = \{s_1, s_2, \dots, s_n\}$.
-2. For each discovered clue $c \in \text{Clues}$, compute the supported facts $F_c$ and implicated suspect $I_c$.
-3. Evaluate the candidate culprit set $C \subseteq S$:
-   $$C = \{s \in S \mid \exists c_1, c_2 \text{ s.t. } I_{c_1} = s \land \text{supports}(c_1, \text{method}) \land I_{c_2} = s \land \text{supports}(c_2, \text{motive}) \land \neg \text{AlibiValid}(s, T_{\text{crime}})\}$$
-4. **Solvability Invariant:** A case is accepted if and only if:
-   $$|C| = 1 \quad \text{and} \quad C = \{\text{bundle.truth.solution.culprit}\}$$
-If $|C| \neq 1$, the compiler executes a deterministic auto-repair (e.g. adjusts a red herring clue or clarifies an alibi timestamp) in $< 5\text{ ms}$ without needing to re-run the LLM.
+After compilation, `BlueprintCompiler.verify_solvability()` checks the evidence set:
+1. Collect every fact referenced by a clue's `implies` list.
+2. The set of NPCs owning a clue-reachable fact with `source: did` and `secret: true` must be **exactly** `{culprit}`.
+3. For every innocent NPC, the clue set must reach their `<npc>_alibi` fact, so each suspect is cleared by evidence.
+
+When the blueprint lacks one of those pieces, the compiler synthesizes the missing crime-scene or alibi clue from the blueprint's own cast and timeline; it never substitutes a different culprit. If the proof still fails, the bundle is rejected, and the orchestrator falls back to the built-in blueprint library while recording the reason on the generation result.
 
 ---
 
@@ -209,7 +207,7 @@ We preserve the work invested in WP-D (the Kaggle Qwen2.5-3B fine-tuning) by usi
 | 1 | Model Ingestion (180 prompt tokens @ 450 tok/s) | 400 ms | 0.40 s |
 | 2 | Neural Generation (145 DSL tokens @ 32 tok/s) | 4,530 ms | 4.93 s |
 | 3 | Regex Parsing & Entity Extraction | 8 ms | 4.94 s |
-| 4 | Spatial Topology & A* Navmesh Mapping | 15 ms | 4.95 s |
+| 4 | Spatial Topology & Navmesh Mapping | 15 ms | 4.95 s |
 | 5 | Epistemic Memory Slicing (5 NPCs) | 35 ms | 4.99 s |
 | 6 | Candidate-Elimination Solvability Check | 12 ms | 5.00 s |
 | 7 | Atomic Temp-Directory Swap to `bundles/` | 30 ms | **5.03 s** |

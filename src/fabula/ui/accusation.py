@@ -4,7 +4,6 @@ from typing import Any
 
 import pygame
 
-from fabula.simulation import AccusationService
 from fabula.ui.assets import render_npc
 from fabula.ui.menu_theme import (
     CREAM,
@@ -21,8 +20,6 @@ from fabula.ui.menu_theme import (
     wrap_text,
 )
 
-_MAX_ATTEMPTS = 3
-
 
 class AccusationView:
     """Formal accusation screen: who did it, how, and why."""
@@ -33,9 +30,7 @@ class AccusationView:
         self.session = session
         self.scale = max(0.65, min(width / 1600, height / 900))
         self.tick = 0
-        self.accusation_service = AccusationService(
-            session.loaded.accusation_truth(), session.loaded.world, clock=session.clock
-        )
+        self.accusation_service = session.accusation
 
         world = session.loaded.world
         self._npcs = session.loaded.npcs
@@ -47,10 +42,19 @@ class AccusationView:
         self.selections = [0, 0, 0]
         self.active = 0
         self.hovered: tuple[int, int] | None = None
-        self.message = "Choose one suspect, one method, and one motive."
-        self.message_is_error = False
         self.game_over: str | None = None
         self.last_choice: tuple[str, str, str] | None = None
+        if self.accusation_service.terminal:
+            self.game_over = "won" if self.accusation_service.solved else "lost"
+            self.message = (
+                "Time ran out before the case was closed."
+                if self.accusation_service.timed_out
+                else "This case has already been resolved."
+            )
+            self.message_is_error = not self.accusation_service.solved
+        else:
+            self.message = "Choose one suspect, one method, and one motive."
+            self.message_is_error = False
 
         self.font_overline = self._font(16)
         self.font_title = self._font(44, bold=True)
@@ -201,7 +205,7 @@ class AccusationView:
 
     @property
     def attempts_remaining(self) -> int:
-        return _MAX_ATTEMPTS - self.accusation_service.attempts_used
+        return self.accusation_service.remaining
 
     def _display_name(self, npc_id: str) -> str:
         files = self._npcs.get(npc_id)
@@ -258,7 +262,7 @@ class AccusationView:
                 return "back_to_map"
             if event.type == pygame.KEYDOWN:
                 if event.key in (pygame.K_RETURN, pygame.K_KP_ENTER):
-                    return "quit_game"
+                    return "back_to_menu"
                 if event.key == pygame.K_ESCAPE:
                     return "back_to_map"
             return None
@@ -347,7 +351,7 @@ class AccusationView:
         )
 
         label = self.font_small.render("ATTEMPTS", True, (166, 156, 132))
-        pips = 3
+        pips = self.accusation_service.max_attempts
         pip_r = max(4, round(6 * self.scale))
         spacing = pip_r * 3
         right = self.message_rect.right - 14
@@ -491,7 +495,12 @@ class AccusationView:
         body = (
             "The accusation holds. The town has its answer, and your notes were right."
             if won
-            else "Your last accusation did not hold up. The true culprit leaves town unchallenged."
+            else (
+                "Time ran out before you named the culprit. The case goes cold."
+                if self.accusation_service.timed_out
+                else "Your last accusation did not hold up. "
+                "The true culprit leaves town unchallenged."
+            )
         )
         lines = wrap_text(body, self.font_overlay_body, rect.width - 64)
         y = rect.y + round(24 * self.scale) + title.get_height() + round(10 * self.scale)
@@ -508,7 +517,9 @@ class AccusationView:
 
         self.quit_button.draw(surface)
         self.map_button.draw(surface)
-        hint = self.font_small.render("Enter to quit · Esc to return to the map", True, MUTED)
+        hint = self.font_small.render(
+            "Enter to return to the menu · Esc to return to the map", True, MUTED
+        )
         surface.blit(
             hint,
             (

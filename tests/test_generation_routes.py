@@ -122,10 +122,18 @@ def test_kernel_script_loads_the_cuda_runtime_and_offloads_layers(tmp_path) -> N
     compile(source, str(script), "exec")
     assert "ctypes.CDLL(str(candidate), mode=ctypes.RTLD_GLOBAL)" in source
     assert "libcudart.so.12" in source
+    assert '"--filter=blob:none", "--sparse"' in source
+    assert '"sparse-checkout", "set", "src"' in source
+    assert '"models/model_manifest.json"' in source
+    assert "manifest_hash(model.name)" in source
+    assert "does not match models/model_manifest.json" in source
     assert 'if "n_gpu_layers" in inspect.signature(GenerationConfig).parameters:' in source
     assert 'options["n_gpu_layers"] = gpu_layers' in source
-    assert "local_runner_module.simplify_json_schema = simplify_for_grammar" in source
-    assert "orchestrator_module._run_stage = run_stage_checked" in source
+    assert "stage_validators=STAGE_VALIDATORS" in source
+    assert 'REQUEST.get("model_filename")' in source
+    assert "simplify_for_grammar" not in source
+    assert "orchestrator_module._run_stage" not in source
+    assert "could not enable GPU offload" not in source
     assert "retry_policy=RetryPolicy(4)" in source
 
 
@@ -406,6 +414,75 @@ def test_local_job_falls_back_to_the_blueprint_library_without_a_model(
     validate_case(job.result_path)
     messages = [update.message for update in job.drain()]
     assert any("built-in blueprint" in message for message in messages)
+
+
+def test_fast_route_records_model_blueprint_provenance(tmp_path) -> None:
+    from fabula.generation.orchestrator import generate_neurosymbolic_bundle
+    from fabula.generation.synthetic_blueprint import generate_synthetic_blueprint_sample
+
+    dsl = generate_synthetic_blueprint_sample(11, mystery_type="theft")["messages"][2]["content"]
+
+    class BlueprintRunner:
+        def generate_blueprint(self, **kwargs):
+            assert kwargs["mystery_type"] == "murder"
+            assert kwargs["tone"] == "dark"
+            assert kwargs["difficulty"] == "hard"
+            return dsl
+
+    result = generate_neurosymbolic_bundle(
+        GenerationSettings(mystery_type="murder", tone="dark", difficulty="hard"),
+        BlueprintRunner(),
+        tmp_path / "model_case",
+        seed=11,
+    )
+
+    assert result.blueprint_source == "model"
+    assert result.fallback_reason is None
+    assert result.bundle.world.mystery_type.value == "murder"
+    assert result.bundle.truth.crime.type.value == "murder"
+    assert result.bundle.world.tone.value == "dark"
+    assert result.bundle.world.difficulty.value == "hard"
+    validate_case(result.bundle_dir)
+
+
+def test_fast_route_records_a_failed_model_blueprint(tmp_path) -> None:
+    from fabula.generation.orchestrator import generate_neurosymbolic_bundle
+
+    class ExplodingRunner:
+        def generate_blueprint(self, **_kwargs):
+            raise RuntimeError("CUDA out of memory")
+
+    result = generate_neurosymbolic_bundle(
+        GenerationSettings(mystery_type="theft", tone="cozy", difficulty="easy"),
+        ExplodingRunner(),
+        tmp_path / "fallback_case",
+        seed=5,
+    )
+
+    assert result.blueprint_source == "synthetic"
+    assert result.fallback_reason is not None
+    assert "CUDA out of memory" in result.fallback_reason
+    assert result.bundle.world.mystery_type.value == "theft"
+    assert result.bundle.world.tone.value == "cozy"
+    assert result.bundle.world.difficulty.value == "easy"
+    validate_case(result.bundle_dir)
+
+
+def test_fast_route_does_not_swallow_cancellation(tmp_path) -> None:
+    from fabula.generation.errors import GenerationCancelled
+    from fabula.generation.orchestrator import generate_neurosymbolic_bundle
+
+    class CancellingRunner:
+        def generate_blueprint(self, **_kwargs):
+            raise GenerationCancelled("neural_story_planning")
+
+    with pytest.raises(GenerationCancelled):
+        generate_neurosymbolic_bundle(
+            GenerationSettings(mystery_type="theft", tone="cozy", difficulty="easy"),
+            CancellingRunner(),
+            tmp_path / "cancelled_case",
+            seed=5,
+        )
 
 
 def test_publish_retries_a_transient_windows_lock(tmp_path, monkeypatch) -> None:

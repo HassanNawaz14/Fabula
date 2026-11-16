@@ -12,8 +12,10 @@ import zipfile
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass
 from pathlib import Path
+from uuid import uuid4
 
 from fabula.case_library import validate_case
+from fabula.generation.bundle_io import replace_directory
 from fabula.generation.errors import (
     GenerationCancelled,
     KaggleRunError,
@@ -28,6 +30,7 @@ DEFAULT_REPO_URL = "https://github.com/HassanNawaz14/Fabula.git"
 DEFAULT_REPO_REF = "main"
 DEFAULT_TIMEOUT_SECONDS = 2700
 DEFAULT_POLL_SECONDS = 20
+STATUS_RETRY_ATTEMPTS = 4
 
 _REQUEST_MARKER = "REQUEST = None  # __FABULA_REQUEST__"
 _FINISHED = "complete"
@@ -46,6 +49,7 @@ class KaggleSettings:
     username: str
     kernel_slug: str = DEFAULT_KERNEL_SLUG
     model_dataset: str = ""
+    model_filename: str = ""
     repo_url: str = DEFAULT_REPO_URL
     repo_ref: str = DEFAULT_REPO_REF
     timeout_seconds: int = DEFAULT_TIMEOUT_SECONDS
@@ -157,20 +161,28 @@ if preloaded:
 repo = Path("/kaggle/working/Fabula")
 if repo.exists():
     shutil.rmtree(repo)
-clone = ["git", "clone", "--depth", "1"]
+clone = ["git", "clone", "--depth", "1", "--filter=blob:none", "--sparse"]
 if REQUEST["repo_ref"] != "main":
     clone += ["--branch", REQUEST["repo_ref"]]
 clone += [REQUEST["repo_url"], str(repo)]
-if run(clone).returncode != 0:
-    raise SystemExit("could not clone the Fabula repository")
+cloned = run(clone).returncode == 0
+if cloned:
+    cloned = (
+        run(
+            ["git", "-C", str(repo), "sparse-checkout", "set", "src", "models/model_manifest.json"]
+        ).returncode
+        == 0
+    )
+if not cloned:
+    if repo.exists():
+        shutil.rmtree(repo)
+    clone = ["git", "clone", "--depth", "1"]
+    if REQUEST["repo_ref"] != "main":
+        clone += ["--branch", REQUEST["repo_ref"]]
+    clone += [REQUEST["repo_url"], str(repo)]
+    if run(clone).returncode != 0:
+        raise SystemExit("could not clone the Fabula repository")
 
-runner_path = repo / "src" / "fabula" / "generation" / "local_runner.py"
-source = runner_path.read_text(encoding="utf-8")
-if "n_gpu_layers" not in source:
-    patched = source.replace("n_threads=threads,", "n_threads=threads, n_gpu_layers=-1,")
-    if patched == source:
-        raise SystemExit("could not enable GPU offload in the local runner")
-    runner_path.write_text(patched, encoding="utf-8")
 os.environ["FABULA_MODEL_GPU_LAYERS"] = "-1"
 sys.path.insert(0, str(repo / "src"))
 
@@ -214,46 +226,63 @@ slug = REQUEST["model_dataset"].split("/", 1)[-1]
 models = sorted((Path("/kaggle/input") / slug).rglob("*.gguf"))
 if not models:
     models = sorted(Path("/kaggle/input").rglob("*.gguf"))
-if not models:
+
+manifest = {}
+manifest_path = repo / "models" / "model_manifest.json"
+if manifest_path.is_file():
+    try:
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError) as exc:
+        print("could not read the model manifest:", exc, flush=True)
+if not isinstance(manifest, dict):
+    manifest = {}
+
+
+def manifest_hash(filename):
+    if manifest.get("filename") == filename:
+        return manifest.get("sha256")
+    fast = manifest.get("fast_model")
+    if isinstance(fast, dict) and fast.get("filename") == filename:
+        return fast.get("sha256")
+    return None
+
+
+requested_model = str(REQUEST.get("model_filename") or "").strip()
+if not requested_model and isinstance(manifest.get("filename"), str):
+    requested_model = manifest["filename"]
+if requested_model:
+    matches = [path for path in models if path.name == requested_model]
+    if not matches:
+        found = ", ".join(path.name for path in models) or "no .gguf files"
+        raise SystemExit(
+            "requested model " + requested_model + " was not found under /kaggle/input ("
+            "found: " + found + "). Set FABULA_KAGGLE_MODEL_FILENAME to the uploaded file."
+        )
+    model = matches[0]
+elif models:
+    model = models[0]
+else:
     raise SystemExit("no .gguf model found under /kaggle/input")
-model = models[0]
+
+expected_hash = manifest_hash(model.name)
+if isinstance(expected_hash, str) and expected_hash:
+    import hashlib
+
+    digest = hashlib.sha256()
+    with model.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    if digest.hexdigest().lower() != expected_hash.lower():
+        raise SystemExit("model " + model.name + " does not match models/model_manifest.json")
+    print("model sha256 verified", flush=True)
 print("model", model, flush=True)
 
-from fabula.generation import local_runner as local_runner_module
-from fabula.generation import orchestrator as orchestrator_module
 from fabula.generation.config import GenerationConfig
 from fabula.generation.local_runner import LocalModelRunner
-from fabula.generation.orchestrator import generate_bundle
-from fabula.generation.prompts import NPC_STAGE
+from fabula.generation.orchestrator import NPC_STAGE, generate_bundle
 from fabula.generation.retries import RetryPolicy
 from fabula.schemas import GenerationSettings
 from fabula.schemas.enums import Disclosure
-
-_GRAMMAR_DROP = frozenset(
-    {"minLength", "maxLength", "pattern", "default", "title", "description", "examples"}
-)
-_SCHEMA_NAME_MAPS = frozenset(
-    {"properties", "$defs", "definitions", "patternProperties", "dependentSchemas"}
-)
-
-
-def simplify_for_grammar(value, *, key=None):
-    if isinstance(value, dict):
-        if key in _SCHEMA_NAME_MAPS:
-            return {name: simplify_for_grammar(item) for name, item in value.items()}
-        return {
-            name: simplify_for_grammar(item, key=name)
-            for name, item in value.items()
-            if name not in _GRAMMAR_DROP
-        }
-    if isinstance(value, list):
-        return [simplify_for_grammar(item) for item in value]
-    return value
-
-
-# llama.cpp >= 0.3.3x rejects grammars nested deeper than 256 levels, and
-# maxLength expands into one nested group per character.
-local_runner_module.simplify_json_schema = simplify_for_grammar
 
 
 def check_world(world):
@@ -353,31 +382,17 @@ def check_npc(output, world, clues):
         raise ValueError("a fact may be lied about, so memory.cover_story must be included")
 
 
-_original_run_stage = orchestrator_module._run_stage
-
-
-def run_stage_checked(*args, **kwargs):
-    stage = kwargs["stage"]
-    base = kwargs.get("extra_validate")
-    stage_input = kwargs["stage_input"]
-
-    def extra_validate(candidate):
-        if base is not None:
-            base(candidate)
-        if stage == "settings->world":
-            check_world(candidate)
-        elif stage == "world+cast->truth+clues":
-            check_truth(candidate, stage_input.world)
-        elif stage == NPC_STAGE:
-            check_npc(candidate, stage_input.world, stage_input.clues)
-
-    kwargs["extra_validate"] = extra_validate
-    return _original_run_stage(*args, **kwargs)
-
-
-# The final Bundle check runs once per bundle and kills every retry. These
-# guards move the same cross-document rules into the per-stage retry loop.
-orchestrator_module._run_stage = run_stage_checked
+# These cross-document guards run inside each stage's retry loop, so a single
+# bad generation is retried instead of failing the finished bundle once.
+STAGE_VALIDATORS = {
+    "settings->world": lambda candidate, _stage_input: check_world(candidate),
+    "world+cast->truth+clues": lambda candidate, stage_input: check_truth(
+        candidate, stage_input.world
+    ),
+    NPC_STAGE: lambda candidate, stage_input: check_npc(
+        candidate, stage_input.world, stage_input.clues
+    ),
+}
 
 output = Path("/kaggle/working/case")
 gpu_layers = int(os.environ.get("FABULA_MODEL_GPU_LAYERS", "-1"))
@@ -412,6 +427,7 @@ try:
                 output,
                 seed=REQUEST["seed"] + bundle_attempt,
                 retry_policy=RetryPolicy(4),
+                stage_validators=STAGE_VALIDATORS,
                 on_progress=progress,
             )
             break
@@ -536,6 +552,7 @@ def kaggle_settings_from_env(
         kernel_slug=env.get("FABULA_KAGGLE_KERNEL_SLUG", DEFAULT_KERNEL_SLUG).strip()
         or DEFAULT_KERNEL_SLUG,
         model_dataset=dataset,
+        model_filename=env.get("FABULA_KAGGLE_MODEL_FILENAME", "").strip(),
         repo_url=env.get("FABULA_KAGGLE_REPO_URL", DEFAULT_REPO_URL).strip() or DEFAULT_REPO_URL,
         repo_ref=env.get("FABULA_KAGGLE_REPO_REF", DEFAULT_REPO_REF).strip() or DEFAULT_REPO_REF,
         timeout_seconds=_int_env(env, "FABULA_KAGGLE_TIMEOUT", DEFAULT_TIMEOUT_SECONDS),
@@ -636,6 +653,26 @@ def _status_payload(raw: object) -> tuple[str, str]:
     return _normalize_status(status), str(message or "")
 
 
+def _status_with_retry(
+    api: object,
+    kernel_ref: str,
+    emit: Callable[[str], None],
+    *,
+    sleep: Callable[[float], None],
+) -> object:
+    last: Exception | None = None
+    for attempt in range(STATUS_RETRY_ATTEMPTS):
+        try:
+            return api.kernels_status(kernel_ref)
+        except Exception as exc:  # noqa: BLE001 - transient network/API errors
+            last = exc
+            if attempt == STATUS_RETRY_ATTEMPTS - 1:
+                break
+            emit("Kaggle status check failed; retrying…")
+            sleep(min(30.0, 2.0 ** (attempt + 1)))
+    raise KaggleRunError(f"Could not read the Kaggle run status: {last}") from last
+
+
 def _wait_for_run(
     api: object,
     settings: KaggleSettings,
@@ -656,7 +693,15 @@ def _wait_for_run(
                 + settings.kernel_url
                 + " to check the run, then try again."
             )
-        status, message = _status_payload(api.kernels_status(settings.kernel_ref))
+        status, message = _status_payload(
+            _status_with_retry(api, settings.kernel_ref, emit, sleep=sleep)
+        )
+        if clock() > deadline:
+            raise KaggleRunError(
+                "Kaggle did not finish in time. Open "
+                + settings.kernel_url
+                + " to check the run, then try again."
+            )
         if status != last_status:
             if status in ("queued", "pending"):
                 emit("Kaggle has queued the GPU notebook…")
@@ -715,6 +760,7 @@ def request_payload(
         "repo_url": settings.repo_url,
         "repo_ref": settings.repo_ref,
         "model_dataset": settings.model_dataset,
+        "model_filename": settings.model_filename,
     }
 
 
@@ -772,7 +818,15 @@ def run_kaggle_case(
         emit("Validating the finished case…")
         validate_case(case_dir)
         destination.parent.mkdir(parents=True, exist_ok=True)
-        shutil.copytree(case_dir, destination)
+        prepared = destination.parent / f".{destination.name}.tmp-{uuid4().hex}"
+        try:
+            shutil.copytree(case_dir, prepared)
+            replace_directory(prepared, destination)
+        except OSError as exc:
+            raise KaggleRunError(f"Could not install the case at {destination}: {exc}") from exc
+        finally:
+            if prepared.exists():
+                shutil.rmtree(prepared, ignore_errors=True)
     return destination
 
 

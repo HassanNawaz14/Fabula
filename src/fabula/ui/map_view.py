@@ -252,6 +252,14 @@ class MapView:
         entry = self._roster.get(npc_id)
         return entry.display_name if entry else npc_id
 
+    @property
+    def time_up(self) -> bool:
+        return bool(self.session.accusation.timed_out)
+
+    def _seconds_left(self) -> float:
+        clock = self.session.clock
+        return max(0.0, clock.duration_minutes * 60 - clock.elapsed_seconds)
+
     def _role(self, npc_id: str) -> str:
         files = self._npcs.get(npc_id)
         role = files.identity.role if files is not None else "villager"
@@ -294,6 +302,15 @@ class MapView:
     # ------------------------------------------------------------------
 
     def handle_event(self, event: pygame.event.Event) -> str | dict[str, Any] | None:
+        if self.time_up:
+            if event.type == pygame.KEYDOWN and event.key in (
+                pygame.K_RETURN,
+                pygame.K_KP_ENTER,
+                pygame.K_ESCAPE,
+            ):
+                return {"action": "back_to_menu"}
+            return None
+
         for btn in self.buttons:
             res = btn.handle_event(event)
             if res:
@@ -392,6 +409,8 @@ class MapView:
         self._draw_bottom_bar(surface)
         self._draw_status(surface)
         self._draw_tooltip(surface)
+        if self.time_up:
+            self._draw_time_up(surface)
 
     def _draw_roads(self, surface: pygame.Surface) -> None:
         seen: set[tuple[str, str]] = set()
@@ -710,18 +729,24 @@ class MapView:
         surface.blit(title, (round(self.width * 0.02), block_y))
         surface.blit(subtitle, (round(self.width * 0.02), block_y + title.get_height() + 2))
 
-        minute = self.session.clock.minute
-        clock_surf = self.font_hud.render(f"{minute // 60:02d}:{minute % 60:02d}", True, _CREAM)
+        remaining = self._seconds_left()
+        total = int(remaining + 0.999)
+        minutes, seconds = divmod(total, 60)
+        clock_color = _CREAM if remaining > 60 else (238, 152, 120)
+        clock_surf = self.font_hud.render(f"{minutes:02d}:{seconds:02d}", True, clock_color)
+        caption_surf = self.font_type.render("TIME LEFT", True, (176, 168, 146))
         place = self._place_names.get(self.session.player_location, "")
         location_surf = self.font_hud_small.render(f"You are at {place}", True, _MUTED)
         right = self.width - round(self.width * 0.02)
-        right_h = clock_surf.get_height() + location_surf.get_height() + 2
-        right_y = (self.hud_h - right_h) // 2
-        surface.blit(clock_surf, (right - clock_surf.get_width(), right_y))
-        surface.blit(
-            location_surf,
-            (right - location_surf.get_width(), right_y + clock_surf.get_height() + 2),
+        right_h = (
+            caption_surf.get_height() + clock_surf.get_height() + location_surf.get_height() + 4
         )
+        right_y = (self.hud_h - right_h) // 2
+        surface.blit(caption_surf, (right - caption_surf.get_width(), right_y))
+        right_y += caption_surf.get_height() + 2
+        surface.blit(clock_surf, (right - clock_surf.get_width(), right_y))
+        right_y += clock_surf.get_height() + 2
+        surface.blit(location_surf, (right - location_surf.get_width(), right_y))
 
     def _draw_bottom_bar(self, surface: pygame.Surface) -> None:
         bar_top = self.height - self.bar_h
@@ -762,6 +787,29 @@ class MapView:
         surface.blit(
             text, (rect.centerx - text.get_width() // 2, rect.centery - text.get_height() // 2)
         )
+
+    def _draw_time_up(self, surface: pygame.Surface) -> None:
+        veil = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        veil.fill((4, 6, 10, 176))
+        surface.blit(veil, (0, 0))
+
+        width = min(self.width - 80, round(620 * self.scale))
+        height = max(200, round(230 * self.scale))
+        rect = pygame.Rect(0, 0, width, height)
+        rect.center = (self.width // 2, self.height // 2)
+        panel = pygame.Surface(rect.size, pygame.SRCALPHA)
+        panel.fill((14, 16, 20, 246))
+        surface.blit(panel, rect.topleft)
+        pygame.draw.rect(surface, (166, 150, 110), rect, 2, border_radius=16)
+
+        title = self.font_hud_title.render("TIME'S UP", True, (238, 152, 120))
+        body = self.font_tooltip.render(
+            "You ran out of time. The case goes cold.", True, (224, 222, 210)
+        )
+        hint = self.font_type.render("Press Enter to return to the menu", True, (196, 186, 160))
+        surface.blit(title, (rect.centerx - title.get_width() // 2, rect.y + 30))
+        surface.blit(body, (rect.centerx - body.get_width() // 2, rect.centery - 6))
+        surface.blit(hint, (rect.centerx - hint.get_width() // 2, rect.bottom - 38))
 
     def _draw_tooltip(self, surface: pygame.Surface) -> None:
         if self.hovered_npc:

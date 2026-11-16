@@ -255,7 +255,9 @@ def _emit_progress(
     label = STAGE_LABELS.get(event.stage or "", "Working on the case…")
     if event.stage == NPC_STAGE and event.detail:
         label = f"Writing the secrets of {event.detail}…"
-    if event.kind == "stage_attempt" and event.attempt > 1:
+    if event.kind == "bundle_notice":
+        emit(f"Using the built-in blueprint library: {event.detail}.", event.stage, None)
+    elif event.kind == "stage_attempt" and event.attempt > 1:
         emit(f"{label} Retrying (attempt {event.attempt}).", event.stage, event.attempt)
     elif event.kind == "stage_started":
         emit(label, event.stage, None)

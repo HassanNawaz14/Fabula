@@ -21,7 +21,7 @@
   <!-- Header -->
   <g transform="translate(60, 40)">
     <text x="0" y="0" class="diagram-title">Runtime Dispatch: Body &amp; Voice</text>
-    <text x="0" y="18" class="diagram-sub">How the engine handles an NPC turn — movement via schedule + A*, speech via prompt assembler + live API</text>
+    <text x="0" y="18" class="diagram-sub">How the engine handles an NPC turn — movement via schedule + shortest path, speech via prompt assembler + live API</text>
   </g>
 
   <!-- Input Node: NPC Turn -->
@@ -59,10 +59,10 @@
 
   <g transform="translate(105, 340)">
     <rect x="0" y="0" width="240" height="80" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.5" />
-    <text x="120" y="26" class="node-title">A* Pathfinding</text>
+    <text x="120" y="26" class="node-title">Dijkstra Routing</text>
     <text x="120" y="46" class="node-sub">shortest path on town graph</text>
     <line x1="20" y1="56" x2="220" y2="56" stroke="#e2e8f0" stroke-width="1" />
-    <text x="120" y="72" class="node-sub">Euclidean heuristic · tile coords</text>
+    <text x="120" y="72" class="node-sub">insertion-order tie-breaking</text>
   </g>
 
   <!-- CENTER: SPOILER FIREWALL CALLOUT -->

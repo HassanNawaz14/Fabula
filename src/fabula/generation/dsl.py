@@ -49,6 +49,7 @@ class Blueprint:
     premise: str
     cast: CastSpec
     crime: CrimeSpec
+    difficulty: str = "normal"
     timeline: list[TimelineEvent] = field(default_factory=list)
     clues: list[ClueSpec] = field(default_factory=list)
     knowledge: dict[str, list[str]] = field(default_factory=dict)
@@ -58,6 +59,7 @@ def parse_dsl(text: str) -> Blueprint:
     """Parse a Compact Blueprint DSL string into a structured Blueprint object."""
     case_type = "theft"
     tone = "cozy"
+    difficulty = "normal"
     seed = 42
     premise = "A mysterious occurrence requires investigation."
     victim = "victim"
@@ -76,15 +78,21 @@ def parse_dsl(text: str) -> Blueprint:
 
     for line in lines:
         if line.startswith("[CASE:") and line.endswith("]"):
-            # [CASE:theft|cozy|seed_101]
+            # [CASE:theft|cozy|hard|seed_101] (difficulty is optional)
             inner = line[6:-1]
             parts = inner.split("|")
             if len(parts) >= 1 and parts[0]:
                 case_type = parts[0].strip().lower()
             if len(parts) >= 2 and parts[1]:
                 tone = parts[1].strip().lower()
-            if len(parts) >= 3 and parts[2]:
-                seed_str = parts[2].strip().replace("seed_", "").replace("seed:", "")
+            for part in parts[2:]:
+                token = part.strip().lower()
+                if not token:
+                    continue
+                if token in ("easy", "normal", "hard"):
+                    difficulty = token
+                    continue
+                seed_str = token.replace("seed_", "").replace("seed:", "")
                 try:
                     seed = int(seed_str)
                 except ValueError:
@@ -174,6 +182,7 @@ def parse_dsl(text: str) -> Blueprint:
         premise=premise,
         cast=cast,
         crime=crime,
+        difficulty=difficulty,
         timeline=timeline,
         clues=clues,
         knowledge=knowledge,
@@ -188,7 +197,8 @@ def format_dsl(blueprint: Blueprint) -> str:
         f"| scene:{blueprint.crime.scene} | time:{blueprint.crime.time}"
     )
     lines = [
-        f"[CASE:{blueprint.case_type}|{blueprint.tone}|seed_{blueprint.seed}]",
+        f"[CASE:{blueprint.case_type}|{blueprint.tone}|{blueprint.difficulty}"
+        f"|seed_{blueprint.seed}]",
         f"PREMISE: {blueprint.premise}",
         f"CAST: vict:{blueprint.cast.victim} | culp:{blueprint.cast.culprit} | susp:{suspects_str}",
         crime_str,

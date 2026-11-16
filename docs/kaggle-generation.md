@@ -75,6 +75,8 @@ The Kaggle notebook needs the fine-tuned GGUF file:
 
 The full dataset reference is `<your-username>/fabula-qwen-3b-gguf`, which is what the game uses by default. If the slug differs, set `FABULA_KAGGLE_MODEL_DATASET=<username>/<dataset-slug>`.
 
+The notebook looks for the staged model by file name, taken from `models/model_manifest.json` (`Qwen2.5-3B-Instruct.Q4_K_M.gguf`) and verified against the manifest's SHA-256. If your dataset holds several GGUFs under different names, set `FABULA_KAGGLE_MODEL_FILENAME=<file name>`; a mismatch is reported before generation starts instead of after a long run.
+
 The upload is a one-time cost. Later generations reuse the same dataset.
 
 ### 5. Check the connection
@@ -96,12 +98,13 @@ A first run creates the private notebook `<username>/fabula-case-generator`, wai
 
 What the notebook does on Kaggle:
 
-1. Clones the Fabula repository (default `main`).
+1. Bare-clones the Fabula repository (default `main`) with a sparse checkout of `src/` and `models/model_manifest.json`; if sparse checkout is unavailable it falls back to a full clone.
 2. Installs a CUDA build of `llama-cpp-python` and enables GPU offload (`FABULA_MODEL_GPU_LAYERS=-1`).
-3. Runs the staged generator with the requested type, tone and difficulty and a fresh seed.
-4. Packages the validated bundle as `case.zip` and prints `KAGGLE_DONE`.
+3. Selects the requested GGUF by file name and verifies its manifest SHA-256.
+4. Runs the same staged generator as a local run, including the official `stage_validators` hook for cross-document checks; the notebook never patches the cloned source.
+5. Packages the validated bundle as `case.zip` and prints `KAGGLE_DONE`.
 
-The notebook is private, runs with GPU and internet enabled, and mounts only the model dataset. Nothing else from the account is exposed.
+The notebook is private, runs with GPU and internet enabled, and mounts only the model dataset. Nothing else from the account is exposed. The finished case is validated locally and installed atomically: a broken download or an invalid bundle leaves the existing ready-case library untouched.
 
 ## Generating the pre-made library (20–30 cases)
 
@@ -141,11 +144,12 @@ Cases land in `bundles/library/kaggle_<YYYYMMDD_HHMMSS>` and appear newest-first
 | `KAGGLE_USERNAME` / `KAGGLE_KEY` | Credentials, if not using `~/.kaggle/kaggle.json` |
 | `FABULA_KAGGLE_USERNAME` | Kernel owner, if it differs from the credentials username |
 | `FABULA_KAGGLE_MODEL_DATASET` | Dataset reference, default `<username>/fabula-qwen-3b-gguf` |
+| `FABULA_KAGGLE_MODEL_FILENAME` | File name to pick inside the dataset; default the manifest's staged model |
 | `FABULA_KAGGLE_KERNEL_SLUG` | Notebook slug, default `fabula-case-generator` |
 | `FABULA_KAGGLE_REPO_URL` | Repository cloned on Kaggle, default the project GitHub URL |
 | `FABULA_KAGGLE_REPO_REF` | Branch or tag to clone, default `main` |
 | `FABULA_KAGGLE_TIMEOUT` | Seconds before the client gives up waiting, default `2700` |
-| `FABULA_KAGGLE_POLL` | Seconds between status checks, default `20` |
+| `FABULA_KAGGLE_POLL` | Seconds between status checks, default `20`; transient status-API errors are retried with backoff before the run is abandoned |
 | `FABULA_LIBRARY_DIR` | Where finished cases are stored, default `bundles/library` |
 
 The notebook reads the repository, so a change to the generator must be pushed before Kaggle can use it. Until a change is merged to `main`, set `FABULA_KAGGLE_REPO_REF` to the branch that contains it.
@@ -162,6 +166,8 @@ The notebook reads the repository, so a change to the generator must be pushed b
 | `Kaggle refused the request` with 401 | The legacy JSON is malformed. It must contain exactly `username` and `key`, with no extra quotes around the values. |
 | `Kaggle refused the request` | The model dataset reference is wrong or not visible to the account. Check the dataset slug and set `FABULA_KAGGLE_MODEL_DATASET`. |
 | Notebook fails with `no .gguf model found` | The dataset does not contain the model file. Re-upload the GGUF. |
+| Notebook fails with `requested model ... was not found` | The uploaded file name differs from the manifest default. Set `FABULA_KAGGLE_MODEL_FILENAME` to the name the error lists. |
+| Notebook fails with `does not match models/model_manifest.json` | The uploaded GGUF is a different build or a corrupted upload. Re-upload the artifact whose hash is in the manifest, or update the manifest for an intentional new build. |
 | Notebook fails with `no CUDA build ... could be installed` | Kaggle changed its CUDA images. Re-run; if it persists, the wheel index list in `kaggle_runner.py` needs a newer tag. |
 | Status `error` with a quota message | The weekly GPU quota is spent, or the account is not phone-verified. |
 | `Kaggle did not finish in time` | The queue was long or the run stalled. Open the notebook URL printed in the message, then raise `FABULA_KAGGLE_TIMEOUT`. |

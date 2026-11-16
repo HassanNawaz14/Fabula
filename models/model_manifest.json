@@ -6,5 +6,14 @@
   "quantization": "Q4_K_M",
   "license": "Apache-2.0",
   "source": "Kaggle WP-D output",
-  "weights_in_git": false
+  "weights_in_git": false,
+  "fast_model": {
+    "filename": "Llama-3.2-1B-Instruct.Q4_K_M.gguf",
+    "sha256": "f93e2cbb18e5f7fc4c623551faae97d642c53ba47400e16af483a775d9c0181b",
+    "base_model": "unsloth/Llama-3.2-1B-Instruct-bnb-4bit",
+    "quantization": "Q4_K_M",
+    "license": "Llama-3.2 Community License",
+    "purpose": "fast blueprint route (Compact Blueprint DSL)",
+    "weights_in_git": false
+  }
 }

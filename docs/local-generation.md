@@ -63,10 +63,11 @@ Environment overrides:
 The in-game **Generate Locally** route and `python -m fabula generate --fast` use the neurosymbolic pipeline instead of the staged JSON pipeline:
 
 1. The model writes a short Compact Blueprint DSL (about 150 tokens; token budget `blueprint: 350`).
-2. `BlueprintCompiler` expands the blueprint into the full bundle and proves candidate-elimination solvability symbolically.
-3. The bundle is published atomically and validated like any other case.
+2. `BlueprintCompiler` compiles the blueprint faithfully: the culprit, cast, scene, minute, timeline, clues, and knowledge lines reach the bundle, and only structural gaps the schema requires (4 connected locations, 5–6 NPCs, 4–6 clues, accusation options) are filled in. The requested type, tone, and difficulty always win over whatever the header says.
+3. The compiler proves candidate-elimination solvability: exactly the culprit may own a clue-reachable secret `did` fact, and every innocent has a clue-backed alibi.
+4. The bundle is published atomically and validated like any other case.
 
-The route prefers `models/Llama-3.2-1B-Instruct.Q4_K_M.gguf` (override with `FABULA_FAST_MODEL_PATH`). If no fast model file exists, the blueprint comes from the deterministic built-in sample library, so the route still finishes in seconds. The 3B GGUF is kept out of this route: it is trained for staged JSON, and at roughly 4–5 tok/s on CPU it cannot meet the one-minute budget.
+The route prefers `models/Llama-3.2-1B-Instruct.Q4_K_M.gguf` (override with `FABULA_FAST_MODEL_PATH`). `python -m fabula model check --model <fast GGUF>` verifies it against the `fast_model` entry in `models/model_manifest.json`. If no fast model file exists, the blueprint comes from the deterministic built-in sample library, so the route still finishes in seconds; the CLI prints `Blueprint: model` or `Blueprint: synthetic` plus the fallback reason, and the game shows the same notice. The 3B GGUF is kept out of this route: it is trained for staged JSON, and at roughly 4–5 tok/s on CPU it cannot meet the one-minute budget.
 
 Generation is CPU-heavy. On a 4-vCPU reference machine the *staged* six-NPC run can take tens of minutes, longer than the HG-16 target; reduce `FABULA_MODEL_CTX` only if prompts still fit. Keep time promises on the loading screen limited to the fast route, and leave the staged route's duration open until HA-03 numbers are final.
 

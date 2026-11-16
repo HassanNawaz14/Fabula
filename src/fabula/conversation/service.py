@@ -8,6 +8,7 @@ from dataclasses import dataclass
 
 import httpx
 
+from fabula.conversation.clue_reveal import eligible_reveal_clues
 from fabula.conversation.config import (
     ApiKeys,
     ConversationConfig,
@@ -36,6 +37,7 @@ class ConversationReply:
     provider: str | None
     scripted: bool
     fallback: bool
+    fallback_reason: str | None = None
     input_blocked: bool = False
     leak_blocked: bool = False
     revealed_clue_ids: tuple[str, ...] = ()
@@ -56,13 +58,8 @@ class ConversationStatus:
 class ParsedReply:
     text: str
     mood: Mood
+    clue_id: str | None = None
 
-
-_FALLBACK_LINES = (
-    '{name} pauses, then says, "Not now — give me a moment to think."',
-    '{name} frowns. "I am sorry, I cannot find the right words just now."',
-    '{name} looks away briefly. "Ask me again in a moment."',
-)
 
 _INPUT_BLOCKED = '{name} holds up a hand. "Let us keep this civil."'
 _LEAK_DEFLECTION = (
@@ -90,7 +87,9 @@ def parse_npc_reply(raw: str) -> ParsedReply:
                     mood = Mood(raw_mood)
                 except ValueError:
                     mood = Mood.NEUTRAL
-            return ParsedReply(text=_clip(reply.strip()), mood=mood)
+            raw_clue = payload.get("clue")
+            clue_id = raw_clue.strip() if isinstance(raw_clue, str) else None
+            return ParsedReply(text=_clip(reply.strip()), mood=mood, clue_id=clue_id or None)
         return ParsedReply(text="", mood=Mood.NEUTRAL)
     return ParsedReply(text=_clip(cleaned), mood=Mood.NEUTRAL)
 
@@ -295,12 +294,15 @@ class ConversationService:
         if self._provider is None:
             raise ConversationSetupError("live mode requires a provider")
         if self._tokens_used >= self.config.token_cap:
-            return self._fallback(identity.id, identity.name, text, "token_cap")
+            return self._degraded(
+                context, text, clues, discovered_clue_ids, len(history), "token_cap"
+            )
 
         messages = build_messages(
             context,
             gated_reveal=self.config.gated_reveal,
             discovered_clue_ids=discovered_clue_ids,
+            reveal_options=eligible_reveal_clues(identity.id, clues, discovered_clue_ids),
         )
         request = ProviderRequest(
             messages=messages,
@@ -311,15 +313,21 @@ class ConversationService:
         try:
             response = self._provider.complete(request)
         except (ProviderTimeout, ProviderError):
-            return self._fallback(identity.id, identity.name, text, "provider_error")
+            return self._degraded(
+                context, text, clues, discovered_clue_ids, len(history), "provider_error"
+            )
 
         if not response.text.strip():
-            return self._fallback(identity.id, identity.name, text, "empty_reply")
+            return self._degraded(
+                context, text, clues, discovered_clue_ids, len(history), "empty_reply"
+            )
 
         self._tokens_used += response.total_tokens or _estimate_tokens(request, response.text)
         parsed = parse_npc_reply(response.text)
         if not parsed.text:
-            return self._fallback(identity.id, identity.name, text, "empty_reply")
+            return self._degraded(
+                context, text, clues, discovered_clue_ids, len(history), "empty_reply"
+            )
 
         leak_blocked = False
         final_text = parsed.text
@@ -330,6 +338,10 @@ class ConversationService:
                 leak_blocked = True
 
         self._record(identity.id, text, final_text)
+        eligible_ids = {
+            clue.id for clue in eligible_reveal_clues(identity.id, clues, discovered_clue_ids)
+        }
+        revealed = (parsed.clue_id,) if parsed.clue_id in eligible_ids else ()
         return ConversationReply(
             text=final_text,
             mood=parsed.mood,
@@ -338,6 +350,7 @@ class ConversationService:
             scripted=False,
             fallback=False,
             leak_blocked=leak_blocked,
+            revealed_clue_ids=revealed,
             leak_filter=self.config.leak_filter,
             gated_reveal=self.config.gated_reveal,
         )
@@ -355,19 +368,31 @@ class ConversationService:
             gated_reveal=self.config.gated_reveal,
         )
 
-    def _fallback(
-        self, npc_id: str, name: str, player_input: str, reason: str
+    def _degraded(
+        self,
+        context: PromptContext,
+        player_text: str,
+        clues: Sequence[Clue],
+        discovered_clue_ids: frozenset[str],
+        turn_index: int,
+        reason: str,
     ) -> ConversationReply:
-        index = (len(self._history.get(npc_id, ())) + len(reason)) % len(_FALLBACK_LINES)
-        text = _FALLBACK_LINES[index].format(name=name)
-        self._record(npc_id, player_input, text)
+        scripted = self._responder.reply(
+            context,
+            clues=clues,
+            discovered_clue_ids=discovered_clue_ids,
+            turn_index=turn_index,
+        )
+        self._record(context.identity.id, player_text, scripted.text)
         return ConversationReply(
-            text=text,
-            mood=Mood.NEUTRAL,
+            text=_clip(scripted.text),
+            mood=scripted.mood,
             mode=self.mode,
             provider=None if self._provider is None else self._provider.name,
-            scripted=self._scripted,
+            scripted=False,
             fallback=True,
+            fallback_reason=reason,
+            revealed_clue_ids=scripted.revealed_clue_ids,
             leak_filter=self.config.leak_filter,
             gated_reveal=self.config.gated_reveal,
         )

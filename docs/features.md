@@ -73,7 +73,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
                                             │
 ┌───────────────────────────── PHASE 2: PLAY (10 minutes) ──────────────────────────────────┐
 │ Python engine loads bundle ─► builds world from world.json (tiles from fixed type enum)   │
-│ NPCs move/act via classical AI (A*, schedules)                                            │
+│ NPCs move/act via classical AI (shortest-path routing, schedules)                        │
 │ Player walks, examines clues, talks (free text)                                           │
 │     └─► Prompt assembler: identity.json + memory.json of THAT NPC only (+ chat history)   │
 │            └─► Live API (Gemini / Grok / …) ─► in-character reply                         │
@@ -103,7 +103,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 - **Engine [OPEN]:** Pygame or Arcade (default if undecided: Pygame). Whichever is chosen, the simulation core is a **pure-Python, headless library with no UI imports** (testable and batch-runnable); the UI is a thin layer on top **[ADOPTED]**.
 - **World construction [DECIDED]:** Python builds the world from `world.json`.
 - **Locations [DECIDED/ADOPTED]:** 3–4 named locations per game, named and described by the LLM, but their **type must come from a fixed enum** (`location_types_v1`: market, library, café, park, parking, residence — decided via HG-04; docks replaced by parking on 2026-10-17) that maps to **pre-made tiles/placeholder assets**. This keeps generated worlds renderable without generated art.
-- **Coordinates [ADOPTED]:** locations and NPC positions use explicit coordinates / tile positions (needed for A* heuristics); movement is on a small tile map or graph with named location nodes.
+- **Coordinates [ADOPTED]:** locations and NPC positions use explicit coordinates / tile positions (needed for shortest-path routing); movement is on a small tile map or graph with named location nodes.
 - **Perception [ADOPTED]:** an NPC perceives events in its own location (optionally adjacent). Specific rule finalised at schema freeze.
 - **Time model [OPEN]:** real-time vs tick-based simulation. The session target is 10 real minutes.
 
@@ -159,7 +159,7 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 ## 5. Fine-Tuning Plan
 
 ### 5.1 Model & method
-- **Small instruct LLM, ~3–4B parameters [ADOPTED]**; exact base model **[OPEN]**. Candidates: Qwen 3.x ~4B, Gemma 3 ~4B, Llama 3.2 3B. (Large MoE models are too heavy for a local game.)
+- **Two fine-tuned generation models [DECIDED/ADOPTED 2026-11-15]:** a ~1B `Llama-3.2-1B-Instruct` fine-tune for the primary fast blueprint route, and a 3B `Qwen2.5-3B-Instruct` fine-tune for the legacy staged JSON route. Both are evaluated and compared (Section 11.3).
 - **QLoRA supervised fine-tuning (SFT) with Unsloth on Kaggle T4 [DECIDED/ADOPTED]**. Check Kaggle's current weekly GPU quota and session limits before scheduling runs.
 - SFT first; RL (e.g. GRPO) is deferred.
 - Export a quantised model (e.g. Q4 GGUF) for **local CPU inference**; inference runtime **[OPEN]** (llama.cpp-style runner).
@@ -189,12 +189,12 @@ Before/while fine-tuning, test **base model + good prompting** and a large API m
 | Language | Python | DECIDED |
 | Game library | Pygame or Arcade | OPEN (default Pygame) |
 | Simulation core | Headless pure-Python library | ADOPTED |
-| Generation model | Small (~3–4B) instruct LLM, QLoRA, Unsloth, Kaggle T4 | DECIDED/ADOPTED |
+| Generation models | 1B Llama-3.2 blueprint (primary) + 3B Qwen2.5 staged (legacy), QLoRA, Unsloth, Kaggle T4 | DECIDED/ADOPTED |
 | Local inference | Quantised (e.g. GGUF Q4), runner TBD | OPEN |
 | Constrained decoding | Grammar / JSON-schema | ADOPTED |
 | Runtime conversation | Live APIs only (Gemini, Grok, …) | DECIDED |
 | Data format | JSON bundle, validated with Pydantic (or equivalent) | ADOPTED |
-| Pathfinding | A* | ADOPTED |
+| Pathfinding | Shortest path (Dijkstra over the location graph) | ADOPTED |
 
 ---
 
@@ -374,7 +374,7 @@ Build a **scripted probe suite per NPC**: direct questions, leading questions, f
 Secondary (generator-side, acceptable to report): schema validity rate, graph connectivity, solvability, unique-culprit rate, timeline consistency, scenario diversity.
 
 ### 11.3 Core experiment
-Generate NPC JSONs with the **base model** and with the **fine-tuned model**, run the **same** runtime API model on both, and compare the metrics above. This ties the fine-tune directly to measurable NPC quality. Break results down by mystery type.
+Generate NPC JSONs with **both generator models** — the fine-tuned 1B fast blueprint model and the fine-tuned 3B staged model — run the **same** runtime API model on both, and compare the metrics above by mystery type and generator. Separately compare base vs fine-tuned within each generator. This ties both fine-tunes to measurable NPC quality and is the project's headline result.
 
 ### 11.4 Ablations [ADOPTED]
 - Secrets-in-prompt (baseline) vs **gated reveal**.
@@ -429,7 +429,7 @@ Which model/provider acts as LLM-judge, and the human-sampling protocol.
 - **Week 1:** specs, schemas, repo setup
 - **Weeks 2–3:** symbolic generator, validators, data pipeline
 - **Week 4:** fine-tune v1 and first generation-quality checks
-- **Weeks 4–6:** simulation core, NPC schedules/A*, prompt assembler, UI
+- **Weeks 4–6:** simulation core, NPC schedules/shortest-path routing, prompt assembler, UI
 - **Week 7:** integration, playtests, NPC-behaviour evaluation
 - **Week 8:** polish, results, demo
 

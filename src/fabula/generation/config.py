@@ -189,8 +189,20 @@ def load_model_manifest(
     return payload
 
 
-def manifest_sha256(manifest: Mapping[str, object] | None) -> str | None:
+def manifest_sha256(
+    manifest: Mapping[str, object] | None, *, filename: str | None = None
+) -> str | None:
     if manifest is None:
+        return None
+    if filename is not None and manifest.get("filename") not in (None, filename):
+        fast = manifest.get("fast_model")
+        if isinstance(fast, dict) and fast.get("filename") == filename:
+            value = fast.get("sha256")
+            if value is None:
+                return None
+            if not isinstance(value, str):
+                raise GenerationSetupError("model manifest fast_model.sha256 must be a string")
+            return value
         return None
     value = manifest.get("sha256")
     if value is None:

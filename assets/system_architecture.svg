@@ -26,7 +26,7 @@
   <!-- Title Header -->
   <g transform="translate(60, 40)">
     <text x="0" y="0" class="diagram-title">System Architecture: Generation &amp; Play</text>
-    <text x="0" y="18" class="diagram-sub">Phase 1: local staged generation → validated JSON bundle · Phase 2: headless play with Body (A*) and Voice (live API)</text>
+    <text x="0" y="18" class="diagram-sub">Phase 1: local staged generation → validated JSON bundle · Phase 2: headless play with Body (shortest path) and Voice (live API)</text>
   </g>
 
   <!-- ============ PHASE 1: GENERATION ============ -->
@@ -145,9 +145,9 @@
 
     <g transform="translate(20, 35)">
       <rect x="0" y="0" width="280" height="62" rx="5" fill="#ffffff" stroke="#64748b" stroke-width="1" />
-      <text x="140" y="22" class="sub-node-title">Body: Schedule + A*</text>
+      <text x="140" y="22" class="sub-node-title">Body: Schedule + Pathfinding</text>
       <text x="140" y="40" class="sub-node-sub">next waypoint from world.json</text>
-      <text x="140" y="54" class="sub-node-sub">A* shortest path (Euclidean)</text>
+      <text x="140" y="54" class="sub-node-sub">Dijkstra shortest path</text>
     </g>
 
     <g transform="translate(320, 35)">

@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import threading
 from typing import Any
 
 import pygame
@@ -62,6 +63,9 @@ class DialogueView:
         self.stick_to_bottom = True
         self._chat_surface: pygame.Surface | None = None
         self._chat_dirty = True
+        self._reply_lock = threading.Lock()
+        self._pending_reply: tuple[str, Any] | None = None
+        self._degraded_notice_shown = False
 
         for statement in session.statements_for(npc_id):
             self.history.append(
@@ -173,10 +177,56 @@ class DialogueView:
         self.loading = True
         self._chat_dirty = True
 
+        files = self.session.loaded.npcs[self.npc_id]
+        clues = tuple(self.session.loaded.clues.clues)
+        discovered = self.session.discovered_ids
+        threading.Thread(
+            target=self._fetch_reply,
+            args=(files, text, clues, discovered),
+            daemon=True,
+        ).start()
+
+    def _fetch_reply(
+        self, files: Any, text: str, clues: tuple[Any, ...], discovered: frozenset[str]
+    ) -> None:
         try:
-            files = self.session.loaded.npcs[self.npc_id]
-            clues = self.session.loaded.clues.clues
-            reply = self.conversation_service.reply(files, text, clues=clues)
+            reply = self.conversation_service.reply(
+                files,
+                text,
+                clues=clues,
+                discovered_clue_ids=discovered,
+            )
+            outcome: tuple[str, Any] = ("reply", reply)
+        except Exception as error:  # keep the scene alive if the service fails
+            outcome = ("error", error)
+        with self._reply_lock:
+            self._pending_reply = outcome
+
+    def _apply_pending_reply(self) -> None:
+        with self._reply_lock:
+            pending, self._pending_reply = self._pending_reply, None
+        if pending is None:
+            return
+        kind, payload = pending
+        if kind == "error":
+            self.history.append(
+                {
+                    "speaker": "system",
+                    "text": f"The conversation falters for a moment. ({payload})",
+                    "mood": "",
+                }
+            )
+        else:
+            reply = payload
+            if getattr(reply, "fallback", False) and not self._degraded_notice_shown:
+                self._degraded_notice_shown = True
+                self.history.append(
+                    {
+                        "speaker": "system",
+                        "text": "Live voice is unavailable — replies now use scripted dialogue.",
+                        "mood": "",
+                    }
+                )
             revealed = 0
             for clue_id in reply.revealed_clue_ids:
                 try:
@@ -200,18 +250,9 @@ class DialogueView:
                         "mood": "",
                     }
                 )
-        except Exception as error:  # keep the scene alive if the service fails
-            self.history.append(
-                {
-                    "speaker": "system",
-                    "text": f"The conversation falters for a moment. ({error})",
-                    "mood": "",
-                }
-            )
-        finally:
-            self.loading = False
-            self._chat_dirty = True
-            self.stick_to_bottom = True
+        self.loading = False
+        self._chat_dirty = True
+        self.stick_to_bottom = True
 
     # ------------------------------------------------------------------
     # Chat rendering
@@ -350,6 +391,7 @@ class DialogueView:
 
     def update(self) -> None:
         self.tick += 1
+        self._apply_pending_reply()
         self.back_button.update()
         self.send_button.update()
 

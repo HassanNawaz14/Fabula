@@ -30,7 +30,7 @@ _OPTIONS = (
     ),
     (
         "Generate Locally",
-        "Runs the local model on this PC. Time varies — often 30+ minutes.",
+        "Builds a fresh case on this PC from a short model blueprint. Usually under a minute.",
         "start_local_generation",
     ),
 )

@@ -364,3 +364,96 @@ def test_local_job_surfaces_a_failure(tmp_path) -> None:
     assert job.error is not None
     assert "model exploded" in job.error
     assert job.take_result() is None
+
+
+def test_local_job_uses_the_fast_blueprint_pipeline(tmp_path) -> None:
+    from fabula.generation.synthetic_blueprint import generate_synthetic_blueprint_sample
+
+    dsl = generate_synthetic_blueprint_sample(11)["messages"][2]["content"]
+
+    class BlueprintRunner:
+        def generate_blueprint(self, **_kwargs):
+            return dsl
+
+    job = LocalCaseJob(
+        GenerationSettings(mystery_type="random", tone="cozy", difficulty="normal"),
+        runner=BlueprintRunner(),
+        output_dir=tmp_path / "fast_case",
+    )
+    job.start()
+
+    assert _wait(job)
+    assert job.error is None
+    validate_case(job.result_path)
+    messages = [update.message for update in job.drain()]
+    assert any("blueprint" in message.lower() for message in messages)
+
+
+def test_local_job_falls_back_to_the_blueprint_library_without_a_model(
+    tmp_path, monkeypatch
+) -> None:
+    monkeypatch.chdir(tmp_path)
+
+    job = LocalCaseJob(
+        GenerationSettings(mystery_type="theft", tone="cozy", difficulty="easy"),
+        output_dir=tmp_path / "fallback_case",
+        environ={},
+    )
+    job.start()
+
+    assert _wait(job)
+    assert job.error is None
+    validate_case(job.result_path)
+    messages = [update.message for update in job.drain()]
+    assert any("built-in blueprint" in message for message in messages)
+
+
+def test_publish_retries_a_transient_windows_lock(tmp_path, monkeypatch) -> None:
+    from fabula.generation import bundle_io
+
+    bundle = generate_skeleton("theft", 3)
+    attempts = {"count": 0}
+    original_rename = Path.rename
+
+    def flaky_rename(self, destination):
+        if self.name.startswith(".retry_case.tmp-"):
+            attempts["count"] += 1
+            if attempts["count"] == 1:
+                raise PermissionError(13, "locked by a scanner", str(self))
+        return original_rename(self, destination)
+
+    monkeypatch.setattr(Path, "rename", flaky_rename)
+
+    published = bundle_io.publish_bundle(bundle, tmp_path / "retry_case")
+
+    assert published == (tmp_path / "retry_case").resolve()
+    assert attempts["count"] == 2
+
+
+def test_cli_without_a_command_launches_the_start_menu(monkeypatch) -> None:
+    from fabula import cli
+
+    launched = []
+    monkeypatch.setattr(cli, "run_game", lambda: launched.append(True) or 0)
+
+    assert cli.main([]) == 0
+    assert launched == [True]
+
+
+def test_play_without_a_bundle_opens_the_start_menu(tmp_path, monkeypatch) -> None:
+    from fabula import cli
+
+    monkeypatch.chdir(tmp_path)
+    launched = []
+    monkeypatch.setattr(cli, "run_game", lambda: launched.append(True) or 0)
+
+    assert cli.main(["play"]) == 0
+    assert launched == [True]
+
+
+def test_play_reports_a_missing_case(tmp_path, monkeypatch) -> None:
+    from fabula import cli
+
+    monkeypatch.chdir(tmp_path)
+
+    assert cli.main(["play", "--bundle", "missing-case"]) == 2

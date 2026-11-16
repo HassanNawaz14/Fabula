@@ -5,6 +5,7 @@ from __future__ import annotations
 import json
 import re
 import shutil
+import time
 from pathlib import Path
 from uuid import uuid4
 
@@ -48,6 +49,22 @@ def write_bundle_files(bundle: Bundle, root: Path) -> None:
         path.write_text(text, encoding="utf-8")
 
 
+_RENAME_ATTEMPTS = 5
+_RENAME_DELAY_SECONDS = 0.12
+
+
+def _rename_with_retry(source: Path, destination: Path) -> None:
+    """Rename a directory, retrying transient Windows locks (OneDrive, AV scans)."""
+    for attempt in range(_RENAME_ATTEMPTS):
+        try:
+            source.rename(destination)
+            return
+        except PermissionError:
+            if attempt == _RENAME_ATTEMPTS - 1:
+                raise
+            time.sleep(_RENAME_DELAY_SECONDS * (attempt + 1))
+
+
 def publish_bundle(bundle: Bundle, output_dir: Path) -> Path:
     """Publish a validated bundle atomically, replacing any previous bundle.
 
@@ -68,12 +85,12 @@ def publish_bundle(bundle: Bundle, output_dir: Path) -> Path:
         temp_dir.mkdir()
         write_bundle_files(bundle, temp_dir)
         if target.exists():
-            target.rename(backup_dir)
+            _rename_with_retry(target, backup_dir)
         try:
-            temp_dir.rename(target)
+            _rename_with_retry(temp_dir, target)
         except OSError:
             if backup_dir.exists() and not target.exists():
-                backup_dir.rename(target)
+                _rename_with_retry(backup_dir, target)
             raise
         if backup_dir.exists():
             shutil.rmtree(backup_dir)

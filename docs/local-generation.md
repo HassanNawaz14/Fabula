@@ -42,6 +42,7 @@ Options:
 | `--out` | `bundles/latest` by default, or `FABULA_GENERATION_OUT` |
 | `--retries` | per-stage attempts (default `3`) |
 | `--model` | GGUF path override |
+| `--fast` | neurosymbolic blueprint pipeline used by the game UI (no per-stage retries) |
 
 `random` is resolved deterministically from the seed, so the same seed and settings reproduce the same requested type.
 
@@ -50,11 +51,24 @@ Environment overrides:
 | Variable | Purpose |
 |---|---|
 | `FABULA_MODEL_PATH` | GGUF path |
+| `FABULA_FAST_MODEL_PATH` | blueprint model for `--fast` and the game UI (default `models/Llama-3.2-1B-Instruct.Q4_K_M.gguf`) |
 | `FABULA_MODEL_CTX` | context size, default `4096` |
 | `FABULA_MODEL_THREADS` | CPU threads, default `cpu_count - 1` |
 | `FABULA_MODEL_GPU_LAYERS` | GPU layers offloaded to llama.cpp; `0` (default) is CPU-only, `-1` moves all layers to the GPU |
 | `FABULA_GENERATION_OUT` | default output directory |
 | `FABULA_GENERATION_RETRIES` | default per-stage attempts |
+
+## Fast generation (game UI and `--fast`)
+
+The in-game **Generate Locally** route and `python -m fabula generate --fast` use the neurosymbolic pipeline instead of the staged JSON pipeline:
+
+1. The model writes a short Compact Blueprint DSL (about 150 tokens; token budget `blueprint: 350`).
+2. `BlueprintCompiler` expands the blueprint into the full bundle and proves candidate-elimination solvability symbolically.
+3. The bundle is published atomically and validated like any other case.
+
+The route prefers `models/Llama-3.2-1B-Instruct.Q4_K_M.gguf` (override with `FABULA_FAST_MODEL_PATH`). If no fast model file exists, the blueprint comes from the deterministic built-in sample library, so the route still finishes in seconds. The 3B GGUF is kept out of this route: it is trained for staged JSON, and at roughly 4–5 tok/s on CPU it cannot meet the one-minute budget.
+
+Generation is CPU-heavy. On a 4-vCPU reference machine the *staged* six-NPC run can take tens of minutes, longer than the HG-16 target; reduce `FABULA_MODEL_CTX` only if prompts still fit. Keep time promises on the loading screen limited to the fast route, and leave the staged route's duration open until HA-03 numbers are final.
 
 ## Pipeline
 
@@ -73,7 +87,7 @@ Each stage retries only on validation failure, up to the configured attempt coun
 
 The local backend compiles one JSON-schema grammar per stage from the frozen Pydantic models. Two llama.cpp-specific safeguards are applied before compilation:
 
-- `pattern`, `minLength` and schema metadata are removed from the grammar. `maxLength` is capped at 300 characters instead of being dropped: llama.cpp expands `maxLength` into nested optional groups, and the original 400/4000-character limits caused a grammar-compiler stack overflow. The cap keeps outputs bounded and the grammar small; Pydantic still enforces the original limits. Array cardinality (`minItems`/`maxItems`) is retained so the model cannot emit too few locations, NPCs, clues or accusation options.
+- `pattern`, `minLength`, `maxLength` and schema metadata are removed from the grammar. llama.cpp expands `maxLength` into one nested group per character, which overflowed the grammar compiler's 256-level depth limit and crashed the process. Pydantic still enforces the original limits after parsing. Array cardinality (`minItems`/`maxItems`) is retained so the model cannot emit too few locations, NPCs, clues or accusation options.
 - For NPC stages, `identity.id`, `memory.npc_id` and every `fact.who` are pinned to the requested NPC id with an enum. This prevents cross-NPC ownership and keeps memory files isolated.
 
 Two final-validation repairs are applied after all stages, because a small model occasionally omits a structurally required culprit detail:

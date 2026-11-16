@@ -395,7 +395,7 @@ def generate_neurosymbolic_bundle(
     on_progress: ProgressCallback | None = None,
 ) -> GenerationResult:
     """Generate a validated bundle via the dual-axis Neurosymbolic pipeline (< 7s)."""
-    from training.scripts.kaggle_blueprint_distillation import generate_synthetic_blueprint_sample
+    from fabula.generation.synthetic_blueprint import generate_synthetic_blueprint_sample
 
     started = time.perf_counter()
     token = cancel_token or _NeverCancelled()

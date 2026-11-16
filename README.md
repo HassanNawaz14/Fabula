@@ -74,6 +74,7 @@ All diagrams are designed with a minimalist light theme (simple boxes, clear arr
 ```powershell
 python -m pip install -e .
 python -m pytest -q
+python -m fabula   # opens the game menu: ready cases, Kaggle, or local generation
 ```
 
 **Optional live voice.** Set one key and `auto` resolves to that provider:

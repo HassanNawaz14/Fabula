@@ -65,6 +65,30 @@ def _rename_with_retry(source: Path, destination: Path) -> None:
             time.sleep(_RENAME_DELAY_SECONDS * (attempt + 1))
 
 
+def replace_directory(prepared: Path, target: Path) -> None:
+    """Swap a fully prepared directory into place, replacing any previous one.
+
+    The previous directory is moved aside first and restored when the swap
+    fails, so a locked or partially copied replacement never destroys a
+    working bundle.
+    """
+    backup_dir = target.parent / f".{target.name}.bak-{uuid4().hex}"
+    try:
+        if target.exists():
+            _rename_with_retry(target, backup_dir)
+        try:
+            _rename_with_retry(prepared, target)
+        except OSError:
+            if backup_dir.exists() and not target.exists():
+                _rename_with_retry(backup_dir, target)
+            raise
+        if backup_dir.exists():
+            shutil.rmtree(backup_dir)
+    finally:
+        if backup_dir.exists() and target.exists():
+            shutil.rmtree(backup_dir, ignore_errors=True)
+
+
 def publish_bundle(bundle: Bundle, output_dir: Path) -> Path:
     """Publish a validated bundle atomically, replacing any previous bundle.
 
@@ -80,20 +104,10 @@ def publish_bundle(bundle: Bundle, output_dir: Path) -> Path:
         raise BundlePublishError(f"cannot create bundle parent {parent}: {exc}") from exc
 
     temp_dir = parent / f".{target.name}.tmp-{uuid4().hex}"
-    backup_dir = parent / f".{target.name}.bak-{uuid4().hex}"
     try:
         temp_dir.mkdir()
         write_bundle_files(bundle, temp_dir)
-        if target.exists():
-            _rename_with_retry(target, backup_dir)
-        try:
-            _rename_with_retry(temp_dir, target)
-        except OSError:
-            if backup_dir.exists() and not target.exists():
-                _rename_with_retry(backup_dir, target)
-            raise
-        if backup_dir.exists():
-            shutil.rmtree(backup_dir)
+        replace_directory(temp_dir, target)
     except BundlePublishError:
         raise
     except OSError as exc:
@@ -101,6 +115,4 @@ def publish_bundle(bundle: Bundle, output_dir: Path) -> Path:
     finally:
         if temp_dir.exists():
             shutil.rmtree(temp_dir, ignore_errors=True)
-        if backup_dir.exists() and target.exists():
-            shutil.rmtree(backup_dir, ignore_errors=True)
     return target

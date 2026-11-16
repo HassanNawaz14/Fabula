@@ -27,8 +27,8 @@ For the complete technical breakdown including architecture, schemas, prompts, e
 ## 🏛️ System Architecture
 The game runs in two phases — **generation** (local, before play) and **play** (~10 minutes):
 
-- **Phase 1**: player settings (`mystery_type`, `tone`, `difficulty`) → the fine-tuned ~3–4B LLM generates the bundle in stages (`world → cast → truth → per-NPC files`) with constrained JSON decoding → validators + retries → a JSON game bundle on disk.
-- **Phase 2**: the engine builds the world from `world.json`; NPCs move via **schedules + A\***; NPC conversation uses **live APIs** when a key is configured, with a deterministic **scripted fallback** when no key is present. Prompts are assembled from that NPC's own `identity.json` + `memory.json`; `truth.json` stays engine-only.
+- **Phase 1**: player settings (`mystery_type`, `tone`, `difficulty`) → a fine-tuned generation model produces the bundle. The primary fast route uses the 1B blueprint model + deterministic compiler; the legacy route uses the 3B model with staged JSON decoding → validators + retries → a JSON game bundle on disk.
+- **Phase 2**: the engine builds the world from `world.json`; NPCs move via **schedules + shortest-path routing**; NPC conversation uses **live APIs** when a key is configured, with a deterministic **scripted fallback** when no key is present. Prompts are assembled from that NPC's own `identity.json` + `memory.json`; `truth.json` stays engine-only.
 
 ![System Architecture: Generation & Play](assets/system_architecture.png)
 
@@ -44,7 +44,7 @@ All diagrams are designed with a minimalist light theme (simple boxes, clear arr
 | # | Diagram Title | Where Used | Formats |
 |---|---|---|---|
 | **01** | **[System Architecture: Generation & Play](assets/system_architecture.png)** | Section 3: Phase 1 staged generation + Phase 2 play loop | [PNG](assets/system_architecture.png) • [SVG](assets/system_architecture.svg) |
-| **02** | **[Runtime Dispatch: Body & Voice](assets/decision_engine_dispatch.png)** | Section 4: How an NPC turn routes to schedule + $A^*$ or prompt assembler + live API | [PNG](assets/decision_engine_dispatch.png) • [SVG](assets/decision_engine_dispatch.svg) |
+| **02** | **[Runtime Dispatch: Body & Voice](assets/decision_engine_dispatch.png)** | Section 4: How an NPC turn routes to schedule + shortest path or prompt assembler + live API | [PNG](assets/decision_engine_dispatch.png) • [SVG](assets/decision_engine_dispatch.svg) |
 | **03** | **[Knowledge Isolation & Spoiler Firewall](assets/town_knowledge_diffusion.png)** | Section 5: Per-NPC knowledge and the engine-only `truth.json` boundary | [PNG](assets/town_knowledge_diffusion.png) • [SVG](assets/town_knowledge_diffusion.svg) |
 
 ---
@@ -53,14 +53,14 @@ All diagrams are designed with a minimalist light theme (simple boxes, clear arr
 
 ### Phase 1 — Generation (local, before play)
 1. **Player settings**: `mystery_type` (theft / disappearance / murder / random), `tone` (cozy ↔ dark), `difficulty`.
-2. **Staged generation**: the fine-tuned ~3–4B LLM emits `world → cast → truth (+clues) → per-NPC files` with grammar / JSON-schema-constrained decoding.
+2. **Fast blueprint generation**: the fine-tuned 1B model emits a compact blueprint that the deterministic compiler turns into the bundle; the legacy 3B route emits `world → cast → truth (+clues) → per-NPC files` with grammar / JSON-schema-constrained decoding.
 3. **Validation**: every stage is checked (schema, cross-references, graph connectivity, timeline, solvability, unique culprit) and retried up to 3 times; persistent failure shows a clear error screen.
 4. **Bundle on disk**: `world.json`, `truth.json` (engine-only), `clues.json`, and `npcs/<id>/identity.json` + `memory.json`.
 5. Everything runs on the player's machine — **the fine-tuned model never runs during play**.
 
 ### Phase 2 — Play (~10 minutes)
 1. **World**: the engine loads the bundle read-only and builds the town (3–4 locations from a fixed type enum → placeholder tiles).
-2. **Body**: NPCs follow simplified schedules using $A^*$ pathfinding and perceive events only in their own location.
+2. **Body**: NPCs follow simplified schedules using shortest-path (Dijkstra) routing and perceive events only in their own location.
 3. **Player loop**: walk, examine ~4–6 clues, type free-text questions to 5–6 NPCs, watch the visible timer.
 4. **Voice**: each reply comes from a live API when a key is configured; otherwise authored scripted NPCs keep the game playable. A live prompt contains only that NPC's `identity.json`, `memory.json`, and chat history — `truth.json` never leaves the engine (enforced by tests).
 5. **Verdict**: the journal records clues; the player accuses **who / how / why**; the engine checks the accusation against `truth.json` → win or lose.
@@ -91,7 +91,7 @@ Use `live` to require a key and fail clearly if it is missing, or `scripted` as 
 ## 🧩 Generate & Play a Mystery
 
 ### Fast Neurosymbolic Generation (< 30s)
-Using the fine-tuned edge model (`Llama-3.2-1B-Instruct.Q4_K_M.gguf`), pre-game generation runs in **~12–24 seconds** with mathematical candidate-elimination solvability ($|C| = 1$):
+Using the fine-tuned edge model (`Llama-3.2-1B-Instruct.Q4_K_M.gguf`), pre-game generation runs in **seconds — typically ~10–30 s on CPU, faster with GPU offload** — with mathematical candidate-elimination solvability ($|C| = 1$):
 
 ```powershell
 python -m pip install -e .

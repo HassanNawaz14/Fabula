@@ -43,9 +43,10 @@ for clue_id in reply.revealed_clue_ids:
 service.close()
 ```
 
-The caller must apply `reply.revealed_clue_ids` through `Session.npc_reveal`. Scripted
-mode returns eligible clue IDs; the live path currently leaves discovery to the
-engine/UI layer.
+The caller must apply `reply.revealed_clue_ids` through `Session.npc_reveal`. Both
+paths return eligible clue IDs: scripted mode reveals deterministically on case
+questions, and live mode returns an ID when the model shares one of the eligible
+evidence items listed in its prompt (see below).
 
 ## Modes
 
@@ -81,6 +82,10 @@ Do not commit a keys file. Set a spend cap in each provider console and keep the
 cap low when testing. Provider default model IDs are implementation defaults, not
 permanent product guarantees; override them when a provider renames or retires a model.
 
+The game UI resolves its configuration with `config_from_env()`, so these variables
+apply when launching `python -m fabula`. The Settings screen changes only the mode and
+preserves the other flags.
+
 If only one key is present, `auto` uses that provider. If both are present, Gemini is
 tried first by default. `ConversationConfig.provider` and `provider_order` control the
 preference.
@@ -92,9 +97,11 @@ A live request contains only:
 - system rules for staying in character and following disclosure policy;
 - the selected NPC's `identity.json` and `memory.json`;
 - that NPC's own recent chat history;
-- the player's current input.
+- the player's current input;
+- the eligible NPC-reveal clues this NPC may share (id and player-visible description),
+  when any remain undiscovered and their prerequisites are met.
 
-`truth.json`, the roster, another NPC's files, clue definitions, and engine state never
+`truth.json`, the roster, another NPC's files, other NPCs' clues, and engine state never
 enter a live request. The prompt DTO enforces this structurally, and tests plant canaries
 in truth and in another NPC's memory. The selected NPC's file IDs must match each other.
 
@@ -104,15 +111,22 @@ not stripped because they are part of the evaluation probe suite.
 
 ## Replies, Limits, and Fallbacks
 
-Live providers return `{ "reply": "...", "mood": "..." }`. Parsing is forgiving:
+Live providers return `{ "reply": "...", "mood": "...", "clue": "..." }`. Parsing is
+forgiving:
 
 - missing or invalid `mood` becomes `neutral`;
+- `clue` is optional: it is honored only when it names one of the eligible evidence
+  items listed in that request, and ignored otherwise;
 - plain text becomes the reply;
-- an unparsable or empty response becomes an in-character fallback line.
+- an unparsable or empty response degrades to the scripted responder (below).
 
-Fallbacks also cover provider timeouts/errors and token-cap exhaustion. Replies are
-clipped to 4,000 characters; history is per-NPC and capped at 12 messages by default.
-Provider errors and keys are never logged.
+Provider timeouts/errors, empty replies, and token-cap exhaustion also degrade to the
+scripted responder instead of a placeholder. The reply keeps `mode: live` but sets
+`fallback: true` and `fallback_reason` (`provider_error`, `empty_reply`, or `token_cap`),
+and its text is authored, not model output. Degraded turns still honor clue eligibility,
+so a provider outage cannot make a case unsolvable. The dialogue screen shows one notice
+per conversation when this happens. Replies are clipped to 4,000 characters; history is
+per-NPC and capped at 12 messages by default. Provider errors and keys are never logged.
 
 ## Scripted Mode
 
@@ -129,7 +143,8 @@ honored. The returned `revealed_clue_ids` list tells the caller which clue to ap
 Use scripted mode when demonstrating the game without keys, in offline tests, and as a
 playability fallback. Its dialogue is authored behavior, not model output, and it is
 **excluded from live-provider evaluation metrics** (secret-keeping, persona, provider
-robustness, and related scores).
+robustness, and related scores). The same responder supplies degraded live turns, which
+are marked `fallback: true` so evaluation can exclude or report them separately.
 
 ## Optional Safeguards
 
@@ -163,8 +178,8 @@ Both toggle values are recorded in every `ConversationReply` for evaluation.
 | NPCs answer with fixed phrasing | No key was found, so `auto` resolved to scripted mode. Check `ConversationStatus.reason`. |
 | `401`/`403` from a provider | Invalid or expired key, or a provider account issue. |
 | `404` from a provider | The configured model ID is unavailable; override `FABULA_GEMINI_MODEL` or `FABULA_XAI_MODEL`. |
-| Repeated fallback lines | Timeout, provider outage, or token cap reached. Check `ConversationStatus.tokens_used`. |
-| No clue is revealed in live mode | Live replies do not return clue IDs; the UI/engine must handle discovery. Scripted mode does return eligible IDs. |
+| NPCs switch to authored dialogue mid-conversation | A live call timed out, failed, returned empty, or hit the token cap. Check `ConversationReply.fallback_reason` and `ConversationStatus.tokens_used`. |
+| No clue is revealed in live mode | No eligible NPC-reveal clue remains for that NPC, or the reply omitted `clue`. Degraded turns reveal through the scripted responder instead. |
 
 ## Running the Tests
 

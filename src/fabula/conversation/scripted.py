@@ -8,8 +8,9 @@ from collections.abc import Sequence
 from dataclasses import dataclass
 from enum import StrEnum
 
+from fabula.conversation.clue_reveal import eligible_reveal_clues
 from fabula.conversation.dto import PromptContext
-from fabula.schemas import Clue, DiscoveryMethod, Mood
+from fabula.schemas import Clue, Mood
 
 
 class _Intent(StrEnum):
@@ -111,7 +112,7 @@ class ScriptedResponder:
         turn_index: int = 0,
     ) -> ScriptedReply:
         intent = _detect_intent(context.player_input)
-        eligible = _eligible_clues(
+        eligible = eligible_reveal_clues(
             context.identity.id,
             clues,
             discovered_clue_ids,
@@ -184,21 +185,6 @@ def _short_backstory(context: PromptContext) -> str:
 
 def _clip(text: str) -> str:
     return text if len(text) <= 4000 else text[:3997] + "..."
-
-
-def _eligible_clues(
-    npc_id: str,
-    clues: Sequence[Clue],
-    discovered_clue_ids: frozenset[str],
-) -> tuple[Clue, ...]:
-    return tuple(
-        clue
-        for clue in clues
-        if clue.discovery is DiscoveryMethod.NPC_REVEAL
-        and clue.revealed_by_npc == npc_id
-        and clue.id not in discovered_clue_ids
-        and set(clue.requires) <= discovered_clue_ids
-    )
 
 
 def _detect_intent(text: str) -> _Intent:

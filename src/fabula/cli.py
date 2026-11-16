@@ -65,7 +65,7 @@ def run_game() -> int:
 
 
 def run_play(bundle: Path | None) -> int:
-    from fabula.conversation import ConversationConfig, create_conversation_service
+    from fabula.conversation import config_from_env, create_conversation_service
     from fabula.simulation import Session, load_bundle
     from fabula.ui.app import FabulaApp
 
@@ -79,7 +79,7 @@ def run_play(bundle: Path | None) -> int:
 
     loaded = load_bundle(bundle)
     session = Session(loaded)
-    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    service = create_conversation_service(config_from_env())
     app = FabulaApp(session=session, conversation_service=service)
     app.run()
     return 0

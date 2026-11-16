@@ -3,6 +3,18 @@
 ## Purpose
 The primary outcome is NPC behavior under structured knowledge and disclosure constraints. Mystery quality is not the headline evaluation. Generator validators are runtime safeguards; report their rates as secondary diagnostics only.
 
+## Model and generation conditions
+Fabula has two fine-tuned generation models that produce the same bundle schema. Both are evaluated and compared: the generator route is an explicit experiment factor, not an implementation detail.
+
+| Condition | Generator | Bundle | Role |
+|---|---|---|---|
+| `fast-1b` | `Llama-3.2-1B-Instruct.Q4_K_M.gguf`, QLoRA-tuned on Compact Blueprint DSL, compiled by `BlueprintCompiler` | blueprint → compiled `world/truth/clues/npcs` | primary UI and `--fast` route |
+| `staged-3b` | `Qwen2.5-3B-Instruct.Q4_K_M.gguf`, QLoRA-tuned on staged JSON | staged `world → cast → truth+clues → per-NPC` | legacy and ablation route |
+
+Within each generator, the model condition axis is `base` (base instruct model with the same prompt) versus `fine-tuned` (the released GGUF). Mark a cell missing when the base artifact is unavailable; never substitute one generator for another. Runtime voice (live provider or scripted), probes, toggles, judge and scoring stay identical across conditions, so differences are attributable to the generated bundle.
+
+Weights are not committed. Pin each model by file name and SHA-256 from `models/model_manifest.json`, generate the evaluation corpus fresh for each condition, and record generator, model hash, settings, seed and schema version. Do not pool bundles of unknown provenance.
+
 ## Probe suite
 `evaluation/probes/*.jsonl` defines scenario, NPC, turn index, player input, expected knowledge/disclosure condition, and probe family. Include for every NPC: direct questions; leading questions; false accusations; pressure claims that another NPC confessed; bluff/false-witness pressure (asserting another NPC placed them at the crime scene to test false-confession resistance); instruction override/jailbreak attempts; repeated questions across turns; probes for `volunteer`, `if_asked`, `hide`, and `lie` facts; required-clue checks. Use identical probes and history reset policy across providers and conditions. Store raw response, provider/model revision, prompt hash, token counts, latency, fallback, toggle values, seed and schema version. Never store keys. Scripted no-key outputs are authored local behaviour and are excluded from live-provider metrics.
 
@@ -25,13 +37,14 @@ Publish numerator, denominator, exclusions, confidence interval, rubric version 
 Report schema validity, cross-reference integrity, connectivity, timeline, solvability, unique-culprit-set rate and type diversity as generation guardrails, not mystery-quality results.
 
 ## Experiments
-1. **Baseline:** base model with good prompting versus approved fine-tuned model. Same held-out settings/seeds, contracts, runtime API model, probes and scoring. Break down by type. Owner reviews baseline before fine-tune commitment and first fine-tune result.
-2. **Provider robustness:** identical probe/scenario matrix against at least two selected live providers.
-3. **Ablations:** secrets-in-prompt versus gated reveal; leak filter off versus on; provider differences. Baseline captures raw behavior with toggles off unless HG-09 records otherwise; preserve ablation comparisons.
-4. **Sampling:** freeze scenario/probe counts and repetitions before runs; stratify by type, culprit status, policy, provider and model condition; state actual sample size and variance.
+1. **Both-generator comparison (headline):** evaluate fine-tuned `fast-1b` and fine-tuned `staged-3b` bundles with the same probes, runtime API model, settings and seeds. Report every metric by mystery type and generator. This answers which generation model produces NPCs that keep secrets, respect knowledge boundaries and hold persona best.
+2. **Base vs fine-tuned per generator:** separately for `fast-1b` and `staged-3b`, compare the base instruct model plus good prompting against the released fine-tune, with the same held-out settings/seeds, probes and scoring. This ties each fine-tune to measurable NPC quality; a missing base artifact is reported as a missing cell. Owner reviews each baseline before that fine-tune is treated as committed.
+3. **Provider robustness:** identical probe/scenario matrix against at least two selected live providers.
+4. **Ablations:** secrets-in-prompt versus gated reveal; leak filter off versus on; provider differences. Baseline captures raw behavior with toggles off unless HG-09 records otherwise; preserve ablation comparisons.
+5. **Sampling:** freeze scenario/probe counts and repetitions before runs; stratify by type, generator, model condition, culprit status, policy and provider; state actual sample size and variance.
 
 ## Judge and human rating
 Do not use a judge or collect provider outputs until HG-12 chooses a judge/protocol and HA-02 supplies keys/spend cap. Recommendation: 1–5 persona fidelity and naturalness, binary persona break/unsupported claim/secret leak; blind conditions and randomize order; 10% sample stratified by provider/type/policy; double-rate a subset and adjudicate disagreement. HG-12 answer controls. HA-05 records ratings by probe ID.
 
 ## Run protocol and report
-Freeze run matrix, model revisions, schema, prompts, seeds, probes, toggles and analysis before collection. Mock run first. Live run requires explicit opt-in, approved providers, HA-02 budgets and rate limits. Report objective, conditions, artifacts, sample, metrics/counts/intervals, results by type/provider, latency/cost/failures, ablations, agreement, deviations, limitations, reproducibility command and owner review. Evaluation must not mutate bundles or claim mystery quality validated.
+Freeze run matrix, generator routes, model revisions/hashes, schema, prompts, seeds, probes, toggles and analysis before collection. Mock run first. Live run requires explicit opt-in, approved providers, HA-02 budgets and rate limits. Report objective, conditions, artifacts, sample, metrics/counts/intervals, results by type/generator/model condition/provider, latency/cost/failures, ablations, agreement, deviations, limitations, reproducibility command and owner review. Evaluation must not mutate bundles or claim mystery quality validated.

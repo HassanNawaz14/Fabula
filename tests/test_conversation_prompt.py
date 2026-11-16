@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from fabula.conversation import NpcFileError, PromptContext, build_messages, load_npc_files
-from fabula.schemas import ChatTurn
+from fabula.schemas import ChatTurn, DiscoveryMethod
 
 
 def _prompt_text(messages) -> str:
@@ -125,6 +125,27 @@ def test_gated_reveal_excludes_facts_until_required_clue(sample_bundle, bundle_w
     assert "GATED_FACT_CANARY_42" in baseline
     assert "GATED_FACT_CANARY_42" not in gated_without_clue
     assert "GATED_FACT_CANARY_42" in gated_with_clue
+
+
+def test_prompt_lists_only_the_selected_npcs_reveal_options(sample_bundle) -> None:
+    clue = next(
+        clue for clue in sample_bundle.clues.clues if clue.discovery is DiscoveryMethod.NPC_REVEAL
+    )
+    other = next(
+        item
+        for item in sample_bundle.clues.clues
+        if item.discovery is DiscoveryMethod.NPC_REVEAL
+        and item.revealed_by_npc != clue.revealed_by_npc
+    )
+    context = PromptContext.from_npc_files(
+        sample_bundle.npcs[clue.revealed_by_npc], player_input="What did you see?"
+    )
+
+    text = _prompt_text(build_messages(context, reveal_options=(clue,)))
+
+    assert "EVIDENCE YOU MAY SHARE" in text
+    assert clue.id in text
+    assert other.id not in text
 
 
 def test_prompt_context_rejects_mismatched_identity_and_memory(sample_bundle) -> None:

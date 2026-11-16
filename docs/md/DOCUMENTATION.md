@@ -29,7 +29,7 @@ The player explores a tiny town (**3–4 named locations, 5–6 NPCs**), talks t
 
 Each NPC:
 - **Lives in its own isolated JSON pair** — `identity.json` (who they are) and `memory.json` (structured facts of what they know, hide, or lie about).
-- **Moves like a classical agent** — it follows a simplified schedule across the session, using $A^*$ pathfinding between named locations.
+- **Moves like a classical agent** — it follows a simplified schedule across the session, using shortest-path (Dijkstra) search between named locations.
 - **Speaks through a live API when a key is configured** — its prompt is assembled *exclusively* from its own JSON files plus chat history. Without a key, a deterministic authored **scripted fallback** keeps the game playable; neither path runs a local conversation model at runtime.
 - **Knows only what its memory contains** — only the culprit(s) hold the true account of the crime; everyone else holds partial observations and their own secrets.
 
@@ -40,9 +40,9 @@ A human player can walk up to any NPC and engage in natural conversation. The NP
 │                            THE FABULA CONCEPT (TWO PHASES)                            │
 ├──────────────────────────────┬───────────────────────────┬────────────────────────────┤
 │ GENERATOR (Phase 1, local)   │ THE BODY (Phase 2)        │ THE VOICE (Phase 2)        │
-│ fine-tuned ~3–4B LLM         │ classical AI + engine     │ live API / scripted        │
+│ fine-tuned SLMs (1B/3B)      │ classical AI + engine     │ live API / scripted        │
 ├──────────────────────────────┼───────────────────────────┼────────────────────────────┤
-│ • Staged: world → cast →     │ • Schedules + A* movement │ • Free-text conversation   │
+│ • Staged: world → cast →     │ • Schedules + shortest-   │ • Free-text conversation   │
 │   truth → per-NPC files      │ • Perception & physics    │ • Persona & disclosure     │
 │ • Constrained JSON decoding  │ • Journal, timer, clue    │   policies                │
 │ • Validated + retried bundle │   discovery, accusation   │ • Grounded in that NPC's   │
@@ -65,10 +65,10 @@ The game is **not limited to murder**. Mystery type is a parameter, not a baked-
 
 ### 1.5 Academic Relevance
 The project integrates core AI and ML topics around a single working product:
-- **Search Algorithms ($A^*$)**: deterministic pathfinding across the town's location graph.
+- **Search Algorithms (Dijkstra shortest paths)**: deterministic pathfinding across the town's location graph.
 - **Knowledge Representation**: structured facts with `source` and `disclosure` policies; authored cover stories for deception.
 - **Constrained Structured Generation**: grammar / JSON-schema-constrained decoding, staged generation, validator-and-retry loops.
-- **LLM Fine-Tuning**: QLoRA supervised fine-tuning of a ~3–4B instruct model with Unsloth on Kaggle T4.
+- **LLM Fine-Tuning**: QLoRA supervised fine-tuning of 1B (blueprint) and 3B (staged) instruct models with Unsloth on Kaggle T4.
 - **Grounded Prompting & Isolation**: per-NPC prompt assembly with a machine-enforced spoiler firewall.
 - **Behavioural Evaluation of LLMs**: scripted probe suites, secret-keeping metrics, LLM-judge rubrics, base-vs-fine-tune experiments.
 
@@ -192,7 +192,7 @@ Each character has two read-only JSON stores plus session state:
 - **Session state**: chat history with the player, in-session facts, discovered clues.
 
 #### 4. Decision & Communication (Body / Voice dispatch)
-- Moving between locations? → the current **schedule waypoint + $A^*$ search**.
+- Moving between locations? → the current **schedule waypoint + shortest-path search**.
 - Speaking with the player? → **prompt assembler** (that NPC's identity + memory only) → **live API** when a key is configured (otherwise the scripted responder) → in-character reply.
 
 #### 5. Action Execution & Feedback
@@ -209,17 +209,17 @@ Each character has two read-only JSON stores plus session state:
 The architecture assigns each responsibility to the technology best suited for it: deterministic algorithms for anything physical, a fine-tuned model for pre-play content, and live APIs for speech, with deterministic authored templates as the no-key fallback.
 
 ![Decision Engine: Task & Tool Routing](../../assets/decision_engine_dispatch.png)
-*Figure 2: Runtime dispatch — schedules + $A^*$ for the Body, prompt assembler + live API (or scripted fallback) for the Voice. ([Vector SVG](../../assets/decision_engine_dispatch.svg))*
+*Figure 2: Runtime dispatch — schedules + shortest-path routing for the Body, prompt assembler + live API (or scripted fallback) for the Voice. ([Vector SVG](../../assets/decision_engine_dispatch.svg))*
 
-### 4.1 Search & Pathfinding ($A^*$)
+### 4.1 Search & Pathfinding (Shortest Path)
 - **Role**: deterministic town navigation **[ADOPTED]**.
-- **Mechanism**: the town is an undirected, weighted graph $G = (V, E)$ — nodes are named locations (market, library, café, … from the **fixed location-type enum**), edges are connections with distances.
-- **Algorithm**: $A^*$ with Euclidean distance as an admissible heuristic over explicit tile coordinates.
+- **Mechanism**: the town is an undirected, unweighted graph $G = (V, E)$ — nodes are named locations (market, library, café, … from the **fixed location-type enum**), edges are connections.
+- **Algorithm**: Dijkstra's algorithm with insertion-order tie-breaking, so repeated runs always produce the same path.
 - **Benefits**: instantaneous, mathematically guaranteed shortest path, zero hallucination risk.
 
 ### 4.2 NPC Schedules (Body)
 - NPCs follow **simplified schedules**: a few waypoints spread over the 10-minute session, authored per NPC in `world.json` (`at_minute` → `location`) **[DECIDED/ADOPTED]**.
-- $A^*$ executes each waypoint transition; the result is a town that feels alive without per-frame planning.
+- Shortest-path search executes each waypoint transition; the result is a town that feels alive without per-frame planning.
 - The schedule's time semantics are frozen with the time model (**HG-05**, one-minute ticks driven by monotonic real time is the plan's proposed resolution).
 
 ### 4.3 Deliberately Not Built in the MVP
@@ -376,7 +376,7 @@ The operational, task-level plan lives in **`docs/dev_plan/`** (`00_OVERVIEW.md`
 | **C** Training-data pipeline | Teacher prompts, expansion runner, validator filter, balancing, dataset export, licence log | A, B, HG-11/13/17 |
 | **D** Fine-tuning | Baseline harness, Kaggle Unsloth QLoRA notebook, held-out eval, GGUF export | C, HG-02, HA-01 |
 | **E** Local generation runtime | Staged generator, constrained decoding, retry loop, CLI, CPU benchmark | A, D, HG-03/16 |
-| **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, A*, perception, journal, accusation, timer | A, HG-05/06 |
+| **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, shortest-path routing, perception, journal, accusation, timer | A, HG-05/06 |
 | **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, token cap, fallbacks, input filter, toggles, deterministic scripted no-key mode | A, HG-07/08/09/13 |
 | **H** UI / game loop | Engine layer, tile kit, map render, movement, dialog, journal, timer, accusation UI, loading/error screens | F, G, HG-01, HA-06 |
 | **I** Evaluation | Probe suite, metric scripts, judge integration, base-vs-FT experiment, ablations, report | E, G, HG-12, HA-02/05 |
@@ -435,7 +435,7 @@ Eighteen **Human Gates (HG-01 … HG-18)** — engine choice, base model, infere
 **Evaluation targets NPC behaviour, not mystery quality** **[DECIDED]**. Generator validators still run as safety guards, and their statistics (schema validity, solvability, diversity, …) may be reported as **secondary** results only.
 
 ### 8.1 Method — Scripted Probe Suite
-A **probe suite per NPC**: direct questions, leading questions, false accusations, pressure (*"the culprit already confessed"*), *"ignore your instructions"* attempts, and repeated questions across turns. Probes run against **≥2 live providers** using prompts built from generated bundles.
+A **probe suite per NPC**: direct questions, leading questions, false accusations, pressure (*"the culprit already confessed"*), *"ignore your instructions"* attempts, and repeated questions across turns. Probes run against **≥2 live providers** using prompts built from bundles produced by both fine-tuned generators (1B fast blueprint and 3B staged); the scripted responder is the offline reference and is excluded from live metrics.
 
 ### 8.2 Core Metrics
 
@@ -454,7 +454,7 @@ Illustrative formulation for the headline metric:
 $$\text{Secret-Keeping} = 1 - \frac{N_{\text{secrets leaked in probes}}}{N_{\text{secret-bearing probes}}}$$
 
 ### 8.3 Core Experiment
-Generate NPC JSONs with the **base model** and with the **fine-tuned model**, run the **same** runtime API model on both with the same probes, and compare the metrics above — **broken down by mystery type**. This ties the fine-tune directly to measurable NPC quality and is the project's headline result.
+Generate bundles with **both fine-tuned generators** — the 1B fast blueprint route and the 3B staged route — and run the **same** runtime API model, probes and scoring on both. Compare the metrics above by **mystery type and generator**; this is the headline result. Separately, compare **base vs fine-tuned** for each generator to attribute gains to each fine-tune. Never pool bundles of unknown provenance: pin the model file/hash, settings, seed and generator route for every case.
 
 ### 8.4 Ablations [ADOPTED]
 1. Secrets-in-prompt (baseline) vs **gated reveal**.
@@ -468,12 +468,12 @@ Which model/provider acts as LLM-judge, and the human-sampling protocol (a human
 
 ## 9. Summary & Key Advantages
 
-1. **A genuinely generated game**: the fine-tuned ~3–4B LLM is the most crucial component — it authors the mystery, town, cast, and every NPC's private knowledge before play **[DECIDED]**.
+1. **A genuinely generated game**: the fine-tuned generation models (1B fast blueprint / 3B staged) are the most crucial component — they author the mystery, town, cast, and every NPC's private knowledge before play **[DECIDED]**.
 2. **Architectural grounding**: the engine owns absolute truth (`truth.json`), each NPC's prompt is built only from its own JSON, and the spoiler firewall is enforced by tests — eliminating game-breaking hallucinations and accidental spoilers while keeping roleplay natural.
 3. **Two-phase, resource-sensible design**: generation runs locally once (loading screen, validators, retries); play needs only a CPU-class machine plus optional live APIs — no fine-tuned model or local chat model at runtime, and the scripted fallback keeps play available without a key **[DECIDED]**.
 4. **Measurable claims**: evaluation targets NPC behaviour with concrete metrics (secret-keeping, knowledge boundary, consistency, persona, disclosure adherence, provider robustness) and a base-vs-fine-tune experiment per mystery type.
 5. **Small, complete product**: 5–6 NPCs, 3–4 locations, ~4–6 clues, three mystery types, and a ~10-minute session with journal, timer, and a who/how/why accusation.
-6. **Course alignment**: classical search ($A^*$), constrained structured generation, QLoRA fine-tuning, grounded prompt engineering, and behavioural LLM evaluation — all inside one working game.
+6. **Course alignment**: classical search (Dijkstra shortest paths), constrained structured generation, QLoRA fine-tuning, grounded prompt engineering, and behavioural LLM evaluation — all inside one working game.
 
 ---
 *Synced with `docs/features.md` and `docs/FABULA_DEVPLAN_SOURCE.md` (the sole sources of truth) and the generated plan in `docs/dev_plan/`. Diagram sources are available in the [`assets/`](../../assets/) directory.*

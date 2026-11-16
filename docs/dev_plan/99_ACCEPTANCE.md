@@ -6,13 +6,13 @@ A release decision requires evidence for each mandatory item and recorded human 
 - Local pre-play generation produces an atomic validated bundle for theft, disappearance or murder from type/random, tone and difficulty settings.
 - Stages are world → cast → truth+clues → per-NPC identity/memory. Each is constrained JSON, separately validated, retried up to three times by default, with loading progress and terminal error.
 - Bundle has 3–4 connected named locations using approved fixed types, 5–6 NPCs, 4–6 clues, engine-only truth and isolated NPC files.
-- Fine-tuned small model has documented Kaggle T4 Unsloth QLoRA SFT and held-out comparison; CPU quantized artifact retrieval and license documented.
+- Fine-tuned generation models (1B fast blueprint and 3B staged) have documented Kaggle T4 Unsloth QLoRA SFT, per-model base-vs-fine-tuned held-out comparison, and a cross-generator comparison; CPU quantized artifact retrieval and licenses documented.
 - No fine-tuned model or local chat model runs during play. At least two approved live API providers are supported; mock is test/demo only.
-- Headless Python simulation loads bundle, schedules NPC movement with A*, handles perception, clues, journal, visible ~10-minute timer and deterministic who/how/why accusations.
+- Headless Python simulation loads bundle, schedules NPC movement with shortest-path routing, handles perception, clues, journal, visible ~10-minute timer and deterministic who/how/why accusations.
 - Thin selected-engine UI supports movement, examine, free-text chat, journal, timer and accusation.
 - Input filter runs before each API call; token/latency limits and canned failure fallback work.
 - With no API key, `auto` mode switches to the deterministic scripted fallback, makes zero network calls, and still lets the player collect NPC-reveal clues and finish the mystery; `live` mode without a key fails clearly.
-- NPC behavior probe suite and report include required metrics and ablations; generator checks are secondary.
+- NPC behavior probe suite and report include required metrics, a `fast-1b` vs `staged-3b` comparison, base-vs-fine-tuned results per generator, and ablations; generator checks are secondary.
 
 ## Mandatory engineering checks
 Run at repository root:

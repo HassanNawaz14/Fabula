@@ -7,7 +7,7 @@ Coding-agent prompt:
 Project: Fabula Python mystery game. Follow task prompt and frozen docs; source brief unavailable.
 Non-negotiables: fine-tuned small LLM generates full game before play; Kaggle T4 QLoRA SFT Unsloth; local generation; live APIs only for NPC chat; no fine-tuned or local chat model at runtime; JSON bundle; 5–6 NPCs, 3–4 locations, 4–6 clues, ~10 minutes; evaluate NPC behavior.
 Firewall: truth.json engine-only, never in any NPC prompt/API request. Prompt may use only selected NPC identity/memory, own history/session facts and player input. Only culprit knows full true account. Enforce with tests.
-Architecture: headless Python core, thin UI, scheduled movement+A*, Pydantic, staged constrained JSON, per-stage validation and max 3 retries. Scope v1 theft/disappearance/murder; no scraping, generated art, runtime local chat or GA/MLP/K-Means. Python 3.11+, pytest, Ruff, offline fixtures.
+Architecture: headless Python core, thin UI, scheduled movement + shortest paths, Pydantic, staged constrained JSON, per-stage validation and max 3 retries. Scope v1 theft/disappearance/murder; no scraping, generated art, runtime local chat or GA/MLP/K-Means. Python 3.11+, pytest, Ruff, offline fixtures.
 Task: Freeze complete schemas and stage contracts as specified in this task. Stop at unresolved HG-04/05/06 and record decisions. Acceptance: typed schemas and stage DTOs; clue/truth cross refs; accusation stable IDs; no truth/other-NPC fields in NPC prompt DTO.
 ```
 

@@ -22,7 +22,7 @@ Constraints:
 - Seed: {seed}
 
 Output strictly in the Compact Blueprint DSL format:
-[CASE:{mystery_type}|{tone}|seed_{seed}]
+[CASE:{mystery_type}|{tone}|{difficulty}|seed_{seed}]
 PREMISE: <one evocative sentence describing the crime>
 CAST: vict:<name> | culp:<culprit_npc_id> | susp:<comma_separated_suspect_ids>
 CRIME: mot:<motive> | meth:<method> | scene:<location_id> | time:<minute_1_to_9>

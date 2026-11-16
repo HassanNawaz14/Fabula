@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import time
 from types import SimpleNamespace
 
 os.environ["SDL_VIDEODRIVER"] = "dummy"
@@ -8,7 +9,13 @@ os.environ["SDL_VIDEODRIVER"] = "dummy"
 import pygame
 import pytest
 
-from fabula.conversation import ConversationConfig, create_conversation_service
+from fabula.conversation import (
+    ConversationConfig,
+    ConversationMode,
+    ProviderTimeout,
+    create_conversation_service,
+)
+from fabula.conversation.mock import MockProvider
 from fabula.schemas import DiscoveryMethod, LocationType
 from fabula.simulation import Session, location_graph
 from fabula.training_data.skeletons.common import ROLES
@@ -39,6 +46,14 @@ def _pygame_ready():
     if not pygame.get_init():
         pygame.init()
     yield
+
+
+def _await_reply(view: DialogueView, timeout: float = 2.0) -> None:
+    deadline = time.monotonic() + timeout
+    while view.loading and time.monotonic() < deadline:
+        view.update()
+        time.sleep(0.005)
+    view.update()
 
 
 def test_generation_screen() -> None:
@@ -677,6 +692,7 @@ def test_case_screens_render_and_fit(loaded, size: tuple[int, int]) -> None:
     dialogue = DialogueView(size[0], size[1], session, service, loaded.world.npcs[0].id)
     dialogue.input_text = "Where were you at eight o'clock?"
     dialogue._send()
+    _await_reply(dialogue)
     assert dialogue.history[-1]["speaker"] in ("npc", "system")
     dialogue.update()
     dialogue.draw(surface)
@@ -729,7 +745,9 @@ def test_accusation_selection_keys_clicks_and_outcome(loaded) -> None:
     assert (
         view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_ESCAPE)) == "back_to_map"
     )
-    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)) == "quit_game"
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)) == (
+        "back_to_menu"
+    )
 
 
 def test_dialogue_accepts_typed_input_and_replies(loaded) -> None:
@@ -744,6 +762,142 @@ def test_dialogue_accepts_typed_input_and_replies(loaded) -> None:
     view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_BACKSPACE, unicode="", mod=0))
     assert view.input_text == "Hell"
     view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN, unicode="\r", mod=0))
+    _await_reply(view)
     assert view.input_text == ""
     assert view.history[-1]["speaker"] in ("npc", "system")
     assert view.history[0]["speaker"] == "player"
+
+
+def test_app_advances_the_session_clock_on_the_map(loaded) -> None:
+    session = Session(loaded)
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(session=session, conversation_service=service, width=800, height=600)
+
+    app.run(max_ticks=3)
+
+    assert session.clock.elapsed_seconds > 0
+
+
+def test_app_pauses_the_session_clock_outside_play_views(loaded) -> None:
+    session = Session(loaded)
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(session=session, conversation_service=service, width=800, height=600)
+    app._handle_view_action("open_journal")
+    start = session.clock.elapsed_seconds
+
+    app._advance_session_clock(5.0)
+
+    assert session.clock.elapsed_seconds == start
+
+
+def test_time_up_ends_the_case_and_returns_to_menu(loaded) -> None:
+    session = Session(loaded)
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(session=session, conversation_service=service, width=800, height=600)
+    session.clock.advance(599.5)
+
+    app._advance_session_clock(1.0)
+
+    assert session.accusation.timed_out is True
+    view = app.current_view
+    assert isinstance(view, MapView)
+    assert view.time_up is True
+    assert view._seconds_left() == 0
+    surface = pygame.Surface((800, 600))
+    view.draw(surface)
+    enter = pygame.event.Event(pygame.KEYDOWN, key=pygame.K_RETURN)
+    assert view.handle_event(enter) == {"action": "back_to_menu"}
+    assert view.handle_event(pygame.event.Event(pygame.KEYDOWN, key=pygame.K_e)) is None
+
+
+def test_accusation_attempts_persist_across_visits(loaded) -> None:
+    session = Session(loaded)
+    service = create_conversation_service(ConversationConfig(mode="scripted"))
+    app = FabulaApp(session=session, conversation_service=service, width=800, height=600)
+    solution = loaded.accusation_truth().solution
+
+    app._handle_view_action("open_accusation")
+    view = app.current_view
+    wrong_who = next(npc.id for npc in view.npcs if npc.id != solution.correct_culprit_id)
+    wrong_how = next(
+        method.id for method in view.methods if method.id != solution.correct_method_id
+    )
+    wrong_why = next(
+        motive.id for motive in view.motives if motive.id != solution.correct_motive_id
+    )
+    view.selections = [
+        [npc.id for npc in view.npcs].index(wrong_who),
+        [method.id for method in view.methods].index(wrong_how),
+        [motive.id for motive in view.motives].index(wrong_why),
+    ]
+    view._submit_accusation()
+    assert view.attempts_remaining == 2
+
+    app._handle_view_action("back_to_map")
+    app._handle_view_action("open_accusation")
+    assert app.current_view.attempts_remaining == 2
+
+
+def test_dialogue_passes_discovered_clues_to_the_service(loaded) -> None:
+    class RecordingService:
+        def __init__(self) -> None:
+            self.discovered: list[frozenset[str]] = []
+
+        def reply(self, _files, _text, *, clues=(), discovered_clue_ids=frozenset()):
+            self.discovered.append(discovered_clue_ids)
+            return SimpleNamespace(text="Noted.", mood="neutral", revealed_clue_ids=())
+
+    session = Session(loaded)
+    clue = next(
+        clue
+        for clue in loaded.clues.clues
+        if clue.discovery is DiscoveryMethod.EXAMINE and not clue.requires
+    )
+    session.player_location = clue.location_id
+    session.examine(clue.location_id, clue.id)
+    service = RecordingService()
+    view = DialogueView(800, 600, session, service, loaded.world.npcs[0].id)
+
+    view.input_text = "What did you see?"
+    view._send()
+    _await_reply(view)
+
+    assert service.discovered == [frozenset({clue.id})]
+
+
+def test_dialogue_announces_degraded_live_voice_once(loaded) -> None:
+    provider = MockProvider([ProviderTimeout("offline"), ProviderTimeout("offline")], name="gemini")
+    service = create_conversation_service(
+        ConversationConfig(provider="gemini"), providers={"gemini": provider}
+    )
+    view = DialogueView(800, 600, Session(loaded), service, loaded.world.npcs[0].id)
+
+    for _ in range(2):
+        view.input_text = "Hello."
+        view._send()
+        _await_reply(view)
+
+    notices = [
+        message
+        for message in view.history
+        if message["text"] == "Live voice is unavailable — replies now use scripted dialogue."
+    ]
+    assert len(notices) == 1
+    assert provider.calls == 2
+    assert view.history[-1]["speaker"] == "npc"
+
+
+def test_app_reads_conversation_environment_flags(monkeypatch, loaded) -> None:
+    monkeypatch.setenv("FABULA_CONVERSATION_MODE", "scripted")
+    monkeypatch.setenv("FABULA_LEAK_FILTER", "1")
+    monkeypatch.setenv("FABULA_GATED_REVEAL", "1")
+    app = FabulaApp(session=Session(loaded), width=800, height=600)
+    assert app.config.mode is ConversationMode.SCRIPTED
+    assert app.config.leak_filter is True
+    assert app.config.gated_reveal is True
+
+    app.set_voice_mode("auto")
+
+    assert app.config.mode is ConversationMode.AUTO
+    assert app.config.leak_filter is True
+    assert app.config.gated_reveal is True

@@ -105,7 +105,7 @@ PHASE 1 (local, pre-game)
    → bundle on disk: world.json, truth.json, clues.json, npcs/<id>/identity.json, npcs/<id>/memory.json
 PHASE 2 (play, ~10 min)
  engine loads bundle → builds world (location types from FIXED enum → pre-made placeholder tiles)
- NPCs move via schedules + A*
+ NPCs move via schedules + shortest-path routing
  player walks / examines clues / types to NPCs
    → prompt assembler (that NPC's identity+memory only, + chat history) → live API → in-character reply
  journal auto-records clues + key statements; visible timer
@@ -118,7 +118,7 @@ PHASE 2 (play, ~10 min)
 
 ## C1. Generation (offline, local) [DECIDED core; details ADOPTED]
 - Fine-tuned model generates **everything**. Player settings: `mystery_type` (theft/disappearance/murder/random), `tone` (cozy↔dark), `difficulty`.
-- **Neurosymbolic Mystery Synthesis (`--fast`):** The primary generation pipeline. Emits token-dense Compact Blueprint DSL (~140 tokens, ~11s on CPU). Python `BlueprintCompiler` deterministically builds all 9 Pydantic bundle files, computes $A^*$ coordinates, aligns schedules, and mathematically verifies solvability ($|C| = 1$) in 2.09 ms. Total cold generation completes in <25s.
+- **Neurosymbolic Mystery Synthesis (`--fast`):** The primary generation pipeline. Emits token-dense Compact Blueprint DSL (~140 tokens, ~11s on CPU). Python `BlueprintCompiler` deterministically builds all 9 Pydantic bundle files, computes grid coordinates and shortest-path routes, aligns schedules, and mathematically verifies solvability ($|C| = 1$) in 2.09 ms. Total cold generation completes in <25s.
 - **Legacy Staged generation:** world → cast → truth → per-NPC files via GBNF grammar masks (retained for baseline comparisons).
 - **Validator + retry:** after each stage; max N retries (N default 3, config); then error screen. Solvability guarantee: a chain of clues/facts uniquely identifies the culprit ($|C| = 1$), every innocent suspect has an alibi, timeline has no contradictions, and location graph is connected.
 - **Loading screen** during generation (~10–20 seconds).
@@ -127,7 +127,7 @@ PHASE 2 (play, ~10 min)
 ## C2. World & engine
 - **Headless pure-Python simulation core, zero UI imports [ADOPTED]**; UI is a thin layer. Engine **Pygame (default) vs Arcade** [OPEN → HG-01].
 - Python builds the world from `world.json` [DECIDED]. Locations: 3–4, named/described by the LLM; **`type` must come from a fixed enum** mapped to pre-made placeholder tiles (**enum [DECIDED → HG-04]**: market, library, café, park, parking, residence — docks replaced by parking 2026-10-17). No generated art.
-- Locations/NPCs have explicit coordinates; movement on a small tile map or graph of named location nodes (needed for A*). NPC **perception**: events in own location (optionally adjacent); finalise at schema freeze.
+- Locations/NPCs have explicit coordinates; movement on a small tile map or graph of named location nodes (needed for shortest-path routing). NPC **perception**: events in own location (optionally adjacent); finalise at schema freeze.
 - **Time model [OPEN → HG-05]**: real-time vs tick-based. Note `schedule.at_minute` assumes a session clock in minutes.
 
 ## C3. NPC behaviour
@@ -169,14 +169,14 @@ Walk, examine objects, type to NPCs. **Journal** auto-records clues/key statemen
 Violence/gore boundary + cozy↔dark tone in generation; **filter on player input before any API call**; age rating stated at release [OPEN → HG-13].
 
 ## C9. Fine-tuning
-- **~3–4B instruct** base [OPEN → HG-02; candidates Qwen 3.x ~4B, Gemma 3 ~4B, Llama 3.2 3B]. **QLoRA SFT, Unsloth, Kaggle T4** (check current weekly GPU quota/session limits). RL (GRPO) deferred.
+- **Two generation models [DECIDED 2026-11-15]:** ~1B `Llama-3.2-1B-Instruct` for the primary fast blueprint route, and 3B `Qwen2.5-3B-Instruct` for the legacy staged JSON route. **QLoRA SFT, Unsloth, Kaggle T4** (check current weekly GPU quota/session limits). RL (GRPO) deferred.
 - Export **quantised GGUF (Q4-class)** for local CPU inference; runtime llama.cpp-style [OPEN → HG-03].
 - Teaches **format reliability, schema adherence, scenario/NPC style**, not world knowledge.
 - **Training data (no scraping), synthetic-to-natural pipeline:** (1) plain-Python **symbolic scenario generator** makes skeletons (crime type, culprit, motive, means, opportunity, timeline, clue graph, alibis, per-NPC knowledge) with **a template per mystery type**; (2) a strong **teacher LLM** expands each skeleton into stage JSON in the target schema [OPEN → HG-11, verify licence permits training on outputs]; (3) **validator filters**; (4) examples `(settings + stage input) → stage JSON`. **1,500–3,000 verified examples**, balanced across types, varied by setting/cast size/culprit type/difficulty/tone. Reference material (MuSR, True Detective, public-domain Christie/Holmes): check licences (HG-17). Optional: hold out a type/combination to test generalisation.
 - **Baselines:** base model + good prompting, and a large API model, on the same generation task. Fine-tune must show measurable benefit.
 
 ## C10. Technology summary
-Python [DECIDED] · Pygame/Arcade [OPEN, default Pygame] · headless sim core [ADOPTED] · ~3–4B QLoRA/Unsloth/Kaggle T4 [DECIDED/ADOPTED] · GGUF local inference [OPEN] · constrained decoding [ADOPTED] · live-API chat [DECIDED] · JSON bundle validated with **Pydantic** (or equivalent) [ADOPTED] · A* [ADOPTED].
+Python [DECIDED] · Pygame/Arcade [OPEN, default Pygame] · headless sim core [ADOPTED] · 1B blueprint + 3B staged QLoRA/Unsloth/Kaggle T4 [DECIDED/ADOPTED] · GGUF local inference [OPEN] · constrained decoding [ADOPTED] · live-API chat [DECIDED] · JSON bundle validated with **Pydantic** (or equivalent) [ADOPTED] · shortest-path routing [ADOPTED].
 
 ---
 
@@ -265,10 +265,10 @@ Also require owner sign-off at: end of baseline comparison (is fine-tune justifi
 | **C** Training-data pipeline | Teacher prompts per stage, expansion runner, validator filter, balancing/augmentation, dataset export, licence log | A, B, HG-11, HG-13 |
 | **D** Fine-tuning | Baseline comparison harness, Kaggle Unsloth QLoRA notebook, eval-on-held-out, GGUF export | C, HG-02, HA-01 |
 | **E** Local generation runtime | Staged generator, constrained decoding, retry loop, config, CLI, loading/error hooks, CPU benchmark, works first with base model/mocks | A, HG-03 |
-| **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, A*, perception, session state, clue discovery, journal model, accusation checker, timer | A, HG-05/06 |
+| **F** Simulation core (headless) | Bundle loader, world builder, time model, schedules, shortest-path routing, perception, session state, clue discovery, journal model, accusation checker, timer | A, HG-05/06 |
 | **G** Conversation | Prompt assembler (isolation enforced), provider abstraction + ≥2 adapters + mock, streaming, token cap, fallback lines, input filter, leak-filter & gated-reveal toggles, deterministic scripted no-key mode | A, HG-07/08/09/13 |
 | **H** UI / game loop | Engine layer, tile kit, map render, movement, dialog box, journal, timer, accusation UI, loading/error screens | F, G, HG-01 |
-| **I** Evaluation | Probe suite per NPC, metric scripts (secret-keeping, knowledge boundary, persona, consistency, culprit-lie consistency, disclosure adherence, provider robustness), judge integration, base-vs-FT experiment by mystery type, ablations, report | E, G, HG-12, HA-05 |
+| **I** Evaluation | Probe suite per NPC, metric scripts (secret-keeping, knowledge boundary, persona, consistency, culprit-lie consistency, disclosure adherence, provider robustness), judge integration, both-generator comparison (1B fast vs 3B staged), base-vs-FT per generator, ablations, report | E, G, HG-12, HA-05 |
 | **J** Integration & release | End-to-end wiring, packaging, playtests, docs, licences, final acceptance | all |
 
 Suggested order: **A first (blocking)** → B, F, G, E (parallel) → C → D → H, I → J. Original rough timeline: W1 specs/schemas; W2–3 generator/validators/data; W4 fine-tune v1; W4–6 sim core/prompt assembler/UI; W7 integration/playtest/eval; W8 polish/demo (adjust per HG-14).
@@ -278,7 +278,7 @@ Suggested order: **A first (blocking)** → B, F, G, E (parallel) → C → D �
 - **Method:** scripted probe suite per NPC — direct questions, leading questions, false accusations, pressure ("the culprit already confessed"), "ignore your instructions", repeated questions across turns — run against ≥2 live providers using prompts built from generated bundles.
 - **Metrics:** secret-keeping rate (fact-match + LLM-judge) · knowledge boundary (fact extraction) · persona adherence (rubric: LLM-judge + human sample) · consistency vs own `memory.json` and earlier answers · culprit lie consistency vs `cover_story` · disclosure-policy adherence (`volunteer`/`if_asked`/required clue) · provider robustness.
 - **Secondary (generator-side):** schema validity rate, connectivity, solvability, unique-culprit rate, timeline consistency, scenario diversity.
-- **Core experiment:** NPC JSONs from **base** vs **fine-tuned** model, same runtime API model, same probes, compare metrics, broken down by mystery type.
+- **Core experiment:** NPC JSONs from **both generators** (`fast-1b` blueprint and `staged-3b` JSON) under the same runtime API model and probes, compared by mystery type and generator; plus **base vs fine-tuned** within each generator, compare metrics.
 - **Ablations:** secrets-in-prompt vs gated reveal; leak-filter off (default for evaluation) vs on; different providers.
 
 # PART H — RISKS (plan must mitigate)

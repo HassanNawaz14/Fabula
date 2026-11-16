@@ -4,6 +4,8 @@ This document explains why generating one mystery currently takes **30–40 minu
 
 All times below are estimates for **one complete case bundle** on the current machine, unless stated otherwise. They assume the same case size and no unusual number of retries.
 
+> **Status (2026-11-16):** the timings below describe the **staged six-NPC pipeline**, which remains available as the legacy high-fidelity path. The game UI and `python -m fabula generate --fast` now use the **neurosymbolic blueprint route**: a 1B model writes a compact blueprint and a deterministic compiler builds the bundle, so in-game generation finishes in seconds when `models/Llama-3.2-1B-Instruct.Q4_K_M.gguf` is present. The options below remain relevant for the staged path and for machines without the fast model.
+
 ---
 
 ## 1. Why it is slow right now
@@ -145,6 +147,8 @@ Before optimizing anything, look at the run report from your last generation. It
 
 ### Option F — Pre-generate a library of cases
 
+**Adopted:** the game ships curated cases in `bundles/library/` and lists them under **New Game → Play a Ready Case**, so those sessions start with no generation wait.
+
 **What it is:** generate 5–10 finished bundles once, ship them with the game, and let the player pick one. Generation then takes **zero minutes during play**.
 
 **Estimated time:** **0 minutes at play time**; 30–40 minutes per case if made on this laptop (or ~45 minutes total for 10 cases on a free Kaggle GPU).
@@ -163,18 +167,20 @@ Before optimizing anything, look at the run report from your last generation. It
 
 ---
 
-### Option G — Use a smaller model (1.5B instead of 3B)
+### Option G — Use a smaller model (adopted as the 1B blueprint route)
 
-**What it is:** run a smaller Qwen2.5 model in the same 4-bit format.
+**Adopted:** the fast route runs `Llama-3.2-1B-Instruct.Q4_K_M.gguf` to emit only the compact blueprint, and a deterministic compiler builds the full bundle. Because the small model no longer writes the full JSON, it needs a blueprint prompt rather than a full-bundle fine-tune, and case generation drops to seconds on CPU.
 
-**Estimated time:** about **15–20 minutes**.
+**What it is (general option):** run a smaller Qwen2.5 model in the same 4-bit format for the staged pipeline.
+
+**Estimated time:** about **15–20 minutes** for the staged pipeline; **seconds** for the adopted blueprint route.
 
 **Advantages**
 - Free, offline, roughly twice as fast.
 - Uses less memory, so the laptop stays responsive.
 
 **Drawbacks**
-- The current fine-tune is 3B; a 1.5B model would need its **own fine-tune**.
+- A 1.5B model for the staged pipeline would need its **own fine-tune** (the blueprint route instead uses the general 1B instruct model).
 - Smaller models make more JSON mistakes and weaker logical connections between clues.
 
 **Effect on players:** simpler, less surprising mysteries and flatter NPC personalities.
@@ -232,7 +238,7 @@ Before optimizing anything, look at the run report from your last generation. It
 | D. Free Kaggle GPU | Yes | **8–14 min per session** (4–6 min generating) | Separate batch workflow | Same | No |
 | E. Free hosted API | Yes (with limits) | **1–3 min** | New adapter | Different, less consistent | No |
 | F. Pre-generated cases | Yes | **0 min at play** | Bundle library + picker | Same as the fine-tune | Yes |
-| G. 1.5B model | Yes | 15–20 min | **Retraining required** | Noticeably weaker | Yes |
+| G. 1B blueprint model | Yes | **Instant** (adopted fast route; 15–20 min staged) | Fast route implemented | Blueprint-guided, simpler prose | Yes |
 | H. Speculative decoding | Yes | 20–30 min | Complex code change | Same | Yes |
 | I. Threads/background apps | Yes | 28–36 min | One environment variable | Same | Yes |
 

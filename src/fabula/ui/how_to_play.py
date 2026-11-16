@@ -116,8 +116,8 @@ _SECTIONS: tuple[tuple[str, str], ...] = (
     ("heading", "WHEN YOU ARE READY"),
     (
         "body",
-        "Press A or click Accuse. Choose who did it, how, and why. You only get one "
-        "accusation, so think it through.",
+        "Press A or click Accuse. Choose who did it, how, and why. You get three "
+        "accusations, so think each one through.",
     ),
 )
 

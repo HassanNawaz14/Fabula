@@ -45,12 +45,34 @@ class AccusationService:
         self._max_attempts = max_attempts
         self._remaining = max_attempts
         self._terminal = False
+        self._solved = False
+        self._timed_out = False
         self._attempts: list[AttemptRecord] = []
         self._clock = clock
 
     @property
     def attempts_used(self) -> int:
         return len(self._attempts)
+
+    @property
+    def max_attempts(self) -> int:
+        return self._max_attempts
+
+    @property
+    def remaining(self) -> int:
+        return self._remaining
+
+    @property
+    def terminal(self) -> bool:
+        return self._terminal
+
+    @property
+    def solved(self) -> bool:
+        return self._solved
+
+    @property
+    def timed_out(self) -> bool:
+        return self._timed_out
 
     def submit(self, who_id: str, how_id: str, why_id: str) -> AccusationResult:
         if self._terminal:
@@ -79,6 +101,7 @@ class AccusationService:
         )
         self._remaining -= 1
         correct = who_correct and how_correct and why_correct
+        self._solved = correct
         self._terminal = correct or self._remaining == 0
         return AccusationResult(
             correct=correct,
@@ -90,6 +113,7 @@ class AccusationService:
         if self._terminal:
             raise RuntimeError("accusation is already resolved")
         self._terminal = True
+        self._timed_out = True
         return AccusationResult(
             correct=False,
             attempts_remaining=self._remaining,

@@ -1,0 +1,1375 @@
+{
+  "e1_fast_cold__g0__00_s1": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:traded it with a box of tea and came back for it | scene:loc_parking | time:6": "template, partly changed",
+      "- 5 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 6 | npc_01 | loc_parking | commits theft using traded it with a box of tea and came back for it": "template, partly changed",
+      "- 6 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 7 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_cold__g1__00_s2": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_2]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_library | time:7": "template exact",
+      "- 6 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 7 | npc_01 | loc_library | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 7 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 8 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_cold__g2__00_s3": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_3]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:hid it under a fruit crate and came back for it | scene:loc_library | time:4": "template exact",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_library | commits theft using hid it under a fruit crate and came back for it": "template exact",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- covert_memo | loc_market | document | links:npc_04": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "covert_memo",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_cold__g3__00_s4": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_4]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with an identical fake from another stall | scene:loc_parking | time:3": "template, partly changed",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using swapped it with an identical fake from another stall": "template, partly changed",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_cold__g4__00_s5": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_5]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:help a sibling in trouble | meth:convinced the owner it was already sold and left with it | scene:loc_market | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_market | commits theft using convinced the owner it was already sold and left with it": "template exact",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_market | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__00_s1000_warmup": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1000]": "template, fields omitted",
+      "PREMISE: A theft of antique hand mirror disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:antique hand mirror | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:sent it to a different stall during the rush | scene:loc_parking | time:3": "template, partly changed",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using sent it to a different stall during the rush": "template, partly changed",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__01_s1": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:traded it for a cheap copy during a rush | scene:loc_library | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_library | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- buried_record | loc_market | document | links:npc_03": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "buried_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__02_s2": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_2]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_library | time:7": "template exact",
+      "- 6 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 7 | npc_01 | loc_library | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 7 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 8 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__03_s3": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_3]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:lured them behind the waterin' trough with a fake errand | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using lured them behind the waterin trough with a fake errand": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__04_s4": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_4]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with an identical copy from another stall | scene:loc_parking | time:3": "template, partly changed",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using swapped it with an identical copy from another stall": "template, partly changed",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__05_s5": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_5]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:help a sibling in secret trouble | meth:slipped it into a coat pocket while the stall was busy | scene:loc_market | time:2": "template exact",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_market | commits theft using slipped it into a coat pocket while the stall was busy": "template exact",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_market | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__06_s6": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_6]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:hid it under a fruit crate and came back for it | scene:loc_parking | time:6": "template exact",
+      "- 5 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 6 | npc_01 | loc_parking | commits theft using hid it under a fruit crate and came back for it": "template exact",
+      "- 6 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 7 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | sees:npc_01_running": "template, fields omitted",
+      "- npc_04 | working_in_row": "template, partly changed",
+      "- npc_05 | notices:hitched truck to the fence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__07_s7": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_7]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:slipped it into a coat pocket while the stall was busy | scene:loc_parking | time:2": "template exact",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using slipped it into a coat pocket while the stall was busy": "template exact",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__08_s8": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_8]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with an identical but cheaper copy from another stall | scene:loc_parking | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_parking | commits theft using swapped it with an identical but cheaper copy from another stall": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- covert_record | loc_parking | document | links:npc_01": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "covert_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__09_s9": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_9]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:pay off a growing debt | meth:swapped it with an identical fake from another stall | scene:loc_library | time:4": "template, partly changed",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_library | commits theft using swapped it with an identical fake from another stall": "template, partly changed",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__10_s10": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_10]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:tricked the owner into giving it to them | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using tricked the owner into giving it to them": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__11_s11": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_11]": "template, fields omitted",
+      "PREMISE: A theft of leather ledger disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:leather ledger | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with a lookalike during the rush | scene:loc_parking | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_parking | commits theft using swapped it with a lookalike during the rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__12_s12": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_12]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with a lookalike from another stall | scene:loc_library | time:8": "template exact",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_library | commits theft using swapped it with a lookalike from another stall": "template exact",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__13_s13": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_13]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:buy back a family heirloom of their own | meth:hid it under a fruit crate and came back for it | scene:loc_library | time:4": "template exact",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_library | commits theft using hid it under a fruit crate and came back for it": "template exact",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__14_s14": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_14]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:tricked them into giving it to a stray and took it off their counter when they turned away | scene:loc_parking | time:5": "template, partly changed",
+      "- 4 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 5 | npc_01 | loc_parking | commits theft using tricked them into giving it to a stray and took it off their counter when they turned away": "template, partly changed",
+      "- 6 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 7 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__15_s15": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_15]": "template, fields omitted",
+      "PREMISE: A theft of antique hand mirror disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:antique hand mirror | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:help a sibling in trouble | meth:traded it for a cheap copy during the rush and came back for it | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using traded it for a cheap copy during the rush and came back for it": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__16_s16": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_16]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:buy back a family heirloom of their own | meth:tricked the owner into handing over a small but valuable item | scene:loc_parking | time:3": "template, partly changed",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using tricked the owner into handing over a small but valuable item": "template, partly changed",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__17_s17": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_17]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:convinced the owner it was already sold and left with it | scene:loc_parking | time:2": "template exact",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using convinced the owner it was already sold and left with it": "template exact",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | sees:npc_02_running": "template, fields omitted",
+      "- npc_04 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__18_s18": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_18]": "template, fields omitted",
+      "PREMISE: A theft of antique hand mirror disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:antique hand mirror | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:tricked them into a wild goose chase and snuck it off during a rush | scene:loc_library | time:5": "template, partly changed",
+      "- 4 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 5 | npc_01 | loc_library | commits theft using tricked them into a wild goose chase and snuck it off during a rush": "template, partly changed",
+      "- 5 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 6 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__19_s19": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_19]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:pay off a public debt | meth:hid it under a fruit crate and came back for it | scene:loc_parking | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_parking | commits theft using hid it under a fruit crate and came back for it": "template exact",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | sees:npc_01_running": "template, fields omitted",
+      "- npc_04 | working_at_counter": "template, partly changed",
+      "- npc_05 | notices:hitched truck to the cart": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__20_s20": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_20]": "template, fields omitted",
+      "PREMISE: A theft of silver money bowl disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver money bowl | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_parking | time:3": "template exact",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | sees:npc_01_running": "template, fields omitted",
+      "- npc_04 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__21_s21": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_21]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:buy back a lost sum of money | meth:traded it for a cheap copy during a rush | scene:loc_parking | time:4": "template, partly changed",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_parking | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__22_s22": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_22]": "template, fields omitted",
+      "PREMISE: A theft of leather ledger disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:leather ledger | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_parking | time:2": "template exact",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__23_s23": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_23]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:settle a grudge from years ago | meth:traded it for a cheap copy during the rush | scene:loc_parking | time:6": "template exact",
+      "- 5 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 6 | npc_01 | loc_parking | commits theft using traded it for a cheap copy during the rush": "template exact",
+      "- 6 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 7 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_residence | confirms:npc_02_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__24_s24": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_24]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with a lookalike while the vendor was busy | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using swapped it with a lookalike while the vendor was busy": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_03_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__25_s25": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_25]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with a lookalike during the rush | scene:loc_parking | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_parking | commits theft using swapped it with a lookalike during the rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__26_s26": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_26]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:traded it for a cheap copy during a rush | scene:loc_parking | time:4": "template, partly changed",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_parking | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__27_s27": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_27]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:swapped it with a lookalike from another stall | scene:loc_library | time:4": "template exact",
+      "- 3 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 4 | npc_01 | loc_library | commits theft using swapped it with a lookalike from another stall": "template exact",
+      "- 4 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 5 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__28_s28": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_28]": "template, fields omitted",
+      "PREMISE: A theft of leather ledger disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:leather ledger | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:settle a grudge from years ago | meth:sent it to a different stall during rush hour | scene:loc_parking | time:5": "template, partly changed",
+      "- 4 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 5 | npc_01 | loc_parking | commits theft using sent it to a different stall during rush hour": "template, partly changed",
+      "- 5 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 6 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__29_s29": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_29]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:convinced a traveling merchant that it was already sold and left it with it | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using convinced a traveling merchant that it was already sold and left it with it": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- concealed_record | loc_market | document | links:npc_03": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "concealed_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e1_fast_warm__g0__30_s30": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_30]": "template, fields omitted",
+      "PREMISE: A theft of box of rare tea disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:box of rare tea | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:traded it for a cheap copy during the rush | scene:loc_library | time:3": "template exact",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_library | commits theft using traded it for a cheap copy during the rush": "template exact",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__00_s1000_warmup": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1000]": "template, fields omitted",
+      "PREMISE: A theft of antique hand mirror disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:antique hand mirror | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:sent it to a different stall during the rush | scene:loc_parking | time:3": "template, partly changed",
+      "- 2 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 3 | npc_01 | loc_parking | commits theft using sent it to a different stall during the rush": "template, partly changed",
+      "- 3 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 4 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | sees:nobody_unusual": "template, fields omitted",
+      "- npc_03 | confirms:npc_02_presence": "template exact"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__01_s1": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:traded it for a cheap copy during a rush | scene:loc_library | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_library | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- buried_record | loc_market | document | links:npc_03": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "buried_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__02_s2": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_2]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_library | time:7": "template exact",
+      "- 6 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 7 | npc_01 | loc_library | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 7 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 8 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__03_s3": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_3]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:lured them behind the waterin' trough with a fake errand | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using lured them behind the waterin trough with a fake errand": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__04_s1": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:traded it for a cheap copy during a rush | scene:loc_library | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_library | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- buried_record | loc_market | document | links:npc_03": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "buried_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__05_s2": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_2]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_library | time:7": "template exact",
+      "- 6 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 7 | npc_01 | loc_library | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 7 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 8 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__06_s3": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_3]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:lured them behind the waterin' trough with a fake errand | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using lured them behind the waterin trough with a fake errand": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__07_s1": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_1]": "template, fields omitted",
+      "PREMISE: A theft of brass pocket watch disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:brass pocket watch | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:traded it for a cheap copy during a rush | scene:loc_library | time:8": "template, partly changed",
+      "- 7 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 8 | npc_01 | loc_library | commits theft using traded it for a cheap copy during a rush": "template, partly changed",
+      "- 8 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 9 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- buried_record | loc_market | document | links:npc_03": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "buried_record",
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__08_s2": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_2]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:prove they were smarter than the market folk | meth:lifted it off the counter when the vendor turned away | scene:loc_library | time:7": "template exact",
+      "- 6 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 7 | npc_01 | loc_library | commits theft using lifted it off the counter when the vendor turned away": "template exact",
+      "- 7 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 8 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_library | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e3_fast_repeat__g0__09_s3": {
+    "line_classes": {
+      "[CASE:theft|cozy|seed_3]": "template, fields omitted",
+      "PREMISE: A theft of silver locket disrupts the quiet routine of the town.": "template exact",
+      "CAST: vict:silver locket | culp:npc_01 | susp:npc_02,npc_03,npc_04,npc_05": "template exact",
+      "CRIME: mot:cover a loss they were blamed for | meth:lured them behind the waterin' trough with a fake errand | scene:loc_parking | time:2": "template, partly changed",
+      "- 1 | npc_01 | loc_library | prepares covert equipment": "template exact",
+      "- 2 | npc_01 | loc_parking | commits theft using lured them behind the waterin trough with a fake errand": "template, partly changed",
+      "- 2 | npc_02 | loc_cafe | working at counter": "template exact",
+      "- 3 | npc_03 | loc_market | notices hurried footsteps": "template exact",
+      "- theft_trace | loc_parking | physical | links:npc_01": "template, fields omitted",
+      "- hidden_record | loc_library | document | links:npc_01": "template, fields omitted",
+      "- stray_button | loc_cafe | trace | red_herring:npc_02": "template exact",
+      "- witness_memo | loc_market | document | links:npc_03": "template, fields omitted",
+      "- npc_02 | loc_cafe | sees:nobody_unusual": "template, partly changed",
+      "- npc_03 | loc_market | sees:npc_01_running": "template, partly changed",
+      "- npc_04 | loc_library | confirms:npc_01_presence": "template, partly changed"
+    },
+    "compiler_added_clue_ids": [
+      "clue_npc_02_alibi",
+      "clue_npc_03_alibi",
+      "clue_npc_04_alibi",
+      "clue_npc_05_alibi"
+    ],
+    "outline_clue_ids_dropped": [
+      "stray_button",
+      "witness_memo"
+    ]
+  },
+  "e2_staged__g0__00_s1": {
+    "python_added_facts": [
+      {
+        "npc": "npc_baker",
+        "fact_id": "account_npc_baker",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of silver locket at the loc_library. the npc_baker slipped it into a coat pocket while the stall was busy at the loc_library at minute 9."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_baker"
+        ]
+      }
+    ],
+    "other_differences": []
+  },
+  "e2_staged__g1__00_s2": {
+    "python_added_facts": [
+      {
+        "npc": "npc_shepherd",
+        "fact_id": "account_npc_shepherd",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of brass saffron teapot at the loc_park. the brass saffron teapot was slipped into a coat pocket while the owner was preoccupied at the loc_park at minute 7, by the npc_shepherd."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_shepherd"
+        ]
+      }
+    ],
+    "other_differences": []
+  },
+  "e2_staged__g2__00_s3": {
+    "python_added_facts": [],
+    "python_changed_clues": [],
+    "other_differences": []
+  },
+  "e3_staged_repeat__g0__00_s1": {
+    "python_added_facts": [
+      {
+        "npc": "npc_baker",
+        "fact_id": "account_npc_baker",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of silver locket at the loc_library. the npc_baker slipped it into a coat pocket while the stall was busy at the loc_library at minute 9."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_baker"
+        ]
+      }
+    ],
+    "other_differences": []
+  }
+}

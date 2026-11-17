@@ -1,0 +1,226 @@
+{
+  "fast|cold|e1_fast_cold|e2e_s": {
+    "n": 5,
+    "mean": 9.803,
+    "median": 9.766,
+    "sd": 0.647,
+    "min": 8.97,
+    "max": 10.752
+  },
+  "fast|cold|e1_fast_cold|load_s": {
+    "n": 5,
+    "mean": 1.045,
+    "median": 0.99,
+    "sd": 0.163,
+    "min": 0.947,
+    "max": 1.334
+  },
+  "fast|cold|e1_fast_cold|infer_s": {
+    "n": 5,
+    "mean": 8.727,
+    "median": 8.595,
+    "sd": 0.643,
+    "min": 7.95,
+    "max": 9.728
+  },
+  "fast|cold|e1_fast_cold|python_s": {
+    "n": 5,
+    "mean": 0.031,
+    "median": 0.03,
+    "sd": 0.004,
+    "min": 0.027,
+    "max": 0.036
+  },
+  "fast|cold|e1_fast_cold|output_tokens": {
+    "n": 5,
+    "mean": 268.2,
+    "median": 270,
+    "sd": 18.485,
+    "min": 243,
+    "max": 292
+  },
+  "fast|cold|e1_fast_cold|tok_per_s": {
+    "n": 5,
+    "mean": 30.748,
+    "median": 30.566,
+    "sd": 0.871,
+    "min": 30.016,
+    "max": 32.226
+  },
+  "fast|cold|e1_fast_cold|rss_peak_mb": {
+    "n": 5,
+    "mean": 1472.06,
+    "median": 1472.2,
+    "sd": 0.297,
+    "min": 1471.7,
+    "max": 1472.4
+  },
+  "fast|warm|e1_fast_warm|e2e_s": {
+    "n": 30,
+    "mean": 9.032,
+    "median": 9.005,
+    "sd": 0.601,
+    "min": 7.647,
+    "max": 10.204
+  },
+  "fast|warm|e1_fast_warm|load_s": {
+    "n": 30,
+    "mean": 0.0,
+    "median": 0.0,
+    "sd": 0.0,
+    "min": 0.0,
+    "max": 0.0
+  },
+  "fast|warm|e1_fast_warm|infer_s": {
+    "n": 30,
+    "mean": 9.007,
+    "median": 8.979,
+    "sd": 0.601,
+    "min": 7.618,
+    "max": 10.177
+  },
+  "fast|warm|e1_fast_warm|python_s": {
+    "n": 30,
+    "mean": 0.025,
+    "median": 0.025,
+    "sd": 0.003,
+    "min": 0.02,
+    "max": 0.031
+  },
+  "fast|warm|e1_fast_warm|output_tokens": {
+    "n": 30,
+    "mean": 279.2,
+    "median": 277.5,
+    "sd": 13.912,
+    "min": 243,
+    "max": 299
+  },
+  "fast|warm|e1_fast_warm|tok_per_s": {
+    "n": 30,
+    "mean": 31.044,
+    "median": 31.154,
+    "sd": 0.975,
+    "min": 28.594,
+    "max": 32.617
+  },
+  "fast|warm|e1_fast_warm|rss_peak_mb": {
+    "n": 30,
+    "mean": 1482.06,
+    "median": 1481.8,
+    "sd": 4.758,
+    "min": 1473.8,
+    "max": 1491.0
+  },
+  "fast|warm|e3_fast_repeat|e2e_s": {
+    "n": 9,
+    "mean": 8.976,
+    "median": 9.272,
+    "sd": 0.759,
+    "min": 7.951,
+    "max": 9.948
+  },
+  "fast|warm|e3_fast_repeat|load_s": {
+    "n": 9,
+    "mean": 0.0,
+    "median": 0.0,
+    "sd": 0.0,
+    "min": 0.0,
+    "max": 0.0
+  },
+  "fast|warm|e3_fast_repeat|infer_s": {
+    "n": 9,
+    "mean": 8.952,
+    "median": 9.25,
+    "sd": 0.759,
+    "min": 7.928,
+    "max": 9.922
+  },
+  "fast|warm|e3_fast_repeat|python_s": {
+    "n": 9,
+    "mean": 0.024,
+    "median": 0.025,
+    "sd": 0.001,
+    "min": 0.022,
+    "max": 0.026
+  },
+  "fast|warm|e3_fast_repeat|output_tokens": {
+    "n": 9,
+    "mean": 282.0,
+    "median": 292,
+    "sd": 20.476,
+    "min": 255,
+    "max": 299
+  },
+  "fast|warm|e3_fast_repeat|tok_per_s": {
+    "n": 9,
+    "mean": 31.536,
+    "median": 31.817,
+    "sd": 0.609,
+    "min": 30.134,
+    "max": 32.167
+  },
+  "fast|warm|e3_fast_repeat|rss_peak_mb": {
+    "n": 9,
+    "mean": 1478.722,
+    "median": 1478.4,
+    "sd": 2.975,
+    "min": 1473.9,
+    "max": 1482.9
+  },
+  "staged|cold|e2_staged|e2e_s": {
+    "n": 2,
+    "mean": 657.662,
+    "median": 657.662,
+    "sd": 48.791,
+    "min": 623.162,
+    "max": 692.163
+  },
+  "staged|cold|e2_staged|load_s": {
+    "n": 2,
+    "mean": 3.007,
+    "median": 3.007,
+    "sd": 0.573,
+    "min": 2.602,
+    "max": 3.413
+  },
+  "staged|cold|e2_staged|infer_s": {
+    "n": 2,
+    "mean": 654.581,
+    "median": 654.581,
+    "sd": 48.209,
+    "min": 620.492,
+    "max": 688.669
+  },
+  "staged|cold|e2_staged|python_s": {
+    "n": 2,
+    "mean": 0.074,
+    "median": 0.074,
+    "sd": 0.01,
+    "min": 0.067,
+    "max": 0.081
+  },
+  "staged|cold|e2_staged|output_tokens": {
+    "n": 2,
+    "mean": 3450.5,
+    "median": 3450.5,
+    "sd": 290.621,
+    "min": 3245,
+    "max": 3656
+  },
+  "staged|cold|e2_staged|tok_per_s": {
+    "n": 2,
+    "mean": 5.27,
+    "median": 5.27,
+    "sd": 0.056,
+    "min": 5.23,
+    "max": 5.309
+  },
+  "staged|cold|e2_staged|rss_peak_mb": {
+    "n": 2,
+    "mean": 3545.9,
+    "median": 3545.9,
+    "sd": 2.687,
+    "min": 3544.0,
+    "max": 3547.8
+  }
+}

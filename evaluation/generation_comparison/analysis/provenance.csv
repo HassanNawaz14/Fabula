@@ -1,0 +1,5 @@
+run_id,step,route,condition,seed,status,stages_with_raw_output,stage_attempts_total,stages_retried,raw_text_contains_account_prefix,python_added_facts,python_changed_clues,other_differences,raw_culprit_had_secret_deed,raw_culprit_fact_sources
+e2_staged__g0__00_s1,e2_staged,staged,cold,1,ok,9,9,0,False,1,1,0,False,witnessed/open;heard/open;witnessed/open;witnessed/open
+e2_staged__g1__00_s2,e2_staged,staged,cold,2,ok,8,8,0,False,1,1,0,False,witnessed/open;did/open;witnessed/open;heard/open
+e2_staged__g2__00_s3,e2_staged,staged,cold,3,failed,8,8,0,False,,,,,
+e3_staged_repeat__g0__00_s1,e3_staged_repeat,staged,cold,1,ok,9,9,0,False,1,1,0,False,witnessed/open;heard/open;witnessed/open;witnessed/open

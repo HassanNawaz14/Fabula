@@ -1,0 +1,70 @@
+{
+  "e2_staged__g0__00_s1": {
+    "python_added_facts": [
+      {
+        "npc": "npc_baker",
+        "fact_id": "account_npc_baker",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of silver locket at the loc_library. the npc_baker slipped it into a coat pocket while the stall was busy at the loc_library at minute 9."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_baker"
+        ]
+      }
+    ],
+    "other_differences": []
+  },
+  "e2_staged__g1__00_s2": {
+    "python_added_facts": [
+      {
+        "npc": "npc_shepherd",
+        "fact_id": "account_npc_shepherd",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of brass saffron teapot at the loc_park. the brass saffron teapot was slipped into a coat pocket while the owner was preoccupied at the loc_park at minute 7, by the npc_shepherd."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_shepherd"
+        ]
+      }
+    ],
+    "other_differences": []
+  },
+  "e2_staged__g2__00_s3": {
+    "python_added_facts": [],
+    "python_changed_clues": [],
+    "other_differences": []
+  },
+  "e3_staged_repeat__g0__00_s1": {
+    "python_added_facts": [
+      {
+        "npc": "npc_baker",
+        "fact_id": "account_npc_baker",
+        "source": "did",
+        "secret": true,
+        "what": "I committed the theft of silver locket at the loc_library. the npc_baker slipped it into a coat pocket while the stall was busy at the loc_library at minute 9."
+      }
+    ],
+    "python_changed_clues": [
+      {
+        "clue": "clue_1",
+        "change": "implies changed",
+        "added_links": [
+          "account_npc_baker"
+        ]
+      }
+    ],
+    "other_differences": []
+  }
+}

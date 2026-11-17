@@ -1,0 +1,25 @@
+﻿case,dimension,score_1to5,evidence
+case_124,logical_consistency,2,"""The Stolen silver money bowl"", ""A theft of brass pocket watch disrupts the quiet routine of the town."" 2 different items"
+case_124,mystery_coherence,5,no character contradicts the other
+case_124,clue_relevance,3,"At Old Library (Hana tells you): “Hana recalls a document detail: hidden record.” no details of the record to infer who it could be.  At Elder Park (examine): “At the Elder Park, a physical trace: theft trace.” no detail of the trace to guess who it could be"
+case_124,npc_identity_memory_consistency,5,no memory leaks into other characters
+case_124,solvability_human,4,"since no one present at old Library saw Lena there, it is guessable"
+case_124,narrative_quality,2,the english is broken: I remember that sees:nobody unusual. internal names are used e.g. npc_01 – sibling
+case_249,logical_consistency,2,Intro says the teapot went missing “from the Old Cottage”; Hidden truth says the theft was “at Elder Park”. The crime location contradicts itself.
+case_249,mystery_coherence,4,"Who, how and why fit together, apart from the theft location (Old Cottage in the intro vs Elder Park in the hidden truth)."
+case_249,clue_relevance,2,"Rumpled fabric is found at both Elder Park and Quiet Residence, but nothing ties it to a specific person; no character descriptions are given to match it against."
+case_249,npc_identity_memory_consistency,2,"Characters volunteer self-incriminating statements, e.g. Gus: “I was seen near the loc_residence at minute 7, acting nervous.” People wouldn’t offer this about themselves."
+case_249,solvability_human,2,"From the player view I suspected Hana or Ravi (Ravi most, “walking quickly away”); the real culprit is Sana, so my guess was wrong. No witness statements confirm anyone’s whereabouts, so there’s no way to check who is lying and who is telling the truth."
+case_249,narrative_quality,2,"internal names are used e.g. At Elder Park (examine): “Something is out of place — signs of a rushed exit from the loc_park.” and At Quiet Residence (examine): “A freshly swept step hints at a hurried exit from the loc_residence, possibly by the npc_shepherd.” Also Characters volunteer their own nervousness and suspicious behaviour (e.g. “I was seen near the loc_park at minute 2, acting nervous”), which reads unnaturally."
+case_339,logical_consistency,2,"stolen item mismatch in title and one liner; The Stolen leather ledger, A theft of silver locket disrupts the quiet routine of the town."
+case_339,mystery_coherence,5,"Coherent: every character’s account matches, except the culprit’s."
+case_339,clue_relevance,3,"No details hint at the culprit: “At the Reading House, a physical trace: theft trace.” and “Omar recalls a document detail: hidden record.”"
+case_339,npc_identity_memory_consistency,5,Memories fit the characters’ roles.
+case_339,solvability_human,5,"Guessed Lena: she claims to have been at the Copper Kettle Cafe with witnesses, but the clues confirm everyone else’s location (Omar at the cafe, Mira at the market, Gus and Piotr at the parking lot) and nobody confirms hers. Correct according to the Hidden truth (culprit: Lena)."
+case_339,narrative_quality,4,"[RATER TO CHECK: the quoted examples ('loc_library', 'npc_baker') are from case 979; they do not appear in case 339. Your earlier note for case 339 was 'good for this one'.] (as entered: only problem is internal name use, Internal values shown to the player again, e.g. “signs of a rushed exit from the loc_library” and “someone thinks the npc_baker is involved”.)"
+case_979,logical_consistency,3,"Title, intro and Hidden truth agree: silver locket, Old Library"
+case_979,mystery_coherence,3,"[RATER TO COMPLETE: reading the Hidden truth, do culprit, method and motive fit together?] (as entered: Title, intro and Hidden truth agree: silver locket, Old Library.)"
+case_979,clue_relevance,1,"Clues are vague and name no one, e.g. “A loose rumour that may or may not matter: people have been seen near this location.”"
+case_979,npc_identity_memory_consistency,4,nothing odd
+case_979,solvability_human,1,"Nothing solid in the clues or NPC statements; no one is named, so I couldn’t identify the culprit from the player view. Hidden truth: culprit is Sana."
+case_979,narrative_quality,3,"Internal values shown to the player again, e.g. “signs of a rushed exit from the loc_library”, “someone thinks the npc_baker is involved”."

@@ -1,0 +1,25 @@
+{
+  "selection": "matched seeds [1, 2]: every staged bundle that succeeded + the first successful 1B bundle with the same seed",
+  "cases": {
+    "case_124": {
+      "run_id": "e1_fast_cold__g0__00_s1",
+      "route": "fast",
+      "seed": 1
+    },
+    "case_339": {
+      "run_id": "e1_fast_cold__g1__00_s2",
+      "route": "fast",
+      "seed": 2
+    },
+    "case_979": {
+      "run_id": "e2_staged__g0__00_s1",
+      "route": "staged",
+      "seed": 1
+    },
+    "case_249": {
+      "run_id": "e2_staged__g1__00_s2",
+      "route": "staged",
+      "seed": 2
+    }
+  }
+}

@@ -1,4 +1,4 @@
-# Analysis summary (2026-11-17T14:59:32+00:00)
+# Analysis summary (2026-11-17T17:39:32+00:00)
 
 git commit `852e104ff215a6ff7f3bb241af99b6ac7e93ffed` (dirty=False); CPU Intel64 Family 6 Model 154 Stepping 4, GenuineIntel, 10 physical / 12 logical cores, RAM 31.69 GB, on battery=False
 - fast: `Llama-3.2-1B-Instruct.Q4_K_M.gguf` sha256 match=True threads=11 temp=0.6
@@ -57,6 +57,7 @@ git commit `852e104ff215a6ff7f3bb241af99b6ac7e93ffed` (dirty=False); CPU Intel64
 | e2_staged__g0__00_s1 | cold | ok | 692.1631 | 3.4126 | 688.6695 | 0.0811 | 3656 | 5.309 | 3547.8 | staged | – | True | 0 | True | – |
 | e2_staged__g1__00_s2 | cold | ok | 623.1616 | 2.6024 | 620.4923 | 0.0669 | 3245 | 5.23 | 3544.0 | staged | – | True | 0 | True | – |
 | e2_staged__g2__00_s3 | cold | failed | – | 2.7469 | 628.0414 | – | 3063 | 4.877 | 3540.2 | – | – | – | – | – | – |
+| e3_staged_repeat__g0__00_s1 | cold | ok | 1363.3039 | 1.5091 | 1361.7258 | 0.069 | 3656 | 2.685 | 3547.0 | staged | – | True | 0 | True | – |
 
 ## Outcome counts per step (nothing excluded)
 
@@ -64,6 +65,7 @@ git commit `852e104ff215a6ff7f3bb241af99b6ac7e93ffed` (dirty=False); CPU Intel64
 - **e1_fast_warm**: 31 records -> {'ok': 31}
 - **e2_staged**: 3 records -> {'ok': 2, 'failed': 1}
 - **e3_fast_repeat**: 10 records -> {'ok': 10}
+- **e3_staged_repeat**: 1 records -> {'ok': 1}
 
 ## Descriptive statistics (successful, non-warm-up runs)
 
@@ -99,6 +101,13 @@ SD is shown only for n ≥ 2; treat any statistic with n < 5 as a case study, no
 | staged | cold | e2_staged | output_tokens | 2 | 3450.5 | 3450.5 | 290.621 | 3245 | 3656 |
 | staged | cold | e2_staged | tok_per_s | 2 | 5.27 | 5.27 | 0.056 | 5.23 | 5.309 |
 | staged | cold | e2_staged | rss_peak_mb | 2 | 3545.9 | 3545.9 | 2.687 | 3544.0 | 3547.8 |
+| staged | cold | e3_staged_repeat | e2e_s | 1 | 1363.304 | 1363.304 | – | 1363.304 | 1363.304 |
+| staged | cold | e3_staged_repeat | load_s | 1 | 1.509 | 1.509 | – | 1.509 | 1.509 |
+| staged | cold | e3_staged_repeat | infer_s | 1 | 1361.726 | 1361.726 | – | 1361.726 | 1361.726 |
+| staged | cold | e3_staged_repeat | python_s | 1 | 0.069 | 0.069 | – | 0.069 | 0.069 |
+| staged | cold | e3_staged_repeat | output_tokens | 1 | 3656.0 | 3656 | – | 3656 | 3656 |
+| staged | cold | e3_staged_repeat | tok_per_s | 1 | 2.685 | 2.685 | – | 2.685 | 2.685 |
+| staged | cold | e3_staged_repeat | rss_peak_mb | 1 | 3547.0 | 3547.0 | – | 3547.0 | 3547.0 |
 
 ## 1B blueprint provenance
 
@@ -115,6 +124,7 @@ SD is shown only for n ≥ 2; treat any statistic with n < 5 as a case study, no
 | fast | 3 | 5 | 2 | 2 | (9.41, 9.95) |
 | fast | 4 | 2 | 2 | 2 | (8.45, 9.77) |
 | fast | 5 | 2 | 2 | 2 | (7.65, 8.97) |
+| staged | 1 | 2 | 1 | see raw/ | (692.16, 1363.3) |
 
 ## Does the seed change the mystery? (e1_fast_warm)
 

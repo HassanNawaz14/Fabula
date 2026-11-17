@@ -222,5 +222,61 @@
     "sd": 2.687,
     "min": 3544.0,
     "max": 3547.8
+  },
+  "staged|cold|e3_staged_repeat|e2e_s": {
+    "n": 1,
+    "mean": 1363.304,
+    "median": 1363.304,
+    "sd": null,
+    "min": 1363.304,
+    "max": 1363.304
+  },
+  "staged|cold|e3_staged_repeat|load_s": {
+    "n": 1,
+    "mean": 1.509,
+    "median": 1.509,
+    "sd": null,
+    "min": 1.509,
+    "max": 1.509
+  },
+  "staged|cold|e3_staged_repeat|infer_s": {
+    "n": 1,
+    "mean": 1361.726,
+    "median": 1361.726,
+    "sd": null,
+    "min": 1361.726,
+    "max": 1361.726
+  },
+  "staged|cold|e3_staged_repeat|python_s": {
+    "n": 1,
+    "mean": 0.069,
+    "median": 0.069,
+    "sd": null,
+    "min": 0.069,
+    "max": 0.069
+  },
+  "staged|cold|e3_staged_repeat|output_tokens": {
+    "n": 1,
+    "mean": 3656.0,
+    "median": 3656,
+    "sd": null,
+    "min": 3656,
+    "max": 3656
+  },
+  "staged|cold|e3_staged_repeat|tok_per_s": {
+    "n": 1,
+    "mean": 2.685,
+    "median": 2.685,
+    "sd": null,
+    "min": 2.685,
+    "max": 2.685
+  },
+  "staged|cold|e3_staged_repeat|rss_peak_mb": {
+    "n": 1,
+    "mean": 3547.0,
+    "median": 3547.0,
+    "sd": null,
+    "min": 3547.0,
+    "max": 3547.0
   }
 }

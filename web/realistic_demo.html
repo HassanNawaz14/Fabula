@@ -2149,6 +2149,30 @@
           </button>
         </div>
 
+        <!-- Render Resolution Scale -->
+        <div style="margin-top: 10px; margin-bottom: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span style="font-family: 'Cinzel', serif; font-size: 11px; color: var(--gold-bright); letter-spacing: 1px;">
+              RENDER RESOLUTION SCALE
+            </span>
+            <span class="speed-val-badge" id="resScaleBadge">1.0x (Native)</span>
+          </div>
+          <div class="gen-chip-group" style="margin-bottom: 0; grid-template-columns: repeat(3, 1fr);">
+            <div class="gen-chip selected" id="resChip10" onclick="setResolutionScale(1.0)">
+              <span style="font-weight: 700; color: #f8fafc; font-size: 12px;">1.0x Native</span>
+              <span style="font-size: 9.5px; color: var(--text-muted);">Crisp 1080p/Retina</span>
+            </div>
+            <div class="gen-chip" id="resChip085" onclick="setResolutionScale(0.85)">
+              <span style="font-weight: 700; color: var(--gold-bright); font-size: 12px;">0.85x Smooth</span>
+              <span style="font-size: 9.5px; color: var(--text-muted);">Locked 60 FPS Boost</span>
+            </div>
+            <div class="gen-chip" id="resChip070" onclick="setResolutionScale(0.70)">
+              <span style="font-weight: 700; color: #38bdf8; font-size: 12px;">0.70x Max FPS</span>
+              <span style="font-size: 9.5px; color: var(--text-muted);">Low-End / Iris Xe</span>
+            </div>
+          </div>
+        </div>
+
         <div style="font-family: 'Courier Prime', monospace; font-size: 11px; color: var(--text-muted); background: rgba(0,0,0,0.3); border: 1px solid rgba(212, 163, 89, 0.2); border-radius: 8px; padding: 10px 14px; display: flex; justify-content: space-between; align-items: center;">
           <div class="perf-banner" id="perfBanner" style="position: static; padding: 0; background: transparent; border: none;">
             <div class="perf-dot" id="perfDot"></div>
@@ -2344,6 +2368,7 @@
 
     let isFollowCam = true;
     window.detectiveSpeedMultiplier = 1.0;
+    window.renderResolutionScale = 1.0;
     let currentSceneId = 'TOWN';
     let isTransitioning = false;
     let fireLight = null;
@@ -3854,22 +3879,26 @@
       return g;
     }
 
-    // 19. Floating Dust Motes
+    // 19. Floating Dust Motes (Single-draw-call InstancedMesh)
     function buildDustParticles(count, areaX, areaY, areaZ, parentGroup) {
       const pMat = new THREE.MeshBasicMaterial({ color: 0xfde047, transparent: true, opacity: 0.38 });
       const pGeo = new THREE.SphereGeometry(0.035, 4, 4);
+      const dustMesh = new THREE.InstancedMesh(pGeo, pMat, count);
+      const dummy = new THREE.Object3D();
+      const motes = [];
 
       for (let i = 0; i < count; i++) {
-        const p = new THREE.Mesh(pGeo, pMat);
-        p.position.set(
-          (Math.random() - 0.5) * areaX,
-          1.0 + Math.random() * areaY,
-          (Math.random() - 0.5) * areaZ
-        );
-        p.userData = { offset: Math.random() * Math.PI * 2 };
-        parentGroup.add(p);
-        window.activeDustMotes.push(p);
+        const x = (Math.random() - 0.5) * areaX;
+        const y = 1.0 + Math.random() * areaY;
+        const z = (Math.random() - 0.5) * areaZ;
+        dummy.position.set(x, y, z);
+        dummy.updateMatrix();
+        dustMesh.setMatrixAt(i, dummy.matrix);
+        motes.push({ x, y, z, offset: Math.random() * Math.PI * 2 });
       }
+      dustMesh.instanceMatrix.needsUpdate = true;
+      parentGroup.add(dustMesh);
+      window.activeDustMotes.push({ mesh: dustMesh, motes, dummy });
     }
 
     // 20. Coalbrookdale Cast-Iron Garden Bench
@@ -4022,30 +4051,45 @@
         waterPlumeJets.push({ mesh: jet, ang: jAng });
       }
 
-      // Splashing Mist Droplet Particles
-      const splashParticles = [];
+      // Splashing Mist Droplet Particles (Batch Instanced for zero draw-call overhead)
       const splashMat = new THREE.MeshBasicMaterial({ color: 0xbfdbfe, transparent: true, opacity: 0.8 });
-      for (let p = 0; p < 28; p++) {
-        const drop = new THREE.Mesh(new THREE.DodecahedronGeometry(0.035, 0), splashMat);
+      const dropCount = 28;
+      const dropGeo = new THREE.DodecahedronGeometry(0.035, 0);
+      const splashInstanced = new THREE.InstancedMesh(dropGeo, splashMat, dropCount);
+      const splashDummy = new THREE.Object3D();
+      const splashData = [];
+
+      for (let p = 0; p < dropCount; p++) {
         const pAng = Math.random() * Math.PI * 2;
         const pRad = 0.8 + Math.random() * (radius * 0.55);
-        drop.position.set(Math.sin(pAng) * pRad, 0.65 + Math.random() * 0.4, Math.cos(pAng) * pRad);
-        drop.userData = {
+        const px = Math.sin(pAng) * pRad;
+        const py = 0.65 + Math.random() * 0.4;
+        const pz = Math.cos(pAng) * pRad;
+        splashDummy.position.set(px, py, pz);
+        splashDummy.updateMatrix();
+        splashInstanced.setMatrixAt(p, splashDummy.matrix);
+        splashData.push({
+          x: px,
+          y: py,
+          z: pz,
           vx: (Math.random() - 0.5) * 0.8,
           vy: 1.2 + Math.random() * 1.4,
           vz: (Math.random() - 0.5) * 0.8,
-          baseY: 0.65
-        };
-        g.add(drop);
-        splashParticles.push(drop);
+          baseY: 0.65,
+          radius: radius
+        });
       }
+      splashInstanced.instanceMatrix.needsUpdate = true;
+      g.add(splashInstanced);
 
       activeFountains.push({
         group: g,
         rippleRings,
         cascades,
         waterPlumeJets,
-        splashParticles
+        splashInstanced,
+        splashData,
+        splashDummy
       });
 
       return g;
@@ -4489,14 +4533,19 @@
       addTownLamp(5.5, 2.5);
       addTownLamp(-6.5, 9.5);
 
-      // Rain Particles
+      // Rain Particles (Batch instanced into 1 single draw call for locked 60 FPS)
       const rainMat = new THREE.MeshBasicMaterial({ color: 0x93c5fd, transparent: true, opacity: 0.55 });
       const dropGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.7, 4);
-      for (let i = 0; i < 280; i++) {
-        const drop = new THREE.Mesh(dropGeo, rainMat);
-        drop.position.set((Math.random() - 0.5) * 45, Math.random() * 20, (Math.random() - 0.5) * 45);
-        rainGroup.add(drop);
+      const rainCount = 280;
+      const rainMesh = new THREE.InstancedMesh(dropGeo, rainMat, rainCount);
+      const dummyRain = new THREE.Object3D();
+      for (let i = 0; i < rainCount; i++) {
+        dummyRain.position.set((Math.random() - 0.5) * 45, Math.random() * 20, (Math.random() - 0.5) * 45);
+        dummyRain.updateMatrix();
+        rainMesh.setMatrixAt(i, dummyRain.matrix);
       }
+      rainMesh.instanceMatrix.needsUpdate = true;
+      rainGroup.add(rainMesh);
     }
 
     // 2. GRAND ARCHIVAL ATHENAEUM LIBRARY (INSIDE)
@@ -5200,6 +5249,11 @@
 
         detective.root.position.set(spawnX, 0, spawnZ);
         detective.root.rotation.y = 0;
+        window.playerVelX = 0;
+        window.playerVelZ = 0;
+        if (currentPreset === 'balanced') {
+          renderer.shadowMap.needsUpdate = true;
+        }
 
         document.getElementById('locDisplay').innerText = label;
         syncMoveToBackend(targetSceneId);
@@ -5212,6 +5266,32 @@
     }
 
     let currentPreset = 'turbo';
+    window.setResolutionScale = function(scale) {
+      window.renderResolutionScale = parseFloat(scale);
+      renderer.setPixelRatio(window.renderResolutionScale);
+      renderer.setSize(window.innerWidth, window.innerHeight);
+
+      ['resChip10', 'resChip085', 'resChip070'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.remove('selected');
+      });
+
+      const badge = document.getElementById('resScaleBadge');
+      if (Math.abs(scale - 1.0) < 0.05) {
+        const el = document.getElementById('resChip10');
+        if (el) el.classList.add('selected');
+        if (badge) badge.innerText = '1.0x (Native)';
+      } else if (Math.abs(scale - 0.85) < 0.05) {
+        const el = document.getElementById('resChip085');
+        if (el) el.classList.add('selected');
+        if (badge) badge.innerText = '0.85x (Smooth Boost)';
+      } else {
+        const el = document.getElementById('resChip070');
+        if (el) el.classList.add('selected');
+        if (badge) badge.innerText = '0.70x (Max FPS)';
+      }
+    };
+
     window.applyPreset = function(preset) {
       currentPreset = preset;
       document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
@@ -5229,16 +5309,21 @@
       if (preset === 'turbo') {
         renderer.shadowMap.enabled = false;
         moonLight.castShadow = false;
-        statusText = 'Status: Locked 60 FPS (Zero Shadow Passes + Room Culling)';
+        setResolutionScale(window.renderResolutionScale || 1.0);
+        statusText = 'Status: Locked 60 FPS (Zero Shadow Passes + Instanced Particles + Dynamic Delta)';
       } else if (preset === 'balanced') {
         renderer.shadowMap.enabled = true;
         renderer.shadowMap.type = THREE.PCFShadowMap;
+        renderer.shadowMap.autoUpdate = false;
+        renderer.shadowMap.needsUpdate = true;
         moonLight.castShadow = true;
-        statusText = 'Status: Balanced Realism (Fast 512p Shadows)';
+        setResolutionScale(window.renderResolutionScale || 1.0);
+        statusText = 'Status: Balanced Realism (Static 512p Shadow Baking)';
       } else {
         renderer.shadowMap.enabled = false;
         moonLight.castShadow = false;
-        statusText = 'Status: Potato Mode (Basic Shapes)';
+        setResolutionScale(0.70);
+        statusText = 'Status: Potato Mode (0.70x Resolution + Minimum Fillrate)';
       }
       if (perfStatus) perfStatus.innerText = statusText;
       if (settingsPerfStatus) settingsPerfStatus.innerText = statusText;
@@ -6323,6 +6408,7 @@
       .then(res => res.json())
       .then(data => {
         gameState = data;
+        updateCachedLocationLabels();
         document.getElementById('caseBrandTitle').innerText = `Fabula: ${data.scenario.title}`;
         document.getElementById('caseTownBadge').innerText = `${data.scenario.town_name} (${data.scenario.mystery_type.toUpperCase()})`;
         startTimerCountdown(data.time_remaining_seconds);
@@ -6481,6 +6567,22 @@
     const promptBox = document.getElementById('actionPrompt');
     const promptText = document.getElementById('actionPromptText');
 
+    const cachedDoorLabels = {
+      LIBRARY: 'Grand Archival Library',
+      MANOR: 'Blackwood Manor',
+      PARK: 'Municipal Park',
+      MARKET: 'Wharfside Market'
+    };
+
+    function updateCachedLocationLabels() {
+      if (gameState && gameState.locations) {
+        gameState.locations.forEach(l => {
+          const s = mapLocationIdToScene(l.id);
+          if (s) cachedDoorLabels[s] = l.name;
+        });
+      }
+    }
+
     function checkProximity() {
       if (isTransitioning) return;
       const px = detective.root.position.x;
@@ -6488,21 +6590,16 @@
 
       activeAction = null;
 
-      // 1. Dynamic Doorways
+      // 1. Dynamic Doorways (Zero allocations with pre-cached location labels)
       if (currentSceneId === 'TOWN') {
-        const libLoc = (gameState && gameState.locations) ? gameState.locations.find(l => mapLocationIdToScene(l.id) === 'LIBRARY') : null;
-        const manorLoc = (gameState && gameState.locations) ? gameState.locations.find(l => mapLocationIdToScene(l.id) === 'MANOR') : null;
-        const parkLoc = (gameState && gameState.locations) ? gameState.locations.find(l => mapLocationIdToScene(l.id) === 'PARK') : null;
-        const marketLoc = (gameState && gameState.locations) ? gameState.locations.find(l => mapLocationIdToScene(l.id) === 'MARKET') : null;
-
         if (Math.hypot(px - 0, pz - (-6.5)) < 2.6) {
-          activeAction = { type: 'DOOR', target: 'LIBRARY', x: 0, z: 6.0, label: libLoc ? libLoc.name : 'Grand Archival Library', prompt: 'Enter ' + (libLoc ? libLoc.name : 'Grand Library') };
+          activeAction = { type: 'DOOR', target: 'LIBRARY', x: 0, z: 6.0, label: cachedDoorLabels.LIBRARY, prompt: 'Enter ' + cachedDoorLabels.LIBRARY };
         } else if (Math.hypot(px - 11.8, pz - 1.0) < 2.6) {
-          activeAction = { type: 'DOOR', target: 'MANOR', x: 0, z: 5.5, label: manorLoc ? manorLoc.name : 'Blackwood Manor', prompt: 'Enter ' + (manorLoc ? manorLoc.name : 'Blackwood Manor') };
+          activeAction = { type: 'DOOR', target: 'MANOR', x: 0, z: 5.5, label: cachedDoorLabels.MANOR, prompt: 'Enter ' + cachedDoorLabels.MANOR };
         } else if (Math.hypot(px - (-12.8), pz - (-1.0)) < 2.6) {
-          activeAction = { type: 'DOOR', target: 'PARK', x: 0, z: 10.0, label: parkLoc ? parkLoc.name : 'Municipal Park', prompt: 'Enter ' + (parkLoc ? parkLoc.name : 'Municipal Park') };
+          activeAction = { type: 'DOOR', target: 'PARK', x: 0, z: 10.0, label: cachedDoorLabels.PARK, prompt: 'Enter ' + cachedDoorLabels.PARK };
         } else if (Math.hypot(px - (-5.0), pz - 12.8) < 2.6) {
-          activeAction = { type: 'DOOR', target: 'MARKET', x: 0, z: 8.0, label: marketLoc ? marketLoc.name : 'Wharfside Market', prompt: 'Enter ' + (marketLoc ? marketLoc.name : 'Wharfside Market') };
+          activeAction = { type: 'DOOR', target: 'MARKET', x: 0, z: 8.0, label: cachedDoorLabels.MARKET, prompt: 'Enter ' + cachedDoorLabels.MARKET };
         }
       } else if (currentSceneId === 'LIBRARY') {
         if (Math.hypot(px - 0, pz - 7.5) < 2.6) {
@@ -7137,12 +7234,20 @@
     // =========================================================================
     let lastTime = performance.now();
     let frameCount = 0;
+    let lastAnimTime = performance.now();
     let walkTimer = 0;
     let stepSoundTimer = 0;
     const fpsMeter = document.getElementById('fpsMeter');
 
     function animate(now) {
       requestAnimationFrame(animate);
+
+      // 1. True Framerate-Independent Delta Time
+      const rawDt = (now - lastAnimTime) * 0.001;
+      lastAnimTime = now;
+      // Clamped to 1ms minimum, 50ms maximum (prevents physics explosion or tunneling on frame hitch/tab switch)
+      const dt = Math.min(Math.max(rawDt, 0.001), 0.05);
+      const elapsed = now * 0.001;
 
       frameCount++;
       if (now - lastTime >= 1000) {
@@ -7159,9 +7264,6 @@
         frameCount = 0;
         lastTime = now;
       }
-
-      const dt = 0.016;
-      const elapsed = now * 0.001;
 
       // Animate Grandfather Clock Pendulum
       if (pendulumMesh && currentSceneId === 'MANOR') {
@@ -7181,22 +7283,41 @@
 
       // Animate Gramophone Turntable
       if (window.gramophoneVinylMesh && AudioEngine.gramophonePlaying && currentSceneId === 'MANOR') {
-        window.gramophoneVinylMesh.rotation.y += 0.08;
+        window.gramophoneVinylMesh.rotation.y += 5.0 * dt;
       }
 
-      // Animate Floating Dust Motes
-      if (window.activeDustMotes && (currentSceneId === 'LIBRARY' || currentSceneId === 'MANOR')) {
-        window.activeDustMotes.forEach(p => {
-          p.position.y += Math.sin(elapsed * 1.5 + p.userData.offset) * 0.002;
-          p.position.x += Math.cos(elapsed * 0.8 + p.userData.offset) * 0.0015;
+      // Animate Floating Dust Motes (Single-draw-call InstancedMesh)
+      if (window.activeDustMotes.length > 0 && (currentSceneId === 'LIBRARY' || currentSceneId === 'MANOR')) {
+        window.activeDustMotes.forEach(system => {
+          if (!system.mesh.parent || !system.mesh.parent.visible) return;
+          const { mesh, motes, dummy } = system;
+          for (let i = 0; i < motes.length; i++) {
+            const m = motes[i];
+            const dy = Math.sin(elapsed * 1.5 + m.offset) * 0.08;
+            const dx = Math.cos(elapsed * 0.8 + m.offset) * 0.05;
+            dummy.position.set(m.x + dx, m.y + dy, m.z);
+            dummy.updateMatrix();
+            mesh.setMatrixAt(i, dummy.matrix);
+          }
+          mesh.instanceMatrix.needsUpdate = true;
         });
       }
 
-      // Animate Dynamic Clues & NPC diamonds
+      // Animate Dynamic Clues & Distance-Gated PointLights
+      const px = detective && detective.root ? detective.root.position.x : 0;
+      const pz = detective && detective.root ? detective.root.position.z : 0;
+
       dynamicClues.forEach(clue => {
         if (clue.sceneId === currentSceneId && clue.clueMesh) {
           clue.clueMesh.rotation.y += dt * 1.5;
           clue.clueMesh.position.y = 0.25 + Math.sin(elapsed * 3) * 0.06;
+          // Performance Culling: Clue light is ONLY active when player is within 4m of this specific clue!
+          if (clue.clueLight) {
+            const dist = Math.hypot(px - clue.position.x, pz - clue.position.z);
+            clue.clueLight.visible = (dist < 4.0 && !clue.collected);
+          }
+        } else if (clue.clueLight) {
+          clue.clueLight.visible = false;
         }
       });
 
@@ -7207,10 +7328,12 @@
         }
       });
 
-      // Animate Realistic Fountains
-      if (activeFountains.length > 0) {
+      // Animate Realistic Fountains (Instanced droplets + ring phase)
+      if (activeFountains.length > 0 && (currentSceneId === 'TOWN' || currentSceneId === 'PARK')) {
         activeFountains.forEach(f => {
           if (!f.group.parent || !f.group.parent.visible) return;
+          const fDist = Math.hypot(px - f.group.position.x, pz - f.group.position.z);
+          if (fDist > 32) return;
 
           f.rippleRings.forEach(ring => {
             ring.userData.phase = (ring.userData.phase + dt * 0.65) % 1.0;
@@ -7229,31 +7352,39 @@
             st.material.opacity = 0.65 + Math.sin(elapsed * 8 + idx * 1.5) * 0.2;
           });
 
-          f.splashParticles.forEach(drop => {
-            drop.position.y += drop.userData.vy * dt;
-            drop.position.x += drop.userData.vx * dt;
-            drop.position.z += drop.userData.vz * dt;
-            drop.userData.vy -= 9.8 * dt;
+          if (f.splashInstanced && f.splashData) {
+            const dummy = f.splashDummy;
+            for (let i = 0; i < f.splashData.length; i++) {
+              const d = f.splashData[i];
+              d.y += d.vy * dt;
+              d.x += d.vx * dt;
+              d.z += d.vz * dt;
+              d.vy -= 9.8 * dt;
 
-            if (drop.position.y < drop.userData.baseY) {
-              drop.position.y = drop.userData.baseY;
-              const pAng = Math.random() * Math.PI * 2;
-              const pRad = 0.6 + Math.random() * 1.8;
-              drop.position.x = Math.sin(pAng) * pRad;
-              drop.position.z = Math.cos(pAng) * pRad;
-              drop.userData.vy = 1.1 + Math.random() * 1.5;
-              drop.userData.vx = (Math.random() - 0.5) * 0.6;
-              drop.userData.vz = (Math.random() - 0.5) * 0.6;
+              if (d.y < d.baseY) {
+                d.y = d.baseY;
+                const pAng = Math.random() * Math.PI * 2;
+                const pRad = 0.6 + Math.random() * (d.radius * 0.55);
+                d.x = Math.sin(pAng) * pRad;
+                d.z = Math.cos(pAng) * pRad;
+                d.vy = 1.1 + Math.random() * 1.5;
+                d.vx = (Math.random() - 0.5) * 0.6;
+                d.vz = (Math.random() - 0.5) * 0.6;
+              }
+              dummy.position.set(d.x, d.y, d.z);
+              dummy.updateMatrix();
+              f.splashInstanced.setMatrixAt(i, dummy.matrix);
             }
-          });
+            f.splashInstanced.instanceMatrix.needsUpdate = true;
+          }
         });
       }
 
-      // Wind & Rain Simulation
+      // Wind & Rain Simulation (Framerate-independent with dt)
       const windForce = WEATHER_PRESETS[currentWeatherKey].wind;
       if (rainGroup.visible) {
-        rainGroup.position.y -= 0.35;
-        rainGroup.position.x += windForce * 0.05;
+        rainGroup.position.y -= 22.0 * dt;
+        rainGroup.position.x += windForce * 3.0 * dt;
         if (rainGroup.position.y < -15) {
           rainGroup.position.y = 0;
           rainGroup.position.x = 0;
@@ -7309,13 +7440,15 @@
         const targetVelX = (len > 0) ? (moveX / len) * targetMaxSpeed : 0;
         const targetVelZ = (len > 0) ? (moveZ / len) * targetMaxSpeed : 0;
 
-        playerVelX = THREE.MathUtils.lerp(playerVelX, targetVelX, isMoving ? 0.22 : 0.14);
-        playerVelZ = THREE.MathUtils.lerp(playerVelZ, targetVelZ, isMoving ? 0.22 : 0.14);
+        // Exponential decay lerp - perfectly smooth and identical response across 30, 60, or 120 FPS
+        const lerpFactor = 1.0 - Math.exp(-(isMoving ? 14.0 : 9.0) * dt);
+        playerVelX = THREE.MathUtils.lerp(playerVelX, targetVelX, lerpFactor);
+        playerVelZ = THREE.MathUtils.lerp(playerVelZ, targetVelZ, lerpFactor);
         window.playerVelX = playerVelX;
         window.playerVelZ = playerVelZ;
 
         const currentSpeed = Math.hypot(playerVelX, playerVelZ);
-        const hasMomentum = currentSpeed > 0.15;
+        const hasMomentum = currentSpeed > 0.08;
 
         if (hasMomentum) {
           const dx = playerVelX * dt;
@@ -7381,7 +7514,8 @@
           let angDiff = targetRotY - detective.root.rotation.y;
           while (angDiff < -Math.PI) angDiff += Math.PI * 2;
           while (angDiff > Math.PI) angDiff -= Math.PI * 2;
-          detective.root.rotation.y += angDiff * 0.18;
+          const rotFactor = 1.0 - Math.exp(-14.0 * dt);
+          detective.root.rotation.y += angDiff * rotFactor;
 
           // Natural stride frequency and leg swing
           const strideRate = isSprinting ? 18.0 : 13.0;
@@ -7422,19 +7556,20 @@
           }
         } else {
           walkTimer += dt * 2.2;
-          detective.leftLeg.rotation.x = THREE.MathUtils.lerp(detective.leftLeg.rotation.x, 0, 0.15);
-          detective.rightLeg.rotation.x = THREE.MathUtils.lerp(detective.rightLeg.rotation.x, 0, 0.15);
-          if (detective.leftKnee) detective.leftKnee.rotation.x = THREE.MathUtils.lerp(detective.leftKnee.rotation.x, 0, 0.15);
-          if (detective.rightKnee) detective.rightKnee.rotation.x = THREE.MathUtils.lerp(detective.rightKnee.rotation.x, 0, 0.15);
-          if (detective.leftArm) detective.leftArm.rotation.x = THREE.MathUtils.lerp(detective.leftArm.rotation.x, 0, 0.15);
-          if (detective.rightArm) detective.rightArm.rotation.x = THREE.MathUtils.lerp(detective.rightArm.rotation.x, 0, 0.15);
+          const idleFactor = 1.0 - Math.exp(-10.0 * dt);
+          detective.leftLeg.rotation.x = THREE.MathUtils.lerp(detective.leftLeg.rotation.x, 0, idleFactor);
+          detective.rightLeg.rotation.x = THREE.MathUtils.lerp(detective.rightLeg.rotation.x, 0, idleFactor);
+          if (detective.leftKnee) detective.leftKnee.rotation.x = THREE.MathUtils.lerp(detective.leftKnee.rotation.x, 0, idleFactor);
+          if (detective.rightKnee) detective.rightKnee.rotation.x = THREE.MathUtils.lerp(detective.rightKnee.rotation.x, 0, idleFactor);
+          if (detective.leftArm) detective.leftArm.rotation.x = THREE.MathUtils.lerp(detective.leftArm.rotation.x, 0, idleFactor);
+          if (detective.rightArm) detective.rightArm.rotation.x = THREE.MathUtils.lerp(detective.rightArm.rotation.x, 0, idleFactor);
           if (detective.upperBody) {
-            detective.upperBody.rotation.z = THREE.MathUtils.lerp(detective.upperBody.rotation.z, 0, 0.15);
-            detective.upperBody.rotation.y = THREE.MathUtils.lerp(detective.upperBody.rotation.y, 0, 0.15);
+            detective.upperBody.rotation.z = THREE.MathUtils.lerp(detective.upperBody.rotation.z, 0, idleFactor);
+            detective.upperBody.rotation.y = THREE.MathUtils.lerp(detective.upperBody.rotation.y, 0, idleFactor);
             detective.upperBody.position.y = Math.sin(walkTimer) * 0.016;
           }
           if (detective.coatHem) {
-            detective.coatHem.rotation.x = THREE.MathUtils.lerp(detective.coatHem.rotation.x, 0, 0.15);
+            detective.coatHem.rotation.x = THREE.MathUtils.lerp(detective.coatHem.rotation.x, 0, idleFactor);
             detective.coatHem.rotation.z = Math.sin(elapsed * 4) * windForce * 0.02;
           }
           if (detective.neck) {
@@ -7442,14 +7577,15 @@
           }
         }
 
-        // Smooth Isometric Follow Camera
+        // Smooth Isometric Follow Camera (Exponential decay tracking)
         if (isFollowCam) {
           const targetDistZ = (currentSceneId === 'TOWN' || currentSceneId === 'PARK') ? 10 : 8.5;
           const targetDistY = (currentSceneId === 'TOWN' || currentSceneId === 'PARK') ? 7.5 : 6.2;
+          const camFactor = 1.0 - Math.exp(-5.5 * dt);
 
-          camera.position.x = THREE.MathUtils.lerp(camera.position.x, detective.root.position.x, 0.08);
-          camera.position.z = THREE.MathUtils.lerp(camera.position.z, detective.root.position.z + targetDistZ, 0.08);
-          camera.position.y = THREE.MathUtils.lerp(camera.position.y, detective.root.position.y + targetDistY, 0.08);
+          camera.position.x = THREE.MathUtils.lerp(camera.position.x, detective.root.position.x, camFactor);
+          camera.position.z = THREE.MathUtils.lerp(camera.position.z, detective.root.position.z + targetDistZ, camFactor);
+          camera.position.y = THREE.MathUtils.lerp(camera.position.y, detective.root.position.y + targetDistY, camFactor);
           controls.target.set(detective.root.position.x, 1.6, detective.root.position.z);
         }
 
@@ -7469,6 +7605,7 @@
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
+      renderer.setPixelRatio(window.renderResolutionScale || 1.0);
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>

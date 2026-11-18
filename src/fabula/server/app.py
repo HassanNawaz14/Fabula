@@ -520,9 +520,19 @@ def make_request_handler(
 
             try:
                 runner = state.get_fast_runner() if use_neural else None
+                tone_str = str(tone).lower().strip()
+                if tone_str in ("melodramatic", "melodrama", "dramatic"):
+                    tone_val = Tone.DARK
+                elif tone_str in ("cozy", "gaslight"):
+                    tone_val = Tone.COZY
+                elif tone_str in ("dark", "noir"):
+                    tone_val = Tone.DARK
+                else:
+                    tone_val = Tone.NEUTRAL
+
                 settings = GenerationSettings(
                     mystery_type=SettingsMysteryType(mystery_type),
-                    tone=Tone(tone),
+                    tone=tone_val,
                     difficulty=Difficulty(difficulty),
                 )
                 gen_dir = Path("bundles/web_generated")

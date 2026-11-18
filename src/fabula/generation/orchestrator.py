@@ -424,7 +424,12 @@ def generate_neurosymbolic_bundle(
             raw_dsl = None
 
     if not raw_dsl:
-        sample = generate_synthetic_blueprint_sample(effective_seed)
+        sample = generate_synthetic_blueprint_sample(
+            effective_seed,
+            mystery_type=resolved_type.value,
+            tone=settings.tone.value,
+            difficulty=settings.difficulty.value,
+        )
         raw_dsl = sample["messages"][2]["content"]
 
     _ensure_not_cancelled(token, None)
@@ -439,7 +444,12 @@ def generate_neurosymbolic_bundle(
         if not compiler.verify_solvability(bundle):
             raise ValueError("Candidate elimination solvability proof failed.")
     except Exception:
-        sample = generate_synthetic_blueprint_sample(effective_seed)
+        sample = generate_synthetic_blueprint_sample(
+            effective_seed,
+            mystery_type=resolved_type.value,
+            tone=settings.tone.value,
+            difficulty=settings.difficulty.value,
+        )
         raw_dsl = sample["messages"][2]["content"]
         bp = parse_dsl(raw_dsl)
         compiler = BlueprintCompiler(bp, seed=effective_seed)

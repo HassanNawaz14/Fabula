@@ -46,12 +46,17 @@ KNOWLEDGE:
 """
 
 
-def generate_synthetic_blueprint_sample(seed: int) -> dict[str, Any]:
+def generate_synthetic_blueprint_sample(
+    seed: int,
+    mystery_type: MysteryType | str | None = None,
+    tone: Tone | str | None = None,
+    difficulty: Difficulty | str | None = None,
+) -> dict[str, Any]:
     """Generate a guaranteed-valid blueprint sample using the domain logic generator."""
     rng = random.Random(f"fabula-distillation:{seed}")
-    mtype = rng.choice(list(MysteryType))
-    tone = rng.choice(list(Tone))
-    diff = rng.choice(list(Difficulty))
+    mtype = MysteryType(mystery_type) if mystery_type is not None else rng.choice(list(MysteryType))
+    tone = Tone(tone) if tone is not None else rng.choice(list(Tone))
+    diff = Difficulty(difficulty) if difficulty is not None else rng.choice(list(Difficulty))
 
     content = CONTENT_MAP[mtype]
     crime_type = rng.choice(list(content.CRIME_LOCATION_PREF))

@@ -217,6 +217,10 @@ class ConversationService:
         return ConversationMode.SCRIPTED if self._scripted else ConversationMode.LIVE
 
     @property
+    def provider(self) -> ChatProvider | None:
+        return self._provider
+
+    @property
     def status(self) -> ConversationStatus:
         return ConversationStatus(
             mode=self.mode,
@@ -310,7 +314,8 @@ class ConversationService:
         )
         try:
             response = self._provider.complete(request)
-        except (ProviderTimeout, ProviderError):
+        except (ProviderTimeout, ProviderError) as exc:
+            print(f"[Conversation] Provider error for {identity.name}: {exc}")
             return self._fallback(identity.id, identity.name, text, "provider_error")
 
         if not response.text.strip():

@@ -48,6 +48,53 @@ def build_parser() -> argparse.ArgumentParser:
         default=Path("bundles/latest"),
         help="bundle directory to play (default: bundles/latest)",
     )
+    play.add_argument(
+        "--web",
+        action="store_true",
+        help="launch in 3D web browser mode instead of Pygame",
+    )
+    play.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="host for web server (default: 127.0.0.1)",
+    )
+    play.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="port for web server (default: 8000)",
+    )
+    play.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="do not automatically open the web browser",
+    )
+
+    serve = subparsers.add_parser("serve", help="serve the 3D web experience for a mystery case")
+    serve.add_argument(
+        "--bundle",
+        type=Path,
+        default=Path("bundles/latest"),
+        help="bundle directory to play (default: bundles/latest)",
+    )
+    serve.add_argument(
+        "--host",
+        type=str,
+        default="127.0.0.1",
+        help="host for web server (default: 127.0.0.1)",
+    )
+    serve.add_argument(
+        "--port",
+        type=int,
+        default=8000,
+        help="port for web server (default: 8000)",
+    )
+    serve.add_argument(
+        "--no-browser",
+        action="store_true",
+        help="do not automatically open the web browser",
+    )
     return parser
 
 
@@ -59,6 +106,18 @@ def main(argv: Sequence[str] | None = None) -> int:
             return run_generate(args)
         if args.command == "model" and args.model_command == "check":
             return run_model_check(args)
+        if args.command == "serve" or (args.command == "play" and getattr(args, "web", False)):
+            from fabula.server import run_server
+
+            web_dir = Path("web")
+            run_server(
+                bundle_path=args.bundle,
+                web_dir=web_dir,
+                host=args.host,
+                port=args.port,
+                auto_open=not args.no_browser,
+            )
+            return 0
         if args.command == "play":
             from fabula.conversation import ConversationConfig, create_conversation_service
             from fabula.simulation import Session, load_bundle
@@ -84,3 +143,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     return 2
+
+
+if __name__ == "__main__":
+    sys.exit(main())

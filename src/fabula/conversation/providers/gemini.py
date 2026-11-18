@@ -68,29 +68,84 @@ class GeminiProvider:
     def _headers(self) -> dict[str, str]:
         return {"x-goog-api-key": self._api_key, "content-type": "application/json"}
 
-    def complete(self, request: ProviderRequest) -> ProviderResponse:
+    def verify_connection(self) -> list[str]:
+        """Verify API key and list available models from Google."""
         try:
-            response = self._client.post(
-                self._url("generateContent"),
+            r = self._client.get(
+                "https://generativelanguage.googleapis.com/v1beta/models",
+                params={"key": self._api_key},
                 headers=self._headers(),
-                json=self._payload(request),
-                timeout=self._timeout,
+                timeout=8.0,
             )
-            response.raise_for_status()
-        except httpx.TimeoutException as exc:
-            raise ProviderTimeout("Gemini request timed out") from exc
-        except httpx.HTTPError as exc:
-            raise ProviderError(f"Gemini request failed: {exc}") from exc
-        try:
-            data = response.json()
-        except ValueError as exc:
-            raise ProviderError("Gemini returned invalid JSON") from exc
-        return ProviderResponse(
-            text=_extract_text(data),
-            input_tokens=_usage(data, "promptTokenCount"),
-            output_tokens=_usage(data, "candidatesTokenCount"),
-            model=self.model,
+            if r.status_code == 200:
+                data = r.json()
+                models = [
+                    m.get("name", "").removeprefix("models/")
+                    for m in data.get("models", [])
+                    if "generateContent" in m.get("supportedGenerationMethods", [])
+                ]
+                chat_models = [
+                    m
+                    for m in models
+                    if not any(x in m for x in ("tts", "image", "embedding", "clip"))
+                ]
+                return chat_models if chat_models else models
+            print(f"[Gemini Verify Error {r.status_code}]: {r.text}")
+        except Exception as exc:
+            print(f"[Gemini Verify Exception]: {exc}")
+        return []
+
+    def complete(self, request: ProviderRequest) -> ProviderResponse:
+        models_to_try = [request.model or self.model]
+        candidates = (
+            "gemini-flash-lite-latest",
+            "gemini-flash-latest",
+            "gemini-3.5-flash-lite",
+            "gemini-3.8-flash",
+            "gemini-1.5-flash",
         )
+        for candidate in candidates:
+            if candidate not in models_to_try:
+                models_to_try.append(candidate)
+
+        last_error: Exception | None = None
+        for idx, model_name in enumerate(models_to_try):
+            url = f"{_BASE_URL}/{quote(model_name, safe='')}:generateContent"
+            try:
+                response = self._client.post(
+                    url,
+                    params={"key": self._api_key},
+                    headers=self._headers(),
+                    json=self._payload(request),
+                    timeout=self._timeout,
+                )
+                if response.status_code in (404, 503) and idx < len(models_to_try) - 1:
+                    continue
+                response.raise_for_status()
+            except httpx.TimeoutException as exc:
+                raise ProviderTimeout("Gemini request timed out") from exc
+            except httpx.HTTPStatusError as exc:
+                if exc.response.status_code in (404, 503) and idx < len(models_to_try) - 1:
+                    last_error = exc
+                    continue
+                err_detail = exc.response.text if hasattr(exc, "response") else str(exc)
+                raise ProviderError(f"Gemini request failed: {err_detail}") from exc
+            except httpx.HTTPError as exc:
+                raise ProviderError(f"Gemini request failed: {exc}") from exc
+
+            try:
+                data = response.json()
+            except ValueError as exc:
+                raise ProviderError("Gemini returned invalid JSON") from exc
+
+            return ProviderResponse(
+                text=_extract_text(data),
+                input_tokens=_usage(data, "promptTokenCount"),
+                output_tokens=_usage(data, "candidatesTokenCount"),
+                model=model_name,
+            )
+
+        raise ProviderError(f"Gemini request failed: {last_error}")
 
     def stream(self, request: ProviderRequest) -> Iterator[str]:
         url = self._url("streamGenerateContent") + "?alt=sse"

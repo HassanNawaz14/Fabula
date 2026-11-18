@@ -10,7 +10,7 @@ from enum import StrEnum
 from pathlib import Path
 
 DEFAULT_PROVIDER_ORDER = ("gemini", "xai")
-DEFAULT_GEMINI_MODEL = "gemini-2.0-flash"
+DEFAULT_GEMINI_MODEL = "gemini-flash-lite-latest"
 DEFAULT_XAI_MODEL = "grok-3-mini"
 DEFAULT_TOKEN_CAP = 20_000
 DEFAULT_TIMEOUT_SECONDS = 20.0
@@ -68,6 +68,23 @@ def load_api_keys(
     env = os.environ if environ is None else environ
     gemini = env.get("GEMINI_API_KEY") or env.get("GOOGLE_API_KEY")
     xai = env.get("XAI_API_KEY")
+
+    if not gemini and not xai:
+        env_file = Path(".env")
+        if env_file.exists():
+            try:
+                for line in env_file.read_text(encoding="utf-8").splitlines():
+                    line = line.strip()
+                    if line and not line.startswith("#") and "=" in line:
+                        k, v = line.split("=", 1)
+                        k = k.strip()
+                        v = v.strip().strip("'\"")
+                        if k in ("GEMINI_API_KEY", "GOOGLE_API_KEY") and not gemini:
+                            gemini = v
+                        elif k == "XAI_API_KEY" and not xai:
+                            xai = v
+            except OSError:
+                pass
 
     path = keys_file if keys_file is not None else env.get("FABULA_KEYS_FILE")
     if path:

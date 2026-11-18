@@ -5535,10 +5535,10 @@
       const name = (loc.name || '').toLowerCase();
 
       if (type === 'town_square' || type === 'square' || id.includes('square') || id.includes('town')) return 'TOWN';
-      if (type === 'library' || type === 'archives' || id.includes('lib') || name.includes('lib')) return 'LIBRARY';
-      if (type === 'residence' || type === 'manor' || id.includes('manor') || name.includes('manor') || type === 'house') return 'MANOR';
-      if (type === 'park' || type === 'garden' || type === 'cemetery' || id.includes('park') || name.includes('park')) return 'PARK';
-      if (type === 'market' || type === 'docks' || type === 'wharf' || id.includes('market') || name.includes('market')) return 'MARKET';
+      if (type === 'library' || type === 'archives' || type === 'school' || id.includes('lib') || name.includes('lib') || name.includes('reading')) return 'LIBRARY';
+      if (type === 'park' || type === 'garden' || type === 'cemetery' || type === 'green' || id.includes('park') || name.includes('park') || name.includes('green') || name.includes('willow')) return 'PARK';
+      if (type === 'market' || type === 'docks' || type === 'wharf' || type === 'cafe' || type === 'shop' || type === 'store' || type === 'tavern' || type === 'inn' || id.includes('market') || name.includes('market') || id.includes('cafe') || name.includes('cafe')) return 'MARKET';
+      if (type === 'residence' || type === 'manor' || type === 'house' || type === 'parking' || id.includes('manor') || name.includes('manor') || id.includes('lane') || name.includes('lane') || id.includes('parking') || name.includes('parking')) return 'MANOR';
 
       return 'MANOR';
     }
